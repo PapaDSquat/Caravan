@@ -16,11 +16,12 @@ ACaravanActor::ACaravanActor(const class FObjectInitializer& ObjInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	static ConstructorHelpers::FClassFinder<ACaravanBuildingPlatform> buildingPlatformBP(TEXT("/Game/Caravan/Blueprints/Caravan/BP_CaravanBuildingPlatform"));
-	if (buildingPlatformBP.Class != NULL)
-	{
-		BuildingPlatformBPClass = buildingPlatformBP.Class;
-	}
+	//// TODO : Get rid of this shit
+	//static ConstructorHelpers::FClassFinder<ACaravanBuildingPlatform> buildingPlatformBP(TEXT("/Caravan/Content/ThirdPerson/Player/Caravan/BP_CaravanBuildingPlatform"));
+	//if (buildingPlatformBP.Class != NULL)
+	//{
+	//	BuildingPlatformBPClass = buildingPlatformBP.Class;
+	//}
 
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CaravanActor_StaticMeshComponent"));
 }

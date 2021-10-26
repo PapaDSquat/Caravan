@@ -20,7 +20,10 @@ class ACaravanActor : public AInteractableActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Classes)
+	TSubclassOf<class ACaravanBuildingPlatform> BuildingPlatformBPClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Settings")
 	int BuildingGridTotalRows= 3;
 
@@ -70,8 +73,6 @@ private:
 		EInteractionType InteractionType;
 		FName SocketName;
 	};
-
-	TSubclassOf<class ACaravanBuildingPlatform> BuildingPlatformBPClass;
 
 	TArray< TArray<ACaravanBuildingPlatform*> > BuildingAttachmentGrid;
 
