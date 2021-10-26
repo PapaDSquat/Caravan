@@ -13,12 +13,6 @@ AMultiToolActor::AMultiToolActor(const class FObjectInitializer& ObjInitializer)
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("MultiToolActor_StaticMeshComponent"));
-
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MultiToolMesh(TEXT("/Game/ThirdPerson/Meshes/MultiToolStaticMesh"));
-	if (StaticMeshComponent && MultiToolMesh.Succeeded())
-	{
-		StaticMeshComponent->SetStaticMesh(MultiToolMesh.Object);
-	}
 }
 
 // Called when the game starts or when spawned
