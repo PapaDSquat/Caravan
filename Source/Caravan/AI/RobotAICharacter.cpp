@@ -28,7 +28,10 @@ void ARobotAICharacter::BeginPlay()
 	if (UAIRobotSubsystem* AIRobotSubsystem = GameInstance->GetSubsystem<UAIRobotSubsystem>())
 	{
 		// TODO : Saved profile
-		AIRobotSubsystem->BuildCharacterFromSpec(CharacterSpec, CharacterProfile);
+		if (AIRobotSubsystem->BuildCharacterFromSpec(CharacterSpec, CharacterProfile))
+		{
+			AIRobotSubsystem->RegisterRobot(this);
+		}
 	}
 }
 
@@ -59,3 +62,7 @@ void ARobotAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 }
 
+FName ARobotAICharacter::GetRobotName() const
+{
+	return CharacterProfile.Name;
+}

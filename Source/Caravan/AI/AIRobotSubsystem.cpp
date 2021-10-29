@@ -33,8 +33,30 @@ bool UAIRobotSubsystem::BuildCharacterFromSpec(const UAIRobotCharacterSpec* Spec
 
 	// Name
 	{
-		PickRandom(Spec->Names, OutProfile.Name);
+		TArray< FName > NamesPool = Spec->Names;
+		
+		// Remove any already used names
+		for (const FAIRobotInternalData& RegisteredRobot : RegisteredRobots)
+		{
+			const int32 Index = NamesPool.IndexOfByKey(RegisteredRobot.Name);
+			if (Index != INDEX_NONE)
+			{
+				NamesPool.RemoveAt(Index);
+			}
+		}
+		
+		// Pick random name from pool
+		PickRandom(NamesPool, OutProfile.Name);
 	}
 
 	return true;
+}
+
+void UAIRobotSubsystem::RegisterRobot(const ARobotAICharacter* RobotCharacter)
+{
+	if (!ensure(RobotCharacter != nullptr))
+		return;
+
+	FAIRobotInternalData& Data = RegisteredRobots.Emplace_GetRef();
+	Data.Name = RobotCharacter->GetRobotName();
 }

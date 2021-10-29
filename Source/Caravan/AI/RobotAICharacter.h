@@ -12,7 +12,7 @@ struct CARAVAN_API FRobotAIProfile
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
-	FName Name;
+	FName Name = "INVALID NAME";
 };
 
 UCLASS()
@@ -34,6 +34,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Robot")
+	FName GetRobotName() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ShowOnlyInnerProperties))
 	class UAIRobotCharacterSpec* CharacterSpec;
