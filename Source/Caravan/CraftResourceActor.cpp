@@ -51,7 +51,7 @@ void ACraftResourceActor::InitCraftResource(const SCraftResourceInitData& initDa
 		
 		if (StaticMeshComponent)
 		{
-			FName meshName = FName(*FString::Printf(TEXT("/Game/ThirdPerson/Meshes/CraftResource_%s_StaticMesh"), *ResourceName));
+			FName meshName = FName(*FString::Printf(TEXT("/Game/Caravan/Meshes/CraftResource_%s_StaticMesh"), *ResourceName));
 			if (UStaticMesh* ResourceMesh = DynamicLoadObjFromPath<UStaticMesh>(meshName))
 			{
 				StaticMeshComponent->SetStaticMesh(ResourceMesh);

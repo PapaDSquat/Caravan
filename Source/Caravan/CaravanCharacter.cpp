@@ -1,13 +1,13 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
-#include "CaravanCharacter.h"
 #include "Caravan.h"
-#include "InteractableActor.h"
 #include "CaravanActor.h"
-#include "MultiToolActor.h"
+#include "CaravanCharacter.h"
 #include "DrawDebugHelpers.h"
-#include "WorldGenerator.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "InteractableActor.h"
+#include "MultiToolActor.h"
+#include "WorldBuilder/WorldBuilderSubsystem.h"
 
 #define COLLISION_INTERACTABLE ECC_GameTraceChannel1
 
@@ -97,12 +97,17 @@ void ACaravanCharacter::SetupPlayerInputComponent(class UInputComponent* inputCo
 	inputComponent->BindAction("Target", IE_Released , this, &ACaravanCharacter::OnTargetDeactivate);
 
 	// Debug
-	if (WorldGenerator)
-	{
-		inputComponent->BindAction("DEBUG_ResetResourceGrid", IE_Pressed, WorldGenerator, &AWorldGenerator::ResetResourceGrid);
-	}
+	inputComponent->BindAction("DEBUG_ResetResourceGrid", IE_Pressed, this, &ACaravanCharacter::DEBUG_ResetResourceGrid);
 }
 
+void ACaravanCharacter::DEBUG_ResetResourceGrid()
+{
+	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
+	if (UWorldBuilderSubsystem* WorldBuilderSubsystem = GameInstance->GetSubsystem<UWorldBuilderSubsystem>())
+	{
+		WorldBuilderSubsystem->ResetResourceGrid();
+	}
+}
 
 void ACaravanCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {

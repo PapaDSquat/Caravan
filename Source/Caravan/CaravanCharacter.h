@@ -7,7 +7,6 @@
 class AInteractableActor;
 class ACaravanActor;
 class AMultiToolActor;
-class AWorldGenerator;
 
 UCLASS(config=Game)
 class ACaravanCharacter : public ACharacter
@@ -58,6 +57,8 @@ protected:
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
+	void DEBUG_ResetResourceGrid();
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
@@ -77,9 +78,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact")
 	float InteractLength = 275.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "World")
-		AWorldGenerator* WorldGenerator = NULL;
 
 	// Targeting
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")

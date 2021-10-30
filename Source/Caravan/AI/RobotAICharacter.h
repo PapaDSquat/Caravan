@@ -6,6 +6,41 @@
 #include "GameFramework/Character.h"
 #include "RobotAICharacter.generated.h"
 
+UENUM(BlueprintType)
+enum class ERobotAILocale : uint8
+{
+	CaravanInterior,
+	CaravanCamp,
+	PlayerExpedition,
+	// PersonalExpedition  // Exploring on it's own?
+};
+
+UENUM(BlueprintType)
+enum class ERobotAISkill : uint8
+{
+	Carpenter,				// Collect wood, craft wood items
+	// Blacksmith,			// Collect ore, craft weapons
+	// Doctor,				// Heal team, craft healing items
+	// Alchemist,			// Magic support, craft potions
+	// Cartographer,		// Expand player map, discover POIs and secrets
+	// Chef,				// Collect plants, cook food items
+	// Tailor,				// Collect materials, craft clothing
+	// Decorator,			// Collect materials, build camp infrastructure
+	// Intern				// All around worker
+};
+
+UENUM(BlueprintType)
+enum class ERobotAIQuirk : uint8
+{
+	Perfectionist,
+	// NightOwl,
+	// AdrenalineJunkie,
+	// Glutton,
+	// AlmostBlind,
+	// Clumsy
+	// TODO
+};
+
 USTRUCT(BlueprintType)
 struct CARAVAN_API FRobotAIProfile
 {
@@ -43,4 +78,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
 	FRobotAIProfile CharacterProfile;
+
+	UPROPERTY(BlueprintReadOnly, Category = "AI")
+	ERobotAILocale CurrentLocale;
 };
