@@ -36,5 +36,5 @@ public:
 	ERobotAILocale CurrentLocale;
 
 	UPROPERTY(BlueprintReadOnly, Category = "RPG")
-	class UInventory* Inventory;
+	class UInventoryComponent* Inventory;
 };

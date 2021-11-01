@@ -349,7 +349,18 @@ bool UWorldBuilderSubsystem::IsInGrid(const FIntPoint& inGridPos) const
 
 ADestructableResourceActor* UWorldBuilderSubsystem::FindClosestDestructableResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange /*= -1.f*/)
 {
-	if (!ensureMsgf(SearchActor != NULL, TEXT("UWorldBuilderSubsystem::FindNearestTree Search Actor is invalid")))
+	return FindClosestResourceActor< ADestructableResourceActor >(SearchActor, Type, MaxRange);
+}
+
+ACraftResourceActor* UWorldBuilderSubsystem::FindClosestCraftResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange /*= -1.f*/)
+{
+	return FindClosestResourceActor< ACraftResourceActor >(SearchActor, Type, MaxRange);
+}
+
+template< typename T >
+T* UWorldBuilderSubsystem::FindClosestResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange /*= -1.f*/)
+{
+	if (!ensureMsgf(SearchActor != NULL, TEXT("UWorldBuilderSubsystem::FindClosestResourceActor Search Actor is invalid")))
 	{
 		return NULL;
 	}
@@ -363,7 +374,7 @@ ADestructableResourceActor* UWorldBuilderSubsystem::FindClosestDestructableResou
 	TArray<FHitResult> outResults; outResults.Reserve(16);
 	GetWorld()->SweepMultiByObjectType(outResults, actorLocation, actorLocation + FVector(searchRadius, searchRadius, 0.f), FQuat::Identity, ECC_WorldDynamic | CARAVAN_OBJECT_CHANNEL_INTERACTABLE, MySphere, TraceParams);
 
-	ADestructableResourceActor* outActor = NULL;
+	T* outActor = NULL;
 	float shortestDistance = TNumericLimits<float>::Max();
 
 	for (const FHitResult& hit : outResults)
@@ -371,7 +382,7 @@ ADestructableResourceActor* UWorldBuilderSubsystem::FindClosestDestructableResou
 		if (!hit.Actor.IsValid())
 			continue;
 
-		ADestructableResourceActor* resourceActor = Cast< ADestructableResourceActor >(hit.Actor.Get());
+		T* resourceActor = Cast< T >(hit.Actor.Get());
 		if (resourceActor == NULL)
 			continue;
 
@@ -381,7 +392,7 @@ ADestructableResourceActor* UWorldBuilderSubsystem::FindClosestDestructableResou
 		const float distance = FVector::Distance(actorLocation, hit.Actor->GetActorLocation());
 		if (distance < shortestDistance)
 		{
-			outActor = Cast< ATreeActor >(hit.Actor);
+			outActor = resourceActor;
 			shortestDistance = distance;
 		}
 	}

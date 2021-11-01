@@ -90,9 +90,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 		AInteractableActor* InteractFocus = NULL;
 
-	// Crafting (TODO: Move to Controller)
 	UPROPERTY(BlueprintReadOnly, Category = "RPG")
-	class UInventory* Inventory;
+	class UInventoryComponent* Inventory;
 
 	// TODO: Move to settings file
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")

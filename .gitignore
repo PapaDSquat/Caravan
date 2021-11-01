@@ -75,3 +75,6 @@ DerivedDataCache/*
 
 # Starter Content
 Content/StarterContent/*
+
+# Temp Code Backups
+enc_temp_folder/*

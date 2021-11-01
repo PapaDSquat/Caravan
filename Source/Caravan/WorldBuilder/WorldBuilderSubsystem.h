@@ -30,6 +30,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	class ADestructableResourceActor* FindClosestDestructableResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange = -1.f);
+	
+	UFUNCTION(BlueprintCallable)
+	class ACraftResourceActor* FindClosestCraftResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange = -1.f);
 
 	// Time
 	UFUNCTION(BlueprintCallable)
@@ -62,6 +65,9 @@ private:
 
 	bool PerformTerrainRaycast(const AActor* Actor, FHitResult& hitResult);
 	bool PerformTerrainRaycast(const FVector& traceStart, float length, FHitResult& hitResult);
+
+	template< typename T >
+	T* FindClosestResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange = -1.f);
 
 	// Grid Helpers
 	void GetGridCellBounds(const FIntPoint& cellPosition, FVector& topLeft, FVector& bottomRight) const;

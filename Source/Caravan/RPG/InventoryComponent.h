@@ -3,16 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "Components/ActorComponent.h"
 #include "CraftResourceActor.h"
-#include "Inventory.generated.h"
+#include "InventoryComponent.generated.h"
 
-UCLASS(BlueprintType)
-class CARAVAN_API UInventory : public UObject
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class CARAVAN_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
-	
-public:
+
+public:	
+	UInventoryComponent();
+
+protected:
+	virtual void BeginPlay() override;
+
+public:	
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	UFUNCTION(BlueprintCallable, Category = "Crafting")
 	void AddCraftResource(const ACraftResourceActor* resourceActor);
 

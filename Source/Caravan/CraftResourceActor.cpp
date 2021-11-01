@@ -2,8 +2,10 @@
 
 #include "CraftResourceActor.h"
 #include "Caravan.h"
-#include "Engine.h"
 #include "DrawDebugHelpers.h"
+#include "Engine.h"
+#include "GameFramework/Pawn.h"
+#include "RPG/InventoryComponent.h"
 
 // Sets default values
 ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInitializer)
@@ -11,18 +13,13 @@ ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInit
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("TreeActor_StaticMeshComponent"));
+	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CraftResourceActor_StaticMeshComponent"));
 }
 
 // Called when the game starts or when spawned
 void ACraftResourceActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (StaticMeshComponent != NULL)
-	{
-		StaticMeshComponent->SetCollisionObjectType(CARAVAN_OBJECT_CHANNEL_INTERACTABLE);
-	}
 }
 
 // Called every frame
@@ -78,15 +75,43 @@ void ACraftResourceActor::OnInteractFocus(const InteractData& interactData)
 	AInteractableActor::OnInteractFocus(interactData);
 }
 
+// TODO: Probably shouldn't need this
+UInventoryComponent* const FindInventoryComponent(APawn* inPawn)
+{
+	if (inPawn != NULL)
+	{
+		if (UInventoryComponent* const inventory = inPawn->FindComponentByClass< UInventoryComponent >())
+		{
+			return inventory;
+		}
+
+		if (const AController* pawnController = inPawn->GetController< AController>())
+		{
+			if (UInventoryComponent* const inventory = pawnController->FindComponentByClass< UInventoryComponent >())
+			{
+				return inventory;
+			}
+		}
+	}
+	return NULL;
+}
+
 EInteractionType ACraftResourceActor::OnInteractSelect(const InteractData& interactData)
 {
 	AInteractableActor::OnInteractSelect(interactData);
 	GEngine->AddOnScreenDebugMessage(1, 2.5f, FColor::Cyan, FString::Printf(TEXT("COLLECTED %s"), *GetResourceName().ToUpper()));
+
+	if (interactData.Pawn != NULL)
+	{
+		if (UInventoryComponent* const inventory = FindInventoryComponent(interactData.Pawn))
+		{
+			inventory->AddCraftResource(this);
+		}
+	}
+
 	Destroy();
 	return EInteractionType::ResourceCollect;
 }
-
-
 
 bool CraftResourceHelpers::IsValidType(ECraftResourceType type)
 {
