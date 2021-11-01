@@ -4,13 +4,20 @@
 #include "AI/RobotAICharacter.h"
 #include "AI/RobotAIController.h"
 #include "AI/AICharacterSpec.h"
+#include "BrainComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Utils/CaravanEngineUtils.h"
 
-static TAutoConsoleVariable<bool> CVarAIDebug(
-	TEXT("AI.Robot.Spec"),
+static TAutoConsoleVariable<bool> CVarAIDebug_Profile(
+	TEXT("AI.Robot.Profile"),
 	false,
-	TEXT("Toggle AI debug HUD Overlay"),
+	TEXT("Toggle AI Profile HUD Overlay"),
+	ECVF_Cheat);
+
+static TAutoConsoleVariable<bool> CVarAIDebug_Behaviour(
+	TEXT("AI.Robot.Behaviour"),
+	false,
+	TEXT("Toggle AI Behaviour HUD Overlay"),
 	ECVF_Cheat);
 
 // Sets default values
@@ -38,36 +45,39 @@ void ARobotAICharacter::Tick(float DeltaTime)
 	}
 	
 	// DEBUG
-	// TODO: Fix positioning
 	{
-		if (CVarAIDebug.GetValueOnGameThread() == true)
+		const FVector rootPos = GetActorLocation();
+		const FVector right = GetActorRightVector();
+		const FVector up = GetActorUpVector();
+
+		static float c_DebugXOffset = 150.f;
+		static float c_DebugYOffset = 30.f;
+
+		auto DrawAIPropertyString = [&](int index, const FString& string)
 		{
-			const FVector rootPos = GetActorLocation();
-			const FVector right = GetActorRightVector();
-			const FVector up = GetActorUpVector();
+			const float offsetX = c_DebugXOffset;
+			const float offsetY = (-c_DebugYOffset * index);
 
-			static float c_DebugXOffset = 150.f;
-			static float c_DebugYOffset = 30.f;
+			const FVector stringOffset = (FVector(offsetX, offsetX, 0.f) * right) + (FVector(0.f, 0.f, offsetY) * up);
+			DrawDebugString(
+				GetWorld(),
+				stringOffset,
+				string,
+				this,
+				FColor::Green,
+				0.f
+			);
+		};
 
-			auto DrawAIPropertyString = [&](int index, const FString& string)
-			{
-				const float offsetX = c_DebugXOffset;
-				const float offsetY = (-c_DebugYOffset * index);
-
-				const FVector stringOffset = (FVector(offsetX, offsetX, 0.f) * right) + (FVector(0.f, 0.f, offsetY) * up);
-				DrawDebugString(
-					GetWorld(),
-					stringOffset,
-					string,
-					this,
-					FColor::Green,
-					0.f
-				);
-			};
-
-			int idx = 0;
+		int idx = 0;
+		if (CVarAIDebug_Profile.GetValueOnGameThread() == true)
+		{
 			DrawAIPropertyString(idx++, controller->GetRobotName().ToString());
 			DrawAIPropertyString(idx++, CaravanUtils::EnumToString(controller->CharacterProfile.PrimarySkill));
+		}
+		if (CVarAIDebug_Behaviour.GetValueOnGameThread() == true)
+		{
+			DrawAIPropertyString(idx++, controller->GetBrainComponent()->GetDebugInfoString());
 		}
 	}
 }
