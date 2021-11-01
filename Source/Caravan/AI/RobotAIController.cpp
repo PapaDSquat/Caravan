@@ -3,6 +3,7 @@
 #include "AI/RobotAIController.h"
 #include "AI/RobotAICharacter.h"
 #include "AI/AIRobotSubsystem.h"
+#include "RPG/Inventory.h"
 
 ARobotAIController::ARobotAIController()
 {
@@ -24,6 +25,8 @@ void ARobotAIController::OnPossess(APawn* InPawn)
 void ARobotAIController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Inventory = NewObject<UInventory>();
 }
 
 bool ARobotAIController::BuildCharacterFromSpec(const UAIRobotCharacterSpec* characterSpec)

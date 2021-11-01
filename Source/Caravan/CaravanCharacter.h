@@ -24,9 +24,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	bool IsCarryingCaravan() const { return (ActiveCaravan != NULL); }
 
-	UFUNCTION(BlueprintCallable, Category = "Crafting")
-	int GetCraftResourceCount(ECraftResourceType resourceType) const;
-
 protected:
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
@@ -93,6 +90,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 		AInteractableActor* InteractFocus = NULL;
 
+	// Crafting (TODO: Move to Controller)
+	UPROPERTY(BlueprintReadOnly, Category = "RPG")
+	class UInventory* Inventory;
 
 	// TODO: Move to settings file
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
@@ -134,8 +134,5 @@ private:
 	// Movement
 	ACaravanActor* ActiveCaravan{ nullptr };
 	AMultiToolActor* MultiToolActor{ nullptr };
-
-	// Crafting (TODO: Make it a manager)
-	int CraftResourceCount[ECraftResourceType::MAX];
 };
 

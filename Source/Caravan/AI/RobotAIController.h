@@ -21,13 +21,12 @@ public:
 	virtual void BeginPlay() override;
 
 public:
-
 	bool BuildCharacterFromSpec(const UAIRobotCharacterSpec* characterSpec);
 
 	UFUNCTION(BlueprintCallable, Category = "Caravan Robot")
 	ARobotAICharacter* GetRobotOwner() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Robot")
+	UFUNCTION(BlueprintCallable, Category = "Caravan Robot")
 	FName GetRobotName() const;
 
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
@@ -35,4 +34,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
 	ERobotAILocale CurrentLocale;
+
+	UPROPERTY(BlueprintReadOnly, Category = "RPG")
+	class UInventory* Inventory;
 };
