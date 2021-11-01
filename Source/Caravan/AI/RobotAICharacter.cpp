@@ -39,27 +39,36 @@ void ARobotAICharacter::Tick(float DeltaTime)
 	
 	// DEBUG
 	// TODO: Fix positioning
-	if (CVarAIDebug.GetValueOnGameThread() == true)
 	{
-		static FVector c_DebugNameOffset(150.f, 0.f, 100.f);
-		DrawDebugString(
-			GetWorld(),
-			c_DebugNameOffset,
-			controller->GetRobotName().ToString(),
-			this,
-			FColor::Green,
-			0.f
-		);
+		if (CVarAIDebug.GetValueOnGameThread() == true)
+		{
+			const FVector rootPos = GetActorLocation();
+			const FVector right = GetActorRightVector();
+			const FVector up = GetActorUpVector();
 
-		static FVector c_DebugPrimarySkillOffset(150.f, -50.f, 100.f);
-		DrawDebugString(
-			GetWorld(),
-			c_DebugPrimarySkillOffset,
-			CaravanUtils::EnumToString(controller->CharacterProfile.PrimarySkill),
-			this,
-			FColor::Green,
-			0.f
-		);
+			static float c_DebugXOffset = 150.f;
+			static float c_DebugYOffset = 30.f;
+
+			auto DrawAIPropertyString = [&](int index, const FString& string)
+			{
+				const float offsetX = c_DebugXOffset;
+				const float offsetY = (-c_DebugYOffset * index);
+
+				const FVector stringOffset = (FVector(offsetX, offsetX, 0.f) * right) + (FVector(0.f, 0.f, offsetY) * up);
+				DrawDebugString(
+					GetWorld(),
+					stringOffset,
+					string,
+					this,
+					FColor::Green,
+					0.f
+				);
+			};
+
+			int idx = 0;
+			DrawAIPropertyString(idx++, controller->GetRobotName().ToString());
+			DrawAIPropertyString(idx++, CaravanUtils::EnumToString(controller->CharacterProfile.PrimarySkill));
+		}
 	}
 }
 
