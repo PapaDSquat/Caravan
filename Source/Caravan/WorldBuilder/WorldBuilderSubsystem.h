@@ -9,6 +9,7 @@
 class ACaravanActor;
 class ACaravanCharacter;
 class UWorldGenerationSpec;
+enum ECraftResourceType;
 
 UCLASS()
 class CARAVAN_API UWorldBuilderSubsystem : public UGameInstanceSubsystem
@@ -26,6 +27,9 @@ public:
 
 	bool GenerateNewWorld(const FVector& Position, UWorldGenerationSpec const * Spec, const struct FWorldGenerationActors& Actors, const struct FWorldGenerationTimeParams& TimeParams);
 	void ResetResourceGrid();
+
+	UFUNCTION(BlueprintCallable)
+	class ADestructableResourceActor* FindClosestDestructableResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange = -1.f);
 
 	// Time
 	UFUNCTION(BlueprintCallable)
@@ -49,15 +53,8 @@ private:
 	struct GridCellData
 	{
 		AActor* Actor{ NULL };
+		FIntPoint GridPosition;
 	};
-	struct GridCellReserveSlot
-	{
-		GridCellReserveSlot(FIntPoint cellPosition, AActor* actor)
-			: CellPosition(cellPosition), Actor(actor) {}
-		FIntPoint CellPosition;
-		AActor* Actor;
-	};
-
 	TArray< TArray<GridCellData> > GridData;
 
 	template< class ActorClass >
@@ -66,7 +63,11 @@ private:
 	bool PerformTerrainRaycast(const AActor* Actor, FHitResult& hitResult);
 	bool PerformTerrainRaycast(const FVector& traceStart, float length, FHitResult& hitResult);
 
+	// Grid Helpers
 	void GetGridCellBounds(const FIntPoint& cellPosition, FVector& topLeft, FVector& bottomRight) const;
+	FIntPoint GetGridPosition(const FVector& inWorldPosition) const;
+	const GridCellData* FindGridCell(const FVector& inWorldPosition) const;
+	bool IsInGrid(const FIntPoint& inGridPos) const;
 
 	FVector GeneratePosition;
 	UWorldGenerationSpec const* WorldSpec = NULL;

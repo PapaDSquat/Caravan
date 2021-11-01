@@ -5,7 +5,6 @@
 #include "Engine.h"
 #include "DrawDebugHelpers.h"
 
-
 // Sets default values
 ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInitializer)
 {
@@ -19,7 +18,11 @@ ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInit
 void ACraftResourceActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (StaticMeshComponent != NULL)
+	{
+		StaticMeshComponent->SetCollisionObjectType(CARAVAN_OBJECT_CHANNEL_INTERACTABLE);
+	}
 }
 
 // Called every frame

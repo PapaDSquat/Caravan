@@ -6,6 +6,8 @@
 #include "Interactable.h"
 #include "InteractableActor.generated.h"
 
+#define CARAVAN_OBJECT_CHANNEL_INTERACTABLE ECC_GameTraceChannel1
+
 UCLASS()
 class AInteractableActor : public AActor, public IInteractable
 {

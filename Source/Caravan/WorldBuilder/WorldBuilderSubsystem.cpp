@@ -1,12 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "WorldBuilder/WorldBuilderSubsystem.h"
 #include "Caravan.h"
 #include "CaravanActor.h"
 #include "CaravanCharacter.h"
+#include "DestructableResourceActor.h"
 #include "Math/UnrealMathUtility.h"
 #include "RockActor.h"
 #include "TreeActor.h"
-#include "WorldBuilder/WorldBuilderSubsystem.h"
 #include "WorldBuilder/WorldGenerationSpec.h"
 
 static const float CELL_ACTOR_SPAWN_RAYCAST_LENGTH = 5000.f;
@@ -102,6 +103,13 @@ bool UWorldBuilderSubsystem::GenerateNewWorld(const FVector& Position, UWorldGen
 
 void UWorldBuilderSubsystem::ResetResourceGrid()
 {
+	struct GridCellReserveSlot
+	{
+		GridCellReserveSlot(FIntPoint cellPosition, AActor* actor)
+			: CellPosition(cellPosition), Actor(actor) {}
+		FIntPoint CellPosition;
+		AActor* Actor;
+	};
 	TArray<GridCellReserveSlot> reservedCells;
 
 	// TODO: Generation avoids player and caravan
@@ -177,6 +185,7 @@ void UWorldBuilderSubsystem::ResetResourceGrid()
 				if (cellData.Actor != NULL)
 				{
 					cellData.Actor->Destroy();
+					cellData.Actor = NULL;
 				}
 
 				// Random chance to spawn based on total actor density
@@ -262,6 +271,7 @@ ActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(GridCellData& cellData, c
 
 		// Update the cell data
 		cellData.Actor = spawnedActor;
+		cellData.GridPosition = gridPosition;
 
 		return spawnedActor;
 	}
@@ -303,6 +313,83 @@ void UWorldBuilderSubsystem::GetGridCellBounds(const FIntPoint& cellPosition, FV
 	bottomRight.Y += WorldSpec->GridCellSizeY;
 }
 
+FIntPoint UWorldBuilderSubsystem::GetGridPosition(const FVector& inWorldPosition) const
+{
+	// Correct for divide by 0
+	FVector worldPos = inWorldPosition;
+	if (worldPos.X - worldPos.X == 0.f)
+		worldPos.X = 1.f;
+	if (worldPos.Y - worldPos.Y == 0.f)
+		worldPos.Y = 1.f;
+
+	const FVector gridCellSize(WorldSpec->GridCellSizeX, WorldSpec->GridCellSizeY, 1.f);
+	const FVector offset = inWorldPosition - GeneratePosition;
+	const FIntPoint gridPosition((int)((offset.X / gridCellSize.X)), (int)((offset.Y / gridCellSize.Y)));
+	return gridPosition;
+}
+
+const UWorldBuilderSubsystem::GridCellData* UWorldBuilderSubsystem::FindGridCell(const FVector& inWorldPosition) const
+{
+	const FIntPoint gridPosition = GetGridPosition(inWorldPosition);
+	if (gridPosition.X == -1 || gridPosition.Y == -1)
+	{
+		return NULL;
+	}
+
+	return &GridData[gridPosition.X][gridPosition.Y];
+}
+
+bool UWorldBuilderSubsystem::IsInGrid(const FIntPoint& inGridPos) const
+{
+	return GridData.Num() > 0
+		&& inGridPos.X > -1 && inGridPos.Y > -1
+		&& inGridPos.X < GridData[0].Num()
+		&& inGridPos.Y < GridData.Num();
+}
+
+ADestructableResourceActor* UWorldBuilderSubsystem::FindClosestDestructableResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange /*= -1.f*/)
+{
+	if (!ensureMsgf(SearchActor != NULL, TEXT("UWorldBuilderSubsystem::FindNearestTree Search Actor is invalid")))
+	{
+		return NULL;
+	}
+	const FVector actorLocation = SearchActor->GetActorLocation();
+
+	FCollisionQueryParams TraceParams(FName(TEXT("PlayerInteractTrace")), true, SearchActor);
+	TraceParams.AddIgnoredActor(PlayerCharacter);
+
+	const float searchRadius = MaxRange * 0.5f;
+	FCollisionShape MySphere = FCollisionShape::MakeSphere(searchRadius); // 5M Radius
+	TArray<FHitResult> outResults; outResults.Reserve(16);
+	GetWorld()->SweepMultiByObjectType(outResults, actorLocation, actorLocation + FVector(searchRadius, searchRadius, 0.f), FQuat::Identity, ECC_WorldDynamic | CARAVAN_OBJECT_CHANNEL_INTERACTABLE, MySphere, TraceParams);
+
+	ADestructableResourceActor* outActor = NULL;
+	float shortestDistance = TNumericLimits<float>::Max();
+
+	for (const FHitResult& hit : outResults)
+	{
+		if (!hit.Actor.IsValid())
+			continue;
+
+		ADestructableResourceActor* resourceActor = Cast< ADestructableResourceActor >(hit.Actor.Get());
+		if (resourceActor == NULL)
+			continue;
+
+		if (resourceActor->GetResourceType() != Type)
+			continue;
+
+		const float distance = FVector::Distance(actorLocation, hit.Actor->GetActorLocation());
+		if (distance < shortestDistance)
+		{
+			outActor = Cast< ATreeActor >(hit.Actor);
+			shortestDistance = distance;
+		}
+	}
+
+	return outActor;
+}
+
+// Debug
 FString UWorldBuilderSubsystem::GetCurrentTimeString() const
 {
 	FString timeString;

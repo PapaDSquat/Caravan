@@ -17,6 +17,7 @@ public:
 	ADestructableResourceActor(const class FObjectInitializer& ObjInitializer, ECraftResourceType resourceType);
 
 	// IInteractable
+	virtual ECraftResourceType GetResourceType() const override { return ResourceType; }
 	virtual void OnInteractFocus(const InteractData& interactData) override;
 	virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
 

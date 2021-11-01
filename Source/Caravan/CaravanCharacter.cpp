@@ -9,8 +9,6 @@
 #include "MultiToolActor.h"
 #include "WorldBuilder/WorldBuilderSubsystem.h"
 
-#define COLLISION_INTERACTABLE ECC_GameTraceChannel1
-
 //////////////////////////////////////////////////////////////////////////
 // ACaravanCharacter
 
@@ -431,7 +429,7 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& trace
 		TraceParams.bReturnPhysicalMaterial = true;
 
 		FHitResult hitResult(ForceInit);
-		GetWorld()->LineTraceSingleByChannel(hitResult, traceData.Start, traceData.End, COLLISION_INTERACTABLE, TraceParams);
+		GetWorld()->LineTraceSingleByChannel(hitResult, traceData.Start, traceData.End, CARAVAN_OBJECT_CHANNEL_INTERACTABLE, TraceParams);
 
 		
 		AInteractableActor* interactableHitActor = nullptr;
