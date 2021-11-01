@@ -3,9 +3,8 @@
 #pragma once
 #include "Interactable.generated.h"
 
-class ACaravanCharacter;
+class APawn;
 enum ECraftResourceType;
-
 
 UENUM(BlueprintType)
 enum EInteractionType
@@ -36,15 +35,15 @@ public:
 
 	struct InteractData
 	{
-		InteractData(ACaravanCharacter* character)
-			: Character(character)
+		InteractData(APawn* pawn)
+			: Pawn(pawn)
 		{}
-		InteractData(ACaravanCharacter* character, FHitResult traceResult)
-			: Character(character)
+		InteractData(APawn* pawn, FHitResult traceResult)
+			: Pawn(pawn)
 			, TraceResult(traceResult) 
 		{}
 		
-		ACaravanCharacter* Character; // TODO: change to controller
+		APawn* Pawn; // TODO: change to controller
 		FHitResult TraceResult;
 	};
 

@@ -38,6 +38,12 @@ void AInteractableActor::OnInteractUnFocus(const InteractData& interactData)
 	NotifyOnInteractUnFocus();
 }
 
+void AInteractableActor::Interact(APawn* interactingPawn)
+{
+	InteractData data(interactingPawn);
+	OnInteractSelect(data);
+}
+
 EInteractionType AInteractableActor::OnInteractSelect(const InteractData& interactData)
 {
 	NotifyOnInteractSelect();

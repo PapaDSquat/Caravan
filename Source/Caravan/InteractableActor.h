@@ -19,6 +19,9 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	UFUNCTION(BlueprintCallable)
+	void Interact(APawn* interactingPawn);
+
 	// IInteractable
 	virtual void OnInteractFocus(const InteractData& interactData) override;
 	virtual void OnInteractUnFocus(const InteractData& interactData) override;
