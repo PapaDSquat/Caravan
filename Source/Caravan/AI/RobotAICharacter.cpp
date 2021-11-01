@@ -2,9 +2,10 @@
 
 
 #include "AI/RobotAICharacter.h"
+#include "AI/RobotAIController.h"
 #include "AI/AICharacterSpec.h"
-#include "AI/AIRobotSubsystem.h"
 #include "DrawDebugHelpers.h"
+#include "Utils/CaravanEngineUtils.h"
 
 static TAutoConsoleVariable<bool> CVarAIDebug(
 	TEXT("AI.Robot.Spec"),
@@ -23,36 +24,43 @@ ARobotAICharacter::ARobotAICharacter()
 void ARobotAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
-	if (UAIRobotSubsystem* AIRobotSubsystem = GameInstance->GetSubsystem<UAIRobotSubsystem>())
-	{
-		// TODO : Saved profile
-		if (AIRobotSubsystem->BuildCharacterFromSpec(CharacterSpec, CharacterProfile))
-		{
-			AIRobotSubsystem->RegisterRobot(this);
-		}
-	}
 }
 
 // Called every frame
 void ARobotAICharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	ARobotAIController* controller = GetRobotController();
+	if (controller == NULL)
+	{
+		return;
+	}
 	
+	// DEBUG
+	// TODO: Fix positioning
 	if (CVarAIDebug.GetValueOnGameThread() == true)
 	{
-		/* constexpr */ static FVector c_DebugTextOffset(0.f, 0.f, 100.f);
+		static FVector c_DebugNameOffset(150.f, 0.f, 100.f);
 		DrawDebugString(
 			GetWorld(),
-			c_DebugTextOffset,
-			CharacterProfile.Name.ToString(),
+			c_DebugNameOffset,
+			controller->GetRobotName().ToString(),
+			this,
+			FColor::Green,
+			0.f
+		);
+
+		static FVector c_DebugPrimarySkillOffset(150.f, -50.f, 100.f);
+		DrawDebugString(
+			GetWorld(),
+			c_DebugPrimarySkillOffset,
+			CaravanUtils::EnumToString(controller->CharacterProfile.PrimarySkill),
 			this,
 			FColor::Green,
 			0.f
 		);
 	}
-	//
 }
 
 // Called to bind functionality to input
@@ -62,7 +70,16 @@ void ARobotAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 }
 
+ARobotAIController* ARobotAICharacter::GetRobotController() const
+{
+	return Cast< ARobotAIController >(GetController());
+}
+
 FName ARobotAICharacter::GetRobotName() const
 {
-	return CharacterProfile.Name;
+	if (ARobotAIController* controller = GetRobotController())
+	{
+		return controller->GetRobotName();
+	}
+	return NAME_None;
 }

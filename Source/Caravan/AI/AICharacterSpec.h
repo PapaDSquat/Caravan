@@ -6,6 +6,54 @@
 #include "Engine/DataAsset.h"
 #include "AICharacterSpec.generated.h"
 
+UENUM(BlueprintType)
+enum class ERobotAISkill : uint8
+{
+	Carpenter,				// Collect wood, craft wood items
+	// Blacksmith,			// Collect ore, craft weapons
+	// Doctor,				// Heal team, craft healing items
+	// Alchemist,			// Magic support, craft potions
+	// Cartographer,		// Expand player map, discover POIs and secrets
+	// Chef,				// Collect plants, cook food items
+	// Tailor,				// Collect materials, craft clothing
+	// Decorator,			// Collect materials, build camp infrastructure
+	// Intern				// All around worker
+};
+
+UENUM(BlueprintType)
+enum class ERobotAIQuirk : uint8
+{
+	Perfectionist,
+	// NightOwl,
+	// AdrenalineJunkie,
+	// Glutton,
+	// AlmostBlind,
+	// Clumsy
+	// TODO
+};
+
+UENUM(BlueprintType)
+enum class ERobotAILocale : uint8
+{
+	CaravanInterior,
+	CaravanCamp,
+	PlayerExpedition,
+	// PersonalExpedition  // Exploring on it's own?
+	Invalid
+};
+
+USTRUCT(BlueprintType)
+struct CARAVAN_API FRobotAIProfile
+{
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY(BlueprintReadOnly, Category = "AI")
+		FName Name = "INVALID NAME";
+
+	UPROPERTY(BlueprintReadOnly, Category = "AI")
+		ERobotAISkill PrimarySkill;
+};
+
 /**
 * Create UDataAsset of this type in Editor to fill with themes
 */
@@ -15,7 +63,7 @@ class CARAVAN_API UAICharacterSpec : public UDataAsset
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan")
 	TArray< FName > Names;
 };
 
@@ -27,22 +75,22 @@ class CARAVAN_API UAIRobotCharacterSpec : public UAICharacterSpec
 public:
 	// TODO
 	// Can effect look, speed, dialogue
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot")
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
 	// int8 Age;
 
 	// Skills already known and already able to perform well
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot")
-	// UAISkill PrimarySkill;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
+	ERobotAISkill PrimarySkill;
 
 	// Skills that can be learned and advanced in order to perform new tasks and change primary job
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot")
-	// TArray< UAISkill > SecondarySkills;
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
+	// TArray< ERobotAISkill > SecondaryInterests;
 
 	// General temperament of the robot in dialogue
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot")
-	// TArray< UAITrait > Traits;
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
+	// TArray< ERobotAITrait > Traits;
 
-	// Traits have positive & negative implications on robot’s AI behaviour
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot")
-	// TArray< UAIQuirk > Quirks;
+	// Traits have positive & negative BlueprintReadOnly on robot’s AI behaviour
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan Robot")
+	// TArray< ERobotAIQuirk > Quirks;
 };

@@ -3,7 +3,7 @@
 
 #include "AI/AIRobotSubsystem.h"
 #include "AI/AICharacterSpec.h"
-#include "AI/RobotAICharacter.h"
+#include "AI/RobotAIController.h"
 
 template< typename T >
 int32 PickRandom(const TArray< T >& Source, T& Out)
@@ -49,14 +49,19 @@ bool UAIRobotSubsystem::BuildCharacterFromSpec(const UAIRobotCharacterSpec* Spec
 		PickRandom(NamesPool, OutProfile.Name);
 	}
 
+	// Skills
+	{
+		OutProfile.PrimarySkill = Spec->PrimarySkill;
+	}
+
 	return true;
 }
 
-void UAIRobotSubsystem::RegisterRobot(const ARobotAICharacter* RobotCharacter)
+void UAIRobotSubsystem::RegisterRobot(const ARobotAIController* robotController)
 {
-	if (!ensure(RobotCharacter != nullptr))
+	if (!ensure(robotController != nullptr))
 		return;
 
 	FAIRobotInternalData& Data = RegisteredRobots.Emplace_GetRef();
-	Data.Name = RobotCharacter->GetRobotName();
+	Data.Name = robotController->GetRobotName();
 }

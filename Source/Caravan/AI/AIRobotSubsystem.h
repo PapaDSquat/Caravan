@@ -6,7 +6,7 @@
 #include "Subsystems/Subsystem.h"
 #include "AIRobotSubsystem.generated.h"
 
-class ARobotAICharacter;
+class ARobotAIController;
 class UAIRobotCharacterSpec;
 struct FRobotAIProfile;
 
@@ -25,7 +25,7 @@ public:
 	// End USubsystem
 
 	bool BuildCharacterFromSpec(const UAIRobotCharacterSpec* Spec, FRobotAIProfile& OutProfile) const;
-	void RegisterRobot(const ARobotAICharacter* RobotCharacter);
+	void RegisterRobot(const ARobotAIController* robotController);
 
 private:
 	struct FAIRobotInternalData
