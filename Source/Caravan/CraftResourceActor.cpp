@@ -8,6 +8,12 @@
 #include "RPG/InventoryComponent.h"
 #include "Utils/CaravanEngineUtils.h"
 
+static TAutoConsoleVariable<bool> CVarAIDebug_UsePlayerInventory(
+	TEXT("AI.Robot.UsePersonalInventory"),
+	true,
+	TEXT("Toggle AI Should store items in Player's inventory rather than personal"),
+	ECVF_Cheat);
+
 // Sets default values
 ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInitializer)
 {
@@ -77,7 +83,7 @@ void ACraftResourceActor::OnInteractFocus(const InteractData& interactData)
 }
 
 // TODO: Probably shouldn't need this
-UInventoryComponent* const FindInventoryComponent(APawn* inPawn)
+UInventoryComponent* const FindInventoryComponent(const APawn* inPawn)
 {
 	if (inPawn != NULL)
 	{
@@ -104,7 +110,23 @@ EInteractionType ACraftResourceActor::OnInteractSelect(const InteractData& inter
 
 	if (interactData.Pawn != NULL)
 	{
-		if (UInventoryComponent* const inventory = FindInventoryComponent(interactData.Pawn))
+		APawn* pawnWithInventory = NULL;
+		if (CVarAIDebug_UsePlayerInventory.GetValueOnGameThread() == true)
+		{
+			if (APlayerController* playerController = GetWorld()->GetFirstPlayerController())
+			{
+				if (APawn* playerPawn = Cast<APawn>(playerController->GetPawn()))
+				{
+					pawnWithInventory = playerPawn;
+				}
+			}
+		}
+		else
+		{
+			pawnWithInventory = interactData.Pawn;
+		}
+
+		if (UInventoryComponent* const inventory = FindInventoryComponent(pawnWithInventory))
 		{
 			inventory->AddCraftResource(this);
 		}

@@ -93,10 +93,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "RPG")
 	class UInventoryComponent* Inventory;
 
-	// TODO: Move to settings file
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
-	bool DEBUG_ENABLED = false;
-
 private:
 	struct SInteractTraceData
 	{

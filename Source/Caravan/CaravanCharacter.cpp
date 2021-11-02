@@ -10,8 +10,11 @@
 #include "RPG/InventoryComponent.h"
 #include "WorldBuilder/WorldBuilderSubsystem.h"
 
-//////////////////////////////////////////////////////////////////////////
-// ACaravanCharacter
+static TAutoConsoleVariable<bool> CVarPlayerDebug_ShowInteractionDebug(
+	TEXT("Player.ShowInteractionDebug"),
+	false,
+	TEXT("Toggle debug overlay for Player interaction"),
+	ECVF_Cheat);
 
 ACaravanCharacter::ACaravanCharacter(const class FObjectInitializer& ObjInitializer)
 {
@@ -261,7 +264,7 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 		TargetActor->GetActorBounds(false, targetOrigin, targetExtent);
 		TargetBaseLocation = targetOrigin + FVector(0.f, 0.f, -(targetExtent.Z * 0.75f)); // HACK offset
 
-		if (DEBUG_ENABLED)
+		if (CVarPlayerDebug_ShowInteractionDebug.GetValueOnGameThread() == true)
 		{
 			DrawDebugBox(
 				GetWorld(),
@@ -448,7 +451,7 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& trace
 			}
 		}
 
-		if (DEBUG_ENABLED)
+		if (CVarPlayerDebug_ShowInteractionDebug.GetValueOnGameThread() == true)
 		{
 			FColor debugColor = (interactableHitActor == NULL)
 				? FColor(255, 0, 0)  // Red for miss
@@ -465,7 +468,7 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& trace
 		}
 	}
 
-	if (DEBUG_ENABLED)
+	if (CVarPlayerDebug_ShowInteractionDebug.GetValueOnGameThread() == true)
 	{
 		// Slightly bigger blue line for closest result
 		DrawDebugLine(
