@@ -68,6 +68,9 @@ void ACaravanCharacter::BeginPlay()
 			pWeaponSocket->AttachActor(MultiToolActor, GetMesh());
 		}
 	}
+
+	// Dwindle Setup
+	DwindleState.LastActorLocation = GetActorLocation();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -235,6 +238,8 @@ void ACaravanCharacter::OnTargetDeactivate()
 void ACaravanCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	UpdateDwindleState(DeltaSeconds);
 
 	Interacting = false;
 
@@ -405,6 +410,29 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 				OnTargetDeactivate();
 			}
 		}
+	}
+}
+
+void ACaravanCharacter::UpdateDwindleState(float DeltaSeconds)
+{
+	DwindleState.TimeBeforeReset -= DeltaSeconds;
+
+	const FVector currentActorLocation = GetActorLocation();
+	const float distance = FVector::Distance(currentActorLocation, DwindleState.LastActorLocation);
+
+	// Check dwindle at every interval
+	if (DwindleState.TimeBeforeReset <= 0.f)
+	{
+		IsDwindling = (distance <= DwindleRange);
+
+		DwindleState.TimeBeforeReset = DwindleTime;
+		DwindleState.LastActorLocation = GetActorLocation();
+	}
+
+	// Check that we are not already outside of dwindle range
+	if (IsDwindling && distance > DwindleRange)
+	{
+		IsDwindling = false;
 	}
 }
 

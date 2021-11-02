@@ -65,6 +65,17 @@ protected:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	// Dwindle
+	// True if Player hasn't moved outside of a fixed range within a fixed amount of time
+	UPROPERTY(BlueprintReadOnly, Category = "State")
+	bool IsDwindling = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	float DwindleRange = 1500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	float DwindleTime = 5.f;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	float BaseTurnRate = 25.f;
@@ -78,22 +89,24 @@ protected:
 
 	// Targeting
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-		bool IsTargeting = false;
+	bool IsTargeting = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-		AInteractableActor* TargetActor = NULL;
+	AInteractableActor* TargetActor = NULL;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-		FVector TargetBaseLocation;
+	FVector TargetBaseLocation;
 
 	// Interaction
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-		AInteractableActor* InteractFocus = NULL;
+	AInteractableActor* InteractFocus = NULL;
 
 	UPROPERTY(BlueprintReadOnly, Category = "RPG")
 	class UInventoryComponent* Inventory;
 
 private:
+	void UpdateDwindleState(float DeltaSeconds);
+
 	struct SInteractTraceData
 	{
 		SInteractTraceData(FVector start, FVector end)
@@ -129,5 +142,13 @@ private:
 	// Movement
 	ACaravanActor* ActiveCaravan{ nullptr };
 	AMultiToolActor* MultiToolActor{ nullptr };
+
+	// Dwindle
+	struct FDwindleState
+	{
+		float TimeBeforeReset = 0.f;
+		FVector LastActorLocation;
+	};
+	FDwindleState DwindleState;
 };
 
