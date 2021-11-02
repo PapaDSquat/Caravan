@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CraftResourceActor.h"
 #include "Engine/DataAsset.h"
 #include "AICharacterSpec.generated.h"
 
@@ -10,7 +11,7 @@ UENUM(BlueprintType)
 enum class ERobotAISkill : uint8
 {
 	Carpenter,				// Collect wood, craft wood items
-	// Blacksmith,			// Collect ore, craft weapons
+	Blacksmith,				// Collect ore, craft weapons
 	// Doctor,				// Heal team, craft healing items
 	// Alchemist,			// Magic support, craft potions
 	// Cartographer,		// Expand player map, discover POIs and secrets
@@ -18,6 +19,7 @@ enum class ERobotAISkill : uint8
 	// Tailor,				// Collect materials, craft clothing
 	// Decorator,			// Collect materials, build camp infrastructure
 	// Intern				// All around worker
+	Invalid
 };
 
 UENUM(BlueprintType)
@@ -30,6 +32,7 @@ enum class ERobotAIQuirk : uint8
 	// AlmostBlind,
 	// Clumsy
 	// TODO
+	Invalid
 };
 
 UENUM(BlueprintType)
@@ -47,11 +50,14 @@ struct CARAVAN_API FRobotAIProfile
 {
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY(BlueprintReadOnly, Category = "AI")
-		FName Name = "INVALID NAME";
+	UPROPERTY(BlueprintReadOnly, Category = "AI")
+	FName Name = "INVALID NAME";
 
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
-		ERobotAISkill PrimarySkill;
+	ERobotAISkill PrimarySkill = ERobotAISkill::Invalid;
+
+	UPROPERTY(BlueprintReadOnly, Category = "AI")
+	ECraftResourceType PreferredCraftResource = ECraftResourceType::Invalid;
 };
 
 /**
@@ -81,6 +87,9 @@ public:
 	// Skills already known and already able to perform well
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
 	ERobotAISkill PrimarySkill;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
+	ECraftResourceType PreferredCraftResource;
 
 	// Skills that can be learned and advanced in order to perform new tasks and change primary job
 	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")

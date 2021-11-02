@@ -31,5 +31,5 @@ public:
 	int GetCraftResourceCount(ECraftResourceType resourceType) const;
 
 private:
-	int CraftResourceCount[ECraftResourceType::MAX];
+	int CraftResourceCount[ECraftResourceType::Invalid];
 };

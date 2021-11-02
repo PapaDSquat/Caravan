@@ -77,7 +77,10 @@ void ARobotAICharacter::Tick(float DeltaTime)
 		}
 		if (CVarAIDebug_Behaviour.GetValueOnGameThread() == true)
 		{
-			DrawAIPropertyString(idx++, controller->GetBrainComponent()->GetDebugInfoString());
+			if (UBrainComponent* brainComponent = controller->GetBrainComponent())
+			{
+				DrawAIPropertyString(idx++, brainComponent->GetDebugInfoString());
+			}
 		}
 	}
 }

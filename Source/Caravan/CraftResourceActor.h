@@ -6,17 +6,11 @@
 #include "CraftResourceActor.generated.h"
 
 UENUM(BlueprintType)
-enum ECraftResourceType
+enum class ECraftResourceType : uint8
 {
 	Wood,
 	Stone,
-	MAX
-};
-
-static const CHAR* CRAFT_RESOURCE_NAME[ECraftResourceType::MAX] =
-{
-	"Wood",
-	"Stone",
+	Invalid
 };
 
 struct CraftResourceHelpers
@@ -26,7 +20,7 @@ struct CraftResourceHelpers
 
 struct SCraftResourceInitData
 {
-	ECraftResourceType Type{ ECraftResourceType::MAX };
+	ECraftResourceType Type{ ECraftResourceType::Invalid };
 	FVector Location;
 	FRotator Rotation;
 };

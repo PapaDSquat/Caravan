@@ -8,7 +8,7 @@
 #include "Math/UnrealMathUtility.h"
 
 ADestructableResourceActor::ADestructableResourceActor(const class FObjectInitializer& ObjInitializer)
-	: ADestructableResourceActor(ObjInitializer, ECraftResourceType::MAX)
+	: ADestructableResourceActor(ObjInitializer, ECraftResourceType::Invalid)
 {}
 
 ADestructableResourceActor::ADestructableResourceActor(const class FObjectInitializer& ObjInitializer, ECraftResourceType resourceType)

@@ -6,6 +6,7 @@
 #include "Engine.h"
 #include "GameFramework/Pawn.h"
 #include "RPG/InventoryComponent.h"
+#include "Utils/CaravanEngineUtils.h"
 
 // Sets default values
 ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInitializer)
@@ -47,7 +48,7 @@ void ACraftResourceActor::InitCraftResource(const SCraftResourceInitData& initDa
 	// Assert
 	if (CraftResourceHelpers::IsValidType(ResourceType))
 	{
-		ResourceName = CRAFT_RESOURCE_NAME[(int)ResourceType];
+		ResourceName = CaravanUtils::EnumToString(ResourceType);
 		
 		if (StaticMeshComponent)
 		{
@@ -115,5 +116,5 @@ EInteractionType ACraftResourceActor::OnInteractSelect(const InteractData& inter
 
 bool CraftResourceHelpers::IsValidType(ECraftResourceType type)
 {
-	return (type < ECraftResourceType::MAX);
+	return (type < ECraftResourceType::Invalid);
 }

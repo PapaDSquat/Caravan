@@ -9,7 +9,7 @@
 class ACaravanActor;
 class ACaravanCharacter;
 class UWorldGenerationSpec;
-enum ECraftResourceType;
+enum class ECraftResourceType : uint8;
 
 UCLASS()
 class CARAVAN_API UWorldBuilderSubsystem : public UGameInstanceSubsystem

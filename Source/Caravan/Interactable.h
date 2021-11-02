@@ -4,7 +4,7 @@
 #include "Interactable.generated.h"
 
 class APawn;
-enum ECraftResourceType;
+enum class ECraftResourceType : uint8;
 
 UENUM(BlueprintType)
 enum EInteractionType

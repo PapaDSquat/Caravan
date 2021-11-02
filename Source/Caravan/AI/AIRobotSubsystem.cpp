@@ -54,6 +54,11 @@ bool UAIRobotSubsystem::BuildCharacterFromSpec(const UAIRobotCharacterSpec* Spec
 		OutProfile.PrimarySkill = Spec->PrimarySkill;
 	}
 
+	// Crafting
+	{
+		OutProfile.PreferredCraftResource = Spec->PreferredCraftResource;
+	}
+
 	return true;
 }
 

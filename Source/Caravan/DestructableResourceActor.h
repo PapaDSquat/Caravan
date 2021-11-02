@@ -25,7 +25,7 @@ public:
 	UStaticMeshComponent* StaticMeshComponent;
 
 protected:
-	ECraftResourceType ResourceType{ ECraftResourceType::MAX };
+	ECraftResourceType ResourceType{ ECraftResourceType::Invalid };
 
 	UPROPERTY(EditAnywhere)
 	int ResourceDropCount;

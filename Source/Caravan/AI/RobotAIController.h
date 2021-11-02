@@ -29,11 +29,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Caravan Robot")
 	FName GetRobotName() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Caravan AI")
+	void SetCurrentAILocale(ERobotAILocale newLocale);
+
+
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
 	FRobotAIProfile CharacterProfile;
 
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
-	ERobotAILocale CurrentLocale;
+	ERobotAILocale CurrentAILocale;
 
 	UPROPERTY(BlueprintReadOnly, Category = "RPG")
 	class UInventoryComponent* Inventory;

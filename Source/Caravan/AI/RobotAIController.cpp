@@ -56,3 +56,8 @@ FName ARobotAIController::GetRobotName() const
 {
 	return CharacterProfile.Name;
 }
+
+void ARobotAIController::SetCurrentAILocale(ERobotAILocale newLocale)
+{
+	CurrentAILocale = newLocale;
+}

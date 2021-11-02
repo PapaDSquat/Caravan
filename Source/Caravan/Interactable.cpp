@@ -13,7 +13,7 @@ UInteractable::UInteractable(const class FObjectInitializer& PCIP)
 
 ECraftResourceType IInteractable::GetResourceType() const 
 { 
-	return ECraftResourceType::MAX;
+	return ECraftResourceType::Invalid;
 }
 
 void IInteractable::OnInteractFocus(const InteractData& interactData) {}
