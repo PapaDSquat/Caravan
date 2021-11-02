@@ -3,18 +3,13 @@
 #include "CaravanCharacter.h"
 #include "Caravan.h"
 #include "CaravanActor.h"
+#include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "InteractableActor.h"
 #include "MultiToolActor.h"
 #include "RPG/InventoryComponent.h"
 #include "WorldBuilder/WorldBuilderSubsystem.h"
-
-static TAutoConsoleVariable<bool> CVarPlayerDebug_ShowInteractionDebug(
-	TEXT("Player.ShowInteractionDebug"),
-	false,
-	TEXT("Toggle debug overlay for Player interaction"),
-	ECVF_Cheat);
 
 ACaravanCharacter::ACaravanCharacter(const class FObjectInitializer& ObjInitializer)
 {

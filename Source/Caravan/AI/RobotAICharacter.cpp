@@ -5,20 +5,9 @@
 #include "AI/RobotAIController.h"
 #include "AI/AICharacterSpec.h"
 #include "BrainComponent.h"
+#include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
 #include "Utils/CaravanEngineUtils.h"
-
-static TAutoConsoleVariable<bool> CVarAIDebug_Profile(
-	TEXT("AI.Robot.Profile"),
-	false,
-	TEXT("Toggle AI Profile HUD Overlay"),
-	ECVF_Cheat);
-
-static TAutoConsoleVariable<bool> CVarAIDebug_Behaviour(
-	TEXT("AI.Robot.Behaviour"),
-	false,
-	TEXT("Toggle AI Behaviour HUD Overlay"),
-	ECVF_Cheat);
 
 // Sets default values
 ARobotAICharacter::ARobotAICharacter()

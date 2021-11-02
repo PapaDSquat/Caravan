@@ -3,16 +3,11 @@
 #include "CraftResourceActor.h"
 #include "Caravan.h"
 #include "DrawDebugHelpers.h"
+#include "Debug/CaravanConsoleVariables.h"
 #include "Engine.h"
 #include "GameFramework/Pawn.h"
 #include "RPG/InventoryComponent.h"
 #include "Utils/CaravanEngineUtils.h"
-
-static TAutoConsoleVariable<bool> CVarAIDebug_UsePlayerInventory(
-	TEXT("AI.Robot.UsePersonalInventory"),
-	true,
-	TEXT("Toggle AI Should store items in Player's inventory rather than personal"),
-	ECVF_Cheat);
 
 // Sets default values
 ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInitializer)
@@ -111,7 +106,7 @@ EInteractionType ACraftResourceActor::OnInteractSelect(const InteractData& inter
 	if (interactData.Pawn != NULL)
 	{
 		APawn* pawnWithInventory = NULL;
-		if (CVarAIDebug_UsePlayerInventory.GetValueOnGameThread() == true)
+		if (CVarRPGDebug_AlwaysUsePlayerInventory.GetValueOnGameThread() == true)
 		{
 			if (APlayerController* playerController = GetWorld()->GetFirstPlayerController())
 			{
