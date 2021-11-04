@@ -15,7 +15,7 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	OwningCharacter = Cast<ACaravanCharacter>(TryGetPawnOwner());
+	OwningCharacter = Cast<ACharacter>(TryGetPawnOwner());
 }
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTimeX)
@@ -38,5 +38,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTimeX)
 	Speed = OwningCharacter->GetVelocity().Size();
 
 	// INTERACTION
-	IsInteracting = OwningCharacter->Interacting;
+	// TODO : Get from InteractableComponent
+	// IsInteracting = OwningCharacter->Interacting;
 }
