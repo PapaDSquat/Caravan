@@ -70,7 +70,9 @@ void ACaravanCharacter::BeginPlay()
 	}
 
 	// Dwindle Setup
+	DwindleState.TimeBeforeReset = DwindleTime;
 	DwindleState.LastActorLocation = GetActorLocation();
+	IsDwindling = true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -430,7 +432,7 @@ void ACaravanCharacter::UpdateDwindleState(float DeltaSeconds)
 	}
 
 	// Check that we are not already outside of dwindle range
-	if (IsDwindling && distance > DwindleRange)
+	if (!IsDwindling && distance > DwindleRange)
 	{
 		IsDwindling = false;
 	}
