@@ -8,7 +8,7 @@
 #include "DestructableResourceActor.generated.h"
 
 UCLASS()
-class ADestructableResourceActor : public AInteractableActor
+class ADestructableResourceActor : public AActor
 {
 	GENERATED_BODY()
 	
@@ -18,18 +18,16 @@ public:
 
 	virtual void BeginPlay() override;
 
-	// IInteractable
-	virtual ECraftResourceType GetResourceType() const override { return ResourceType; }
-	//virtual void OnInteractFocus(const InteractData& interactData) override;
-	//virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
+	ECraftResourceType GetResourceType() const { return ResourceType; }
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
 
+	UPROPERTY(EditAnywhere)
+	UInteractableComponent* InteractableComponent;
+
 protected:
 	ECraftResourceType ResourceType{ ECraftResourceType::Invalid };
-
-	UInteractableComponent* InteractableComponent;
 
 	UPROPERTY(EditAnywhere)
 	int ResourceDropCount;

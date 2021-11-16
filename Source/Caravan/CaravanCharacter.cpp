@@ -7,7 +7,6 @@
 #include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/SkeletalMeshSocket.h"
-#include "InteractableActor.h"
 #include "MultiToolActor.h"
 #include "RPG/InventoryComponent.h"
 #include "WorldBuilder/WorldBuilderSubsystem.h"
@@ -256,11 +255,11 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 		return;
 	}
 
-	// Orient towards the target
 	if (IsTargeting && IsValid(InteractTarget))
 	{
 		AActor* targetActor = GetTargetedActor();
 
+		// Orient towards the target
 		// Build new rotation from distance vector
 		FRotator newRotation = (targetActor->GetActorLocation() - GetActorLocation()).GetSafeNormal().Rotation();
 		// Use the current pitch
@@ -274,7 +273,7 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 
 		if (CVarPlayerDebug_ShowInteractionTarget.GetValueOnGameThread() == true)
 		{
-			GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, InteractTarget->InteractionName.ToString());
+			GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, InteractTarget->PrimaryInteractionName.ToString());
 		}
 
 		if (CVarPlayerDebug_ShowInteractionOverlay.GetValueOnGameThread() == true)

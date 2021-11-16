@@ -5,10 +5,11 @@
 #include "InteractableActor.h"
 #include "CaravanBuildingPlatform.generated.h"
 
+class UInteractableComponent;
 class UStaticMeshSocket;
 
 UCLASS()
-class ACaravanBuildingPlatform : public AInteractableActor
+class ACaravanBuildingPlatform : public AActor
 {
 	GENERATED_BODY()
 	
@@ -25,9 +26,13 @@ public:
 	bool GetActive() const { return IsActive; }
 	void SetActive(bool bActive);
 
-private:
-	UPROPERTY(EditAnywhere)
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UInteractableComponent* InteractableComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* StaticMeshComponent;
 
+private:
 	bool IsActive{ true }; // Reset to false in BeginPlay
 };

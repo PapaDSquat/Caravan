@@ -2,12 +2,19 @@
 
 #include "CaravanBuildingPlatform.h"
 #include "Caravan.h"
+#include "Components/InteractableComponent.h"
 
 ACaravanBuildingPlatform::ACaravanBuildingPlatform(const class FObjectInitializer& ObjInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CaravanActor_StaticMeshComponent"));
+
+	InteractableComponent = FindComponentByClass< UInteractableComponent >();
+	if (InteractableComponent == NULL)
+	{
+		InteractableComponent = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractableComponent"));
+	}
 }
 
 void ACaravanBuildingPlatform::BeginPlay()

@@ -27,7 +27,7 @@ struct SCraftResourceInitData
 };
 
 UCLASS()
-class CARAVAN_API ACraftResourceActor : public AInteractableActor
+class CARAVAN_API ACraftResourceActor : public AActor
 {
 	GENERATED_BODY()
 	
@@ -42,8 +42,7 @@ public:
 
 	const FString& GetResourceName() const { return ResourceName; }
 
-	// IInteractable
-	virtual ECraftResourceType GetResourceType() const override { return ResourceType; }
+	virtual ECraftResourceType GetResourceType() const { return ResourceType; }
 	//virtual FString GetInteractionName() const override;
 	//virtual void OnInteractFocus(const InteractData& interactData) override;
 	//virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;

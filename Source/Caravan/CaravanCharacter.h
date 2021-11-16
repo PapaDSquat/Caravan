@@ -4,7 +4,6 @@
 #include "CraftResourceActor.h"
 #include "CaravanCharacter.generated.h"
 
-class AInteractableActor;
 class UInteractableComponent;
 class ACaravanActor;
 class AMultiToolActor;

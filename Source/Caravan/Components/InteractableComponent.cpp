@@ -6,7 +6,7 @@
 #include "DrawDebugHelpers.h"
 
 UInteractableComponent::UInteractableComponent()
-	: InteractionName( FText::FromString("UNNAMED_INTERACTION") )
+	: PrimaryInteractionName( FText::FromString("UNNAMED_INTERACTION") )
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -14,19 +14,6 @@ UInteractableComponent::UInteractableComponent()
 void UInteractableComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Doesn't work because Actors can be owners, and Components cannot :((((
-	if (ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner()))
-	{
-		if (IInteractable* InteractableActor = Cast<IInteractable>(OwnerCharacter))
-		{
-			OwnerInteractable = InteractableActor;
-		}		
-		else if (IInteractable* InteractableController = Cast<IInteractable>(OwnerCharacter->GetController()))
-		{
-			OwnerInteractable = InteractableController;
-		}
-	}
 }
 
 void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -49,7 +36,7 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 				DrawDebugString(
 					GetWorld(),
 					WorldOffset,
-					PrimaryInteractionName,
+					PrimaryInteractionName.ToString(),
 					GetOwner(),
 					FColor::Green,
 					0.f

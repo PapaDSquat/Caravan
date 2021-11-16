@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Interactable.h"
 #include "InteractableComponent.generated.h"
 
 class APawn;
@@ -92,12 +91,9 @@ public:
 
 	//==================================================
 	// Config Properties
-	UPROPERTY(EditAnywhere, Category = "Interaction")
-	FText InteractionName;
-
 	// Interaction name displayed when targeting the interactable (before opening interaction menu)
 	UPROPERTY(EditAnywhere, Category="Interaction")
-	FString PrimaryInteractionName;
+	FText PrimaryInteractionName;
 
 	// If true, overrides InteractionChoices to build the choices from a script function call
 	UPROPERTY(EditAnywhere, Category = "Interaction")
@@ -109,8 +105,6 @@ public:
 	//==================================================
 
 private:
-	IInteractable* OwnerInteractable;
-
 	TWeakPtr< APawn > TargetingPawn;
 	TWeakPtr< APawn > InteractingPawn;
 };
