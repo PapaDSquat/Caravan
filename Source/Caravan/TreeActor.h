@@ -12,7 +12,4 @@ class ATreeActor : public ADestructableResourceActor
 
 public:
 	ATreeActor(const class FObjectInitializer& ObjInitializer);
-
-	// IInteractable
-	virtual FString GetInteractionName() const override { return FString("CHOP"); }
 };

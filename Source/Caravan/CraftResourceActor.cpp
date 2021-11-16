@@ -2,6 +2,7 @@
 
 #include "CraftResourceActor.h"
 #include "Caravan.h"
+#include "Components/InteractableComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Debug/CaravanConsoleVariables.h"
 #include "Engine.h"
@@ -16,19 +17,23 @@ ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInit
 	PrimaryActorTick.bCanEverTick = true;
 	
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CraftResourceActor_StaticMeshComponent"));
+
+	InteractableComponent = FindComponentByClass< UInteractableComponent >();
+	if (InteractableComponent == NULL)
+	{
+		InteractableComponent = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractableComponent"));
+	}
 }
 
-// Called when the game starts or when spawned
 void ACraftResourceActor::BeginPlay()
 {
 	Super::BeginPlay();
-}
 
-// Called every frame
-void ACraftResourceActor::Tick( float DeltaTime )
-{
-	Super::Tick( DeltaTime );
-
+	// Event Registration
+	if (IsValid(InteractableComponent))
+	{
+		InteractableComponent->OnInteract.AddDynamic(this, &ACraftResourceActor::OnInteract);
+	}
 }
 
 /*static*/ /*bool ACraftResourceActor::CreateInWorld(const SCraftResourceInitData& initData, ACraftResourceActor* pOutActor)
@@ -67,16 +72,6 @@ void ACraftResourceActor::InitCraftResource(const SCraftResourceInitData& initDa
 	SetActorRotation(initData.Rotation);
 }
 
-FString ACraftResourceActor::GetInteractionName() const
-{ 
-	return FString::Printf(TEXT("COLLECT %s"), *GetResourceName().ToUpper());
-}
-
-void ACraftResourceActor::OnInteractFocus(const InteractData& interactData)
-{
-	AInteractableActor::OnInteractFocus(interactData);
-}
-
 // TODO: Probably shouldn't need this
 UInventoryComponent* const FindInventoryComponent(const APawn* inPawn)
 {
@@ -96,6 +91,48 @@ UInventoryComponent* const FindInventoryComponent(const APawn* inPawn)
 		}
 	}
 	return NULL;
+}
+
+void ACraftResourceActor::OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice)
+{
+	GEngine->AddOnScreenDebugMessage(1, 2.5f, FColor::Cyan, FString::Printf(TEXT("COLLECTED %s"), *GetResourceName().ToUpper()));
+
+	if (InteractingPawn != NULL)
+	{
+		APawn* pawnWithInventory = NULL;
+		if (CVarRPGDebug_AlwaysUsePlayerInventory.GetValueOnGameThread() == true)
+		{
+			if (APlayerController* playerController = GetWorld()->GetFirstPlayerController())
+			{
+				if (APawn* playerPawn = Cast<APawn>(playerController->GetPawn()))
+				{
+					pawnWithInventory = playerPawn;
+				}
+			}
+		}
+		else
+		{
+			pawnWithInventory = InteractingPawn;
+		}
+
+		if (UInventoryComponent* const inventory = FindInventoryComponent(pawnWithInventory))
+		{
+			inventory->AddCraftResource(this);
+		}
+	}
+
+	Destroy();
+}
+
+/*
+FString ACraftResourceActor::GetInteractionName() const
+{
+	return FString::Printf(TEXT("COLLECT %s"), *GetResourceName().ToUpper());
+}
+
+void ACraftResourceActor::OnInteractFocus(const InteractData& interactData)
+{
+	AInteractableActor::OnInteractFocus(interactData);
 }
 
 EInteractionType ACraftResourceActor::OnInteractSelect(const InteractData& interactData)
@@ -130,6 +167,7 @@ EInteractionType ACraftResourceActor::OnInteractSelect(const InteractData& inter
 	Destroy();
 	return EInteractionType::ResourceCollect;
 }
+*/
 
 bool CraftResourceHelpers::IsValidType(ECraftResourceType type)
 {

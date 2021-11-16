@@ -16,6 +16,6 @@ ECraftResourceType IInteractable::GetResourceType() const
 	return ECraftResourceType::Invalid;
 }
 
-void IInteractable::OnInteractFocus(const InteractData& interactData) {}
-void IInteractable::OnInteractUnFocus(const InteractData& interactData) {}
-EInteractionType IInteractable::OnInteractSelect(const InteractData& interactData) { return EInteractionType::None; }
+//void IInteractable::OnInteractFocus(const InteractData& interactData) {}
+//void IInteractable::OnInteractUnFocus(const InteractData& interactData) {}
+//EInteractionType IInteractable::OnInteractSelect(const InteractData& interactData) { return EInteractionType::None; }

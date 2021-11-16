@@ -185,6 +185,7 @@ void ACaravanActor::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 }
 
+/*
 FString ACaravanActor::GetInteractionName() const
 {
 	FString interactionName("");
@@ -248,6 +249,7 @@ EInteractionType ACaravanActor::OnInteractSelect(const InteractData& interactDat
 	}
 	return FocusedInteractionType;
 }
+*/
 
 // TODO: Remove these
 const UStaticMeshSocket* ACaravanActor::GetCarrySocket() const

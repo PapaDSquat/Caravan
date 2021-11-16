@@ -5,6 +5,7 @@
 #include "CaravanCharacter.generated.h"
 
 class AInteractableActor;
+class UInteractableComponent;
 class ACaravanActor;
 class AMultiToolActor;
 
@@ -23,6 +24,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	bool IsCarryingCaravan() const { return (ActiveCaravan != NULL); }
+
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	AActor* GetFocusedActor() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	AActor* GetTargetedActor() const;
+
+	/** Returns FollowCamera subobject **/
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 protected:
 	/** Called for forwards/backward input */
@@ -62,19 +72,17 @@ protected:
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	// Dwindle
 	// True if Player hasn't moved outside of a fixed range within a fixed amount of time
 	UPROPERTY(BlueprintReadOnly, Category = "State")
-	bool IsDwindling = false;
+	bool IsLoitering = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	float DwindleRange = 1500.f;
+	float LoiterRange = 1500.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	float DwindleTime = 5.f;
+	float LoiterTime = 5.f;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
@@ -92,14 +100,14 @@ protected:
 	bool IsTargeting = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-	AInteractableActor* TargetActor = NULL;
+	UInteractableComponent* InteractTarget = NULL;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	FVector TargetBaseLocation;
 
 	// Interaction
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
-	AInteractableActor* InteractFocus = NULL;
+	UInteractableComponent* InteractFocus = NULL;
 
 	UPROPERTY(BlueprintReadOnly, Category = "RPG")
 	class UInventoryComponent* Inventory;
@@ -117,12 +125,12 @@ private:
 	struct SInteractTraceResult
 	{
 		FHitResult HitResult;
-		AInteractableActor* HitActor;
+		UInteractableComponent* HitComponent;
 		float HitDistance;
 		SInteractTraceResult& operator = (const SInteractTraceResult& rhs)
 		{
 			HitResult = rhs.HitResult;
-			HitActor = rhs.HitActor;
+			HitComponent = rhs.HitComponent;
 			HitDistance = rhs.HitDistance;
 			return *this;
 		}

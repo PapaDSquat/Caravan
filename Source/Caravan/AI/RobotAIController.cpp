@@ -3,14 +3,21 @@
 #include "AI/RobotAIController.h"
 #include "AI/RobotAICharacter.h"
 #include "AI/AIRobotSubsystem.h"
+#include "Components/InteractableComponent.h"
 #include "RPG/InventoryComponent.h"
 
 ARobotAIController::ARobotAIController()
 {
-	Inventory = FindComponentByClass< UInventoryComponent >();
-	if (Inventory == NULL)
+	InventoryComponent = FindComponentByClass< UInventoryComponent >();
+	if (InventoryComponent == NULL)
 	{
-		Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
+		InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	}
+
+	InteractableComponent = FindComponentByClass< UInteractableComponent >();
+	if (InteractableComponent == NULL)
+	{
+		InteractableComponent = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractableComponent"));
 	}
 }
 
@@ -25,6 +32,17 @@ void ARobotAIController::OnPossess(APawn* InPawn)
 	}
 
 	BuildCharacterFromSpec(robotCharacter->CharacterSpec);
+
+	// Event Registration
+	if (IsValid(InteractableComponent))
+	{
+		InteractableComponent->OnInteract.AddDynamic(this, &ARobotAIController::OnInteract);
+	}
+}
+
+void ARobotAIController::OnUnPossess()
+{
+	// Event Unregistration
 }
 
 void ARobotAIController::BeginPlay()
@@ -45,6 +63,11 @@ bool ARobotAIController::BuildCharacterFromSpec(const UAIRobotCharacterSpec* cha
 		}
 	}
 	return false;
+}
+
+void ARobotAIController::OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice)
+{
+	
 }
 
 ARobotAICharacter* ARobotAIController::GetRobotOwner() const

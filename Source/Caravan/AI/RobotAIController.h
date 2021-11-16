@@ -8,6 +8,9 @@
 #include "RobotAIController.generated.h"
 
 enum class ERobotAILocale : uint8;
+class UInventoryComponent;
+class UInteractableComponent;
+struct FInteractionChoice;
 
 UCLASS()
 class CARAVAN_API ARobotAIController : public AAIController
@@ -18,6 +21,7 @@ public:
 	ARobotAIController();
 
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
 	virtual void BeginPlay() override;
 
 public:
@@ -40,5 +44,12 @@ public:
 	ERobotAILocale CurrentAILocale;
 
 	UPROPERTY(BlueprintReadOnly, Category = "RPG")
-	class UInventoryComponent* Inventory;
+	UInventoryComponent* InventoryComponent;
+
+	UPROPERTY(BlueprintReadOnly, Category = "RPG")
+	UInteractableComponent* InteractableComponent;
+
+private:
+	UFUNCTION()
+	void OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice);
 };

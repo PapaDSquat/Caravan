@@ -16,10 +16,12 @@ public:
 	ADestructableResourceActor(const class FObjectInitializer& ObjInitializer);
 	ADestructableResourceActor(const class FObjectInitializer& ObjInitializer, ECraftResourceType resourceType);
 
+	virtual void BeginPlay() override;
+
 	// IInteractable
 	virtual ECraftResourceType GetResourceType() const override { return ResourceType; }
-	virtual void OnInteractFocus(const InteractData& interactData) override;
-	virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
+	//virtual void OnInteractFocus(const InteractData& interactData) override;
+	//virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
@@ -27,9 +29,15 @@ public:
 protected:
 	ECraftResourceType ResourceType{ ECraftResourceType::Invalid };
 
+	UInteractableComponent* InteractableComponent;
+
 	UPROPERTY(EditAnywhere)
 	int ResourceDropCount;
 
 	UPROPERTY(EditAnywhere)
 	float Health;
+
+private:
+	UFUNCTION()
+	void OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice);
 };

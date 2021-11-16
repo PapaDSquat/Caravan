@@ -12,7 +12,4 @@ class ARockActor : public ADestructableResourceActor
 	
 public:
 	ARockActor(const class FObjectInitializer& ObjInitializer);
-
-	// IInteractable
-	virtual FString GetInteractionName() const override { return FString("MINE"); }
 };

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "InteractableActor.h"
+#include "Components/InteractableComponent.h"
 #include "CraftResourceActor.generated.h"
 
 UENUM(BlueprintType)
@@ -31,6 +32,8 @@ class CARAVAN_API ACraftResourceActor : public AInteractableActor
 	GENERATED_BODY()
 	
 public:	
+	virtual void BeginPlay() override;
+
 	//static bool CreateInWorld(const SCraftResourceInitData& initData, ACraftResourceActor* pOutActor);
 	void InitCraftResource(const SCraftResourceInitData& initData);
 	
@@ -39,19 +42,17 @@ public:
 
 	const FString& GetResourceName() const { return ResourceName; }
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
-
 	// IInteractable
-	virtual FString GetInteractionName() const override;
 	virtual ECraftResourceType GetResourceType() const override { return ResourceType; }
-	virtual void OnInteractFocus(const InteractData& interactData) override;
-	virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
+	//virtual FString GetInteractionName() const override;
+	//virtual void OnInteractFocus(const InteractData& interactData) override;
+	//virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
 
 private:
+	UFUNCTION()
+	void OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice);
+
+	UInteractableComponent* InteractableComponent;
 
 	ECraftResourceType ResourceType;
 	FString ResourceName;

@@ -23,15 +23,12 @@ public:
 	void Interact(APawn* interactingPawn);
 
 	// IInteractable
-	virtual void OnInteractFocus(const InteractData& interactData) override;
-	virtual void OnInteractUnFocus(const InteractData& interactData) override;
-	virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
+	//virtual void OnInteractFocus(const InteractData& interactData) override;
+	//virtual void OnInteractUnFocus(const InteractData& interactData) override;
+	//virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Interaction)
 	void NotifyOnInteractFirstFocus();
-
-	UFUNCTION(BlueprintImplementableEvent, Category = Interaction)
-	void NotifyOnInteractFocusTick();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Interaction)
 	void NotifyOnInteractUnFocus();

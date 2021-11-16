@@ -18,10 +18,10 @@ void AInteractableActor::Tick(float DeltaSeconds)
 {
 	if (IsFocused)
 	{
-		GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, GetInteractionName());
+		//GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, GetInteractionName());
 	}
 }
-
+/*
 void AInteractableActor::OnInteractFocus(const InteractData& interactData)
 {
 	if (!IsFocused)
@@ -29,7 +29,6 @@ void AInteractableActor::OnInteractFocus(const InteractData& interactData)
 		IsFocused = true;
 		NotifyOnInteractFirstFocus();
 	}
-	NotifyOnInteractFocusTick();
 }
 
 void AInteractableActor::OnInteractUnFocus(const InteractData& interactData)
@@ -38,14 +37,15 @@ void AInteractableActor::OnInteractUnFocus(const InteractData& interactData)
 	NotifyOnInteractUnFocus();
 }
 
-void AInteractableActor::Interact(APawn* interactingPawn)
-{
-	InteractData data(interactingPawn);
-	OnInteractSelect(data);
-}
-
 EInteractionType AInteractableActor::OnInteractSelect(const InteractData& interactData)
 {
 	NotifyOnInteractSelect();
 	return EInteractionType::None;
+}
+*/
+
+void AInteractableActor::Interact(APawn* interactingPawn)
+{
+	//InteractData data(interactingPawn);
+	//OnInteractSelect(data);
 }

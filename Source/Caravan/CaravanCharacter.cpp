@@ -3,6 +3,7 @@
 #include "CaravanCharacter.h"
 #include "Caravan.h"
 #include "CaravanActor.h"
+#include "Components/InteractableComponent.h"
 #include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -70,9 +71,9 @@ void ACaravanCharacter::BeginPlay()
 	}
 
 	// Dwindle Setup
-	DwindleState.TimeBeforeReset = DwindleTime;
+	DwindleState.TimeBeforeReset = LoiterTime;
 	DwindleState.LastActorLocation = GetActorLocation();
-	IsDwindling = true;
+	IsLoitering = true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -185,16 +186,19 @@ void ACaravanCharacter::Interact()
 		ActiveCaravan->DetachFromActor(rules);
 		ActiveCaravan = NULL;
 	}
-	else if (InteractFocus != NULL)
+	else if (IsValid(InteractFocus))
 	{
-		IInteractable::InteractData interactData(this, LastTraceResult.HitResult);
-		EInteractionType interactionType = InteractFocus->OnInteractSelect(interactData);
+		AActor* focusedActor = GetFocusedActor();
+		const UInteractableComponent::InteractData interactData(this, LastTraceResult.HitResult);
+		InteractFocus->Interact(this);
+		/*
+		const EInteractionType interactionType = InteractFocus->InteractSelect(interactData);
 		Interacting = true; // Reset on next tick
 
 		switch (interactionType)
 		{
 		case EInteractionType::CaravanPull:
-			if (ACaravanActor* pCaravan = Cast<ACaravanActor>(InteractFocus))
+			if (ACaravanActor* pCaravan = Cast<ACaravanActor>(focusedActor))
 			{
 				this->SetActorLocation(pCaravan->GetCarrySocketLocation());
 				this->SetActorRotation(pCaravan->GetCarrySocketRotation());
@@ -207,8 +211,8 @@ void ACaravanCharacter::Interact()
 			break;
 		}
 		
-
-		if (InteractFocus->IsPendingKillPending())
+		*/
+		if (focusedActor->IsPendingKillPending())
 		{
 			// It's going to be destroyed, so cancel targetting if any
 			if (IsTargeting)
@@ -223,8 +227,8 @@ void ACaravanCharacter::OnTargetActivate()
 {
 	if (!IsTargeting) // Wait for Deactivate
 	{
-		TargetActor = InteractFocus;
-		IsTargeting = (TargetActor != NULL);
+		InteractTarget = InteractFocus;
+		IsTargeting = (InteractTarget != NULL);
 		if (IsTargeting)
 		{
 		}
@@ -233,7 +237,7 @@ void ACaravanCharacter::OnTargetActivate()
 
 void ACaravanCharacter::OnTargetDeactivate()
 {
-	TargetActor = NULL;
+	InteractTarget = NULL;
 	IsTargeting = false;
 }
 
@@ -253,20 +257,27 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 	}
 
 	// Orient towards the target
-	if (IsTargeting && TargetActor != NULL)
+	if (IsTargeting && IsValid(InteractTarget))
 	{
+		AActor* targetActor = GetTargetedActor();
+
 		// Build new rotation from distance vector
-		FRotator newRotation = (TargetActor->GetActorLocation() - GetActorLocation()).GetSafeNormal().Rotation();
+		FRotator newRotation = (targetActor->GetActorLocation() - GetActorLocation()).GetSafeNormal().Rotation();
 		// Use the current pitch
 		newRotation.Pitch = GetActorRotation().Pitch;
 		this->SetActorRotation(newRotation);
 
-		FVector targetLocation = TargetActor->GetActorLocation();
+		FVector targetLocation = targetActor->GetActorLocation();
 		FVector targetOrigin, targetExtent;
-		TargetActor->GetActorBounds(false, targetOrigin, targetExtent);
+		targetActor->GetActorBounds(false, targetOrigin, targetExtent);
 		TargetBaseLocation = targetOrigin + FVector(0.f, 0.f, -(targetExtent.Z * 0.75f)); // HACK offset
 
-		if (CVarPlayerDebug_ShowInteractionDebug.GetValueOnGameThread() == true)
+		if (CVarPlayerDebug_ShowInteractionTarget.GetValueOnGameThread() == true)
+		{
+			GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, InteractTarget->InteractionName.ToString());
+		}
+
+		if (CVarPlayerDebug_ShowInteractionOverlay.GetValueOnGameThread() == true)
 		{
 			DrawDebugBox(
 				GetWorld(),
@@ -382,28 +393,28 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 	{
 		LastTraceResult = traceResult;
 
-		IInteractable::InteractData interactData(this, LastTraceResult.HitResult);
+		UInteractableComponent::InteractData interactData(this, LastTraceResult.HitResult);
 		// Focus on new one if it's not the same as previous
-		if (LastTraceResult.HitActor != InteractFocus)
+		if (LastTraceResult.HitComponent != InteractFocus)
 		{
 			// Unfocus previous
-			if (InteractFocus)
+			if (IsValid(InteractFocus))
 			{
-				InteractFocus->OnInteractUnFocus(interactData);
+				InteractFocus->InteractUnFocus(interactData);
 			}
 
-			InteractFocus = LastTraceResult.HitActor;
+			InteractFocus = LastTraceResult.HitComponent;
 		}
 
-		InteractFocus->OnInteractFocus(interactData);
+		InteractFocus->InteractFocus(interactData);
 	}
 	else
 	{
 		// TODO: Add delay before lose focus
-		if (InteractFocus)
+		if (IsValid(InteractFocus))
 		{
-			IInteractable::InteractData interactData(this);
-			InteractFocus->OnInteractUnFocus(interactData);
+			UInteractableComponent::InteractData interactData(this);
+			InteractFocus->InteractUnFocus(interactData);
 			InteractFocus = NULL;
 
 			// Cancel targetting
@@ -425,16 +436,16 @@ void ACaravanCharacter::UpdateDwindleState(float DeltaSeconds)
 	// Check dwindle at every interval
 	if (DwindleState.TimeBeforeReset <= 0.f)
 	{
-		IsDwindling = (distance <= DwindleRange);
+		IsLoitering = (distance <= LoiterRange);
 
-		DwindleState.TimeBeforeReset = DwindleTime;
+		DwindleState.TimeBeforeReset = LoiterTime;
 		DwindleState.LastActorLocation = GetActorLocation();
 	}
 
 	// Check that we are not already outside of dwindle range
-	if (!IsDwindling && distance > DwindleRange)
+	if (!IsLoitering && distance > LoiterRange)
 	{
-		IsDwindling = false;
+		IsLoitering = false;
 	}
 }
 
@@ -442,7 +453,7 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& trace
 {
 	int32 closestIndex = 0;
 	FHitResult closesHitResult;
-	AInteractableActor* closestInteractable = NULL;
+	UInteractableComponent* closestInteractable = NULL;
 	float closestActorDistance = 9999999.f; // TODO: Find a define
 
 	int32 traceTotal = traceDataList.Num();
@@ -457,28 +468,28 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& trace
 		FHitResult hitResult(ForceInit);
 		GetWorld()->LineTraceSingleByChannel(hitResult, traceData.Start, traceData.End, CARAVAN_OBJECT_CHANNEL_INTERACTABLE, TraceParams);
 
-		
-		AInteractableActor* interactableHitActor = nullptr;
+		UInteractableComponent* hitComponent = nullptr;
 		if (AActor* hitActor = hitResult.GetActor())
 		{
-			interactableHitActor = Cast<AInteractableActor>(hitActor);
-			if (interactableHitActor)
+			hitComponent = hitActor->FindComponentByClass<UInteractableComponent>();
+			if (IsValid(hitComponent))
 			{
-				float distance = (hitActor->GetActorLocation() - this->GetActorLocation()).Size();
+				const FVector actorLocation = IsValid(hitComponent) ? hitComponent->GetOwner()->GetActorLocation() : hitActor->GetActorLocation();
+				float distance = (actorLocation - this->GetActorLocation()).Size();
 				if (distance < closestActorDistance) //&& // TODO: Fix
 					//distance < interactableHitActor->MinimumInteractDistance) // Within interact range of this actor
 				{
 					distance = closestActorDistance;
-					closestInteractable = interactableHitActor;
+					closestInteractable = hitComponent;
 					closesHitResult = hitResult;
 					closestIndex = traceIdx;
 				}
 			}
 		}
 
-		if (CVarPlayerDebug_ShowInteractionDebug.GetValueOnGameThread() == true)
+		if (CVarPlayerDebug_ShowInteractionOverlay.GetValueOnGameThread() == true)
 		{
-			FColor debugColor = (interactableHitActor == NULL)
+			FColor debugColor = !IsValid(hitComponent)
 				? FColor(255, 0, 0)  // Red for miss
 				: FColor(0, 255, 0); // Green for hit
 
@@ -493,7 +504,7 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& trace
 		}
 	}
 
-	if (CVarPlayerDebug_ShowInteractionDebug.GetValueOnGameThread() == true)
+	if (CVarPlayerDebug_ShowInteractionOverlay.GetValueOnGameThread() == true)
 	{
 		// Slightly bigger blue line for closest result
 		DrawDebugLine(
@@ -507,8 +518,18 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& trace
 	}
 
 	outTraceResult.HitResult = closesHitResult;
-	outTraceResult.HitActor = closestInteractable;
+	outTraceResult.HitComponent = closestInteractable;
 	outTraceResult.HitDistance = closestActorDistance;
 
 	return (closestInteractable != NULL);
+}
+
+AActor* ACaravanCharacter::GetFocusedActor() const
+{
+	return IsValid(InteractFocus) ? InteractFocus->GetOwner() : NULL;
+}
+
+AActor* ACaravanCharacter::GetTargetedActor() const
+{
+	return IsValid(InteractTarget) ? InteractTarget->GetOwner() : NULL;
 }

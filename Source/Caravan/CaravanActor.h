@@ -3,6 +3,7 @@
 #pragma once
 
 #include "InteractableActor.h"
+#include "Components/InteractableComponent.h"
 #include "CaravanActor.generated.h"
 
 class UStaticMeshSocket;
@@ -50,9 +51,13 @@ public:
 	FRotator GetCarrySocketRotation() const;
 
 	// IInteractable
-	virtual FString GetInteractionName() const override;
-	virtual void OnInteractFocus(const InteractData& interactData) override;
-	virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
+	//virtual FString GetInteractionName() const override;
+	//virtual void OnInteractFocus(const InteractData& interactData) override;
+	//virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* StaticMeshComponent;
 
 private:
 	void SetCaravanOpen(bool bOpen);
@@ -60,10 +65,6 @@ private:
 	ACaravanBuildingPlatform* CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition);
 	ACaravanBuildingPlatform* GetBuildingAttachment(const FIntPoint& gridPosition) const;
 	bool SetBuildingAttachment(const FIntPoint& gridPosition, ACaravanBuildingPlatform* actor);
-
-private:
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* StaticMeshComponent;
 
 	// TODO: Potentially move to Interactable? (needs base StaticMeshComponent or getter)
 	struct SocketInteractionData

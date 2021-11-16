@@ -18,11 +18,17 @@ static TAutoConsoleVariable<bool> CVarAIDebug_Behaviour(
 	ECVF_Cheat);
 
 /*
-*	Player
+*	Interaction
 */
 
-static TAutoConsoleVariable<bool> CVarPlayerDebug_ShowInteractionDebug(
-	TEXT("Player.ShowInteractionDebug"),
+static TAutoConsoleVariable<bool> CVarPlayerDebug_ShowInteractionTarget(
+	TEXT("Interaction.Target"),
+	false,
+	TEXT("Toggle target name for Player interaction"),
+
+	ECVF_Cheat);
+static TAutoConsoleVariable<bool> CVarPlayerDebug_ShowInteractionOverlay(
+	TEXT("Interaction.Overlay"),
 	false,
 	TEXT("Toggle debug overlay for Player interaction"),
 	ECVF_Cheat);
