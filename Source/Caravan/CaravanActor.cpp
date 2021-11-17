@@ -52,6 +52,8 @@ void ACaravanActor::BeginPlay()
 	{
 		InteractableBackComponent->OnInteract.AddDynamic(this, &ACaravanActor::OnInteractWithBack);
 	}
+
+	SetCaravanOpen(bOpenOnBegin);
 }
 
 ACaravanBuildingPlatform* ACaravanActor::CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition)

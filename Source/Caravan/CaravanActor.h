@@ -31,10 +31,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Settings")
 	int BuildingGridTotalColumns = 7;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Caravan States")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan | State")
+	bool bOpenOnBegin = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Caravan | State")
 	bool IsOpen = false;
 	
-	UFUNCTION(BlueprintImplementableEvent, Category = "Caravan States")
+	UFUNCTION(BlueprintImplementableEvent, Category = "Caravan | State")
 	void NotifyOnToggleOpen(bool Open);
 
 	// Sets default values for this actor's properties
