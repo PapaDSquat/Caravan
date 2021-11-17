@@ -5,20 +5,12 @@
 #include "AI/AIRobotSubsystem.h"
 #include "Components/InteractableComponent.h"
 #include "RPG/InventoryComponent.h"
+#include "Utils/CaravanEngineUtils.h"
 
 ARobotAIController::ARobotAIController()
 {
-	InventoryComponent = FindComponentByClass< UInventoryComponent >();
-	if (InventoryComponent == NULL)
-	{
-		InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
-	}
-
-	InteractableComponent = FindComponentByClass< UInteractableComponent >();
-	if (InteractableComponent == NULL)
-	{
-		InteractableComponent = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractableComponent"));
-	}
+	FindOrCreateComponent(UInventoryComponent, InventoryComponent, "InventoryComponent");
+	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent");
 }
 
 void ARobotAIController::OnPossess(APawn* InPawn)

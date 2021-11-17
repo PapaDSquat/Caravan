@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "InteractableActor.h"
 #include "Components/InteractableComponent.h"
 #include "CaravanActor.generated.h"
 
@@ -16,8 +15,9 @@ enum ECaravanBuildingType
 	CraftStation
 };
 
+// TODO : Rename
 UCLASS()
-class ACaravanActor : public AInteractableActor
+class ACaravanActor : public AActor
 {
 	GENERATED_BODY()
 	

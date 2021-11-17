@@ -7,6 +7,7 @@
 #include "Engine.h"
 #include "DrawDebugHelpers.h"
 #include "Math/UnrealMathUtility.h"
+#include "Utils/CaravanEngineUtils.h"
 
 ADestructableResourceActor::ADestructableResourceActor(const class FObjectInitializer& ObjInitializer)
 	: ADestructableResourceActor(ObjInitializer, ECraftResourceType::Invalid)
@@ -19,11 +20,7 @@ ADestructableResourceActor::ADestructableResourceActor(const class FObjectInitia
 {
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("TreeActor_StaticMeshComponent"));
 
-	InteractableComponent = FindComponentByClass< UInteractableComponent >();
-	if (InteractableComponent == NULL)
-	{
-		InteractableComponent = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractableComponent"));
-	}
+	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent");
 }
 
 void ADestructableResourceActor::BeginPlay()

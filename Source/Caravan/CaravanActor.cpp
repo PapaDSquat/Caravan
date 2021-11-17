@@ -213,7 +213,7 @@ FString ACaravanActor::GetInteractionName() const
 
 void ACaravanActor::OnInteractFocus(const InteractData& interactData)
 {
-	AInteractableActor::OnInteractFocus(interactData);
+	Super::OnInteractFocus(interactData);
 
 	if (StaticMeshComponent)
 	{

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Interactable.h"
 #include "InteractionActorComponent.generated.h"
 
 class APawn;

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "InteractableActor.h"
 #include "Components/InteractableComponent.h"
 #include "CraftResourceActor.generated.h"
 

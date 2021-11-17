@@ -8,6 +8,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "RockActor.h"
 #include "TreeActor.h"
+#include "Utils/CaravanCollisionTypes.h"
 #include "WorldBuilder/WorldGenerationSpec.h"
 
 static const float CELL_ACTOR_SPAWN_RAYCAST_LENGTH = 5000.f;

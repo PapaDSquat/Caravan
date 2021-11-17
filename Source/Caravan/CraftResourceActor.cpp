@@ -18,11 +18,7 @@ ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInit
 	
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CraftResourceActor_StaticMeshComponent"));
 
-	InteractableComponent = FindComponentByClass< UInteractableComponent >();
-	if (!InteractableComponent)
-	{
-		InteractableComponent = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractableComponent"));
-	}
+	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent");
 }
 
 void ACraftResourceActor::BeginPlay()

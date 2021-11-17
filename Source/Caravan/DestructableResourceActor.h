@@ -3,9 +3,10 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "InteractableActor.h"
 #include "CraftResourceActor.h"
 #include "DestructableResourceActor.generated.h"
+
+class UInteractableComponent;
 
 UCLASS()
 class ADestructableResourceActor : public AActor

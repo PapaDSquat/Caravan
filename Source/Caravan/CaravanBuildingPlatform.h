@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "InteractableActor.h"
 #include "CaravanBuildingPlatform.generated.h"
 
 class UInteractableComponent;

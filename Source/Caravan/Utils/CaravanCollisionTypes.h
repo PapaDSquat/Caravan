@@ -1,0 +1,3 @@
+#pragma once
+
+#define CARAVAN_OBJECT_CHANNEL_INTERACTABLE ECC_GameTraceChannel1
