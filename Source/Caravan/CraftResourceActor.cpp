@@ -129,7 +129,6 @@ FString ACraftResourceActor::GetInteractionName() const
 {
 	return FString::Printf(TEXT("COLLECT %s"), *GetResourceName().ToUpper());
 }
-
 */
 
 bool CraftResourceHelpers::IsValidType(ECraftResourceType type)

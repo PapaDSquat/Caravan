@@ -53,11 +53,16 @@ public:
 	// IInteractable
 	//virtual FString GetInteractionName() const override;
 	//virtual void OnInteractFocus(const InteractData& interactData) override;
-	//virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
+
+	UPROPERTY(EditAnywhere)
+	UInteractableComponent* InteractableFrontComponent;
+
+	UPROPERTY(EditAnywhere)
+	UInteractableComponent* InteractableBackComponent;
 
 private:
 	void SetCaravanOpen(bool bOpen);
@@ -65,6 +70,11 @@ private:
 	ACaravanBuildingPlatform* CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition);
 	ACaravanBuildingPlatform* GetBuildingAttachment(const FIntPoint& gridPosition) const;
 	bool SetBuildingAttachment(const FIntPoint& gridPosition, ACaravanBuildingPlatform* actor);
+
+	UFUNCTION()
+	void OnInteractWithFront(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice);
+	UFUNCTION()
+	void OnInteractWithBack(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice);
 
 	// TODO: Potentially move to Interactable? (needs base StaticMeshComponent or getter)
 	struct SocketInteractionData

@@ -44,14 +44,13 @@ public:
 
 	virtual ECraftResourceType GetResourceType() const { return ResourceType; }
 	//virtual FString GetInteractionName() const override;
-	//virtual void OnInteractFocus(const InteractData& interactData) override;
-	//virtual EInteractionType OnInteractSelect(const InteractData& interactData) override;
+
+	UPROPERTY(EditAnywhere)
+	UInteractableComponent* InteractableComponent;
 
 private:
 	UFUNCTION()
 	void OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice);
-
-	UInteractableComponent* InteractableComponent;
 
 	ECraftResourceType ResourceType;
 	FString ResourceName;

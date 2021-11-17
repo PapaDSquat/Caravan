@@ -21,3 +21,16 @@ namespace CaravanUtils
         return Name;
     }
 }
+
+/*
+* Find a component, or create it if not found.
+* Can only be called from Actor constructor.
+* 
+* TODO: Move to CaravanBaseActor class…
+*/
+#define FindOrCreateComponent(ComponentClass, ComponentObject, ComponentName) \
+    ComponentObject = FindComponentByClass< ComponentClass >(); \
+    if (ComponentObject == NULL) \
+    { \
+    	ComponentObject = CreateDefaultSubobject< ComponentClass >(TEXT(ComponentName)); \
+    }

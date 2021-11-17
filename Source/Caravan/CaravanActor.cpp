@@ -4,6 +4,8 @@
 #include "Caravan.h"
 #include "CaravanCharacter.h"
 #include "CaravanBuildingPlatform.h"
+#include "Utils/CaravanEngineUtils.h"
+#include "Components/InteractableComponent.h"
 #include "Engine.h"
 #include "DrawDebugHelpers.h"
 
@@ -17,6 +19,9 @@ ACaravanActor::ACaravanActor(const class FObjectInitializer& ObjInitializer)
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CaravanActor_StaticMeshComponent"));
+
+	FindOrCreateComponent(UInteractableComponent, InteractableFrontComponent, "InteractableFrontComponent");
+	FindOrCreateComponent(UInteractableComponent, InteractableBackComponent, "InteractableBackComponent");
 }
 
 // Called when the game starts or when spawned
@@ -30,7 +35,6 @@ void ACaravanActor::BeginPlay()
 	{
 		row.SetNum(BuildingGridTotalColumns);
 	}
-
 	
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(1, 0));
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(0, 1));
@@ -39,6 +43,15 @@ void ACaravanActor::BeginPlay()
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(0, 2));
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(2, 2));
 	
+	// Event Registration
+	if (IsValid(InteractableFrontComponent))
+	{
+		InteractableFrontComponent->OnInteract.AddDynamic(this, &ACaravanActor::OnInteractWithFront);
+	}
+	if (IsValid(InteractableBackComponent))
+	{
+		InteractableBackComponent->OnInteract.AddDynamic(this, &ACaravanActor::OnInteractWithBack);
+	}
 }
 
 ACaravanBuildingPlatform* ACaravanActor::CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition)
@@ -236,20 +249,17 @@ void ACaravanActor::OnInteractFocus(const InteractData& interactData)
 		FocusedInteractionType = EInteractionType::None;
 	}
 }
-
-EInteractionType ACaravanActor::OnInteractSelect(const InteractData& interactData)
-{
-	AInteractableActor::OnInteractSelect(interactData);
-
-	switch (FocusedInteractionType)
-	{
-	case EInteractionType::CaravanToggleOpen:
-		SetCaravanOpen(!IsOpen);
-		break;
-	}
-	return FocusedInteractionType;
-}
 */
+
+void ACaravanActor::OnInteractWithFront(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice)
+{
+	// TODO
+}
+
+void ACaravanActor::OnInteractWithBack(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice)
+{
+	SetCaravanOpen(!IsOpen);
+}
 
 // TODO: Remove these
 const UStaticMeshSocket* ACaravanActor::GetCarrySocket() const
