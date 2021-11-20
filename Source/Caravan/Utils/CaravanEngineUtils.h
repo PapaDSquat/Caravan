@@ -32,5 +32,6 @@ namespace CaravanUtils
     ComponentObject = FindComponentByClass< ComponentClass >(); \
     if (ComponentObject == NULL) \
     { \
-    	ComponentObject = CreateDefaultSubobject< ComponentClass >(TEXT(ComponentName)); \
+    	ComponentObject = ObjInitializer.CreateDefaultSubobject< ComponentClass >(this, TEXT(ComponentName)); \
+        AddOwnedComponent(ComponentObject); \
     }

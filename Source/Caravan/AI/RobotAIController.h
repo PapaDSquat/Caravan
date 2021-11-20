@@ -15,11 +15,9 @@ struct FInteractionChoice;
 UCLASS()
 class CARAVAN_API ARobotAIController : public AAIController
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 	
 public:
-	ARobotAIController();
-
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 	virtual void BeginPlay() override;

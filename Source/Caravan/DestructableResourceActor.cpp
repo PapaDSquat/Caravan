@@ -14,13 +14,17 @@ ADestructableResourceActor::ADestructableResourceActor(const class FObjectInitia
 {}
 
 ADestructableResourceActor::ADestructableResourceActor(const class FObjectInitializer& ObjInitializer, ECraftResourceType resourceType)
-	: ResourceType(resourceType)
+	: Super(ObjInitializer)
+	, ResourceType(resourceType)
 	, ResourceDropCount(1)
 	, Health(100.f)
 {
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("TreeActor_StaticMeshComponent"));
 
 	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent");
+	{
+		InteractableComponent->PrimaryInteractionName = FText::FromString("Destroy");
+	}
 }
 
 void ADestructableResourceActor::BeginPlay()

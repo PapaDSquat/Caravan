@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
 #include "InteractableComponent.generated.h"
 
 class APawn;
@@ -37,7 +37,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInteractTargetEvent, APawn*, Inter
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FInteractEvent, APawn*, InteractingPawn, class UInteractableComponent*, InteractableComponent, const FInteractionChoice&, Choice);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class CARAVAN_API UInteractableComponent : public UActorComponent
+class CARAVAN_API UInteractableComponent : public USceneComponent
 {
 	GENERATED_BODY()
 

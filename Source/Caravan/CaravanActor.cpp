@@ -18,10 +18,23 @@ ACaravanActor::ACaravanActor(const class FObjectInitializer& ObjInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	USkeletalMeshComponent* SkeletalMesh = ObjInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("SkeletalMesh"));;
+	SetRootComponent(SkeletalMesh);
+	//UBoxComponent* Collision = ObjInitializer.CreateDefaultSubobject<UBoxComponent>(this, TEXT("CaravanRoot"));
+	//SetRootComponent(Collision);
+
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CaravanActor_StaticMeshComponent"));
 
-	FindOrCreateComponent(UInteractableComponent, InteractableFrontComponent, "InteractableFrontComponent");
-	FindOrCreateComponent(UInteractableComponent, InteractableBackComponent, "InteractableBackComponent");
+	InteractableFrontComponent = ObjInitializer.CreateDefaultSubobject<UInteractableComponent>(this, TEXT("InteractableFrontComponent"));
+	{
+		AddOwnedComponent(InteractableFrontComponent);
+		InteractableFrontComponent->PrimaryInteractionName = FText::FromString("Travel");
+	}
+	InteractableBackComponent = ObjInitializer.CreateDefaultSubobject<UInteractableComponent>(this, TEXT("InteractableBackComponent"));
+	{
+		AddOwnedComponent(InteractableBackComponent);
+		InteractableBackComponent->PrimaryInteractionName = FText::FromString("Open/Close");
+	}
 }
 
 // Called when the game starts or when spawned

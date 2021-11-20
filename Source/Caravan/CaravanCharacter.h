@@ -30,6 +30,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	AActor* GetTargetedActor() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	UInteractableComponent* GetFocusedInteractable() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	UInteractableComponent* GetTargetedInteractable() const;
+
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
@@ -112,6 +118,8 @@ protected:
 	class UInventoryComponent* Inventory;
 
 private:
+	void OnInteractComponentDeactivated(UActorComponent* Component, bool bReset);
+
 	void UpdateDwindleState(float DeltaSeconds);
 
 	struct SInteractTraceData
