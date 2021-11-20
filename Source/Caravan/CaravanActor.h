@@ -22,6 +22,10 @@ class ACaravanActor : public AActor
 	GENERATED_BODY()
 	
 public:
+	ACaravanActor(const class FObjectInitializer& ObjInitializer);
+
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Classes)
 	TSubclassOf<class ACaravanBuildingPlatform> BuildingPlatformBPClass;
 
@@ -39,15 +43,6 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "Caravan | State")
 	void NotifyOnToggleOpen(bool Open);
-
-	// Sets default values for this actor's properties
-	ACaravanActor(const class FObjectInitializer& ObjInitializer);
-
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
 
 	const UStaticMeshSocket* GetCarrySocket() const;
 	FVector GetCarrySocketLocation() const;

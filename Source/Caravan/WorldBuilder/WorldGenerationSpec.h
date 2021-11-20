@@ -8,6 +8,8 @@
 
 class ACaravanActor;
 class ACaravanCharacter;
+class ACraftResourceActor;
+class ADestructableResourceActor;
 
 USTRUCT(BlueprintType)
 struct FWorldGenerationActors
@@ -57,6 +59,18 @@ class CARAVAN_API UWorldGenerationSpec : public UDataAsset
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditDefaultsOnly, Category = "Actors|Destructable Resource")
+	TSubclassOf<ADestructableResourceActor> TreeActorClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Actors|Destructable Resource")
+	TSubclassOf<ADestructableResourceActor> RockActorClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Actors|Craft Resource")
+	TSubclassOf<ACraftResourceActor> WoodActorClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Actors|Craft Resource")
+	TSubclassOf<ACraftResourceActor> StoneActorClass;
+
 	// Toggle whether to spawn trees, rocks, etc.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flags")
 	bool SpawnResourceActorsEnabled = true;

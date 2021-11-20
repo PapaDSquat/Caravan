@@ -9,11 +9,13 @@ ACaravanBuildingPlatform::ACaravanBuildingPlatform(const class FObjectInitialize
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CaravanActor_StaticMeshComponent"));
+	SetRootComponent(StaticMeshComponent);
 
 	InteractableComponent = FindComponentByClass< UInteractableComponent >();
 	if (InteractableComponent == NULL)
 	{
 		InteractableComponent = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractableComponent"));
+		InteractableComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 }
 

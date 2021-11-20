@@ -20,10 +20,12 @@ ADestructableResourceActor::ADestructableResourceActor(const class FObjectInitia
 	, Health(100.f)
 {
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("TreeActor_StaticMeshComponent"));
+	SetRootComponent(StaticMeshComponent);
 
 	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent");
 	{
 		InteractableComponent->PrimaryInteractionName = FText::FromString("Destroy");
+		InteractableComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
 
@@ -43,7 +45,7 @@ void ADestructableResourceActor::OnInteract(APawn* InteractingPawn, UInteractabl
 	Health -= 35; // TODO: From weapon controller
 	if (Health <= 0)
 	{
-		// Drop craft resource actors
+		// Drop craft resource actorsw
 		static float LOCATION_OFFSET_LENGTH = 100.f;
 
 		FBox thisBB = GetComponentsBoundingBox();
@@ -54,6 +56,7 @@ void ADestructableResourceActor::OnInteract(APawn* InteractingPawn, UInteractabl
 		for (int i = 0; i < ResourceDropCount; ++i)
 		{
 			FActorSpawnParameters SpawnParameters;
+			//if (TActorClass* spawnedActor = GetWorld()->SpawnActor<TActorClass>(ActorClass.Get(), SpawnParameters))
 			if (ACraftResourceActor* resourceActor = GetWorld()->SpawnActor<ACraftResourceActor>(SpawnParameters))
 			{
 				resourceBB = resourceActor->GetComponentsBoundingBox();

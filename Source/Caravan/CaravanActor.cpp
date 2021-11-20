@@ -13,15 +13,10 @@ static const FName SOCKET_PULL("PullSocket");
 static const FName SOCKET_TOGGLE_OPEN("ToggleOpenSocket");
 static const FName SOCKET_BUILDING_ATTACHMENT("BuildingAttachmentSocket");
 
-// Sets default values
 ACaravanActor::ACaravanActor(const class FObjectInitializer& ObjInitializer)
 {
-	PrimaryActorTick.bCanEverTick = true;
-
 	USkeletalMeshComponent* SkeletalMesh = ObjInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("SkeletalMesh"));;
 	SetRootComponent(SkeletalMesh);
-	//UBoxComponent* Collision = ObjInitializer.CreateDefaultSubobject<UBoxComponent>(this, TEXT("CaravanRoot"));
-	//SetRootComponent(Collision);
 
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CaravanActor_StaticMeshComponent"));
 
@@ -205,12 +200,6 @@ bool ACaravanActor::SetBuildingAttachment(const FIntPoint& gridPosition, ACarava
 		}
 	}
 	return false;
-}
-
-// Called every frame
-void ACaravanActor::Tick( float DeltaTime )
-{
-	Super::Tick( DeltaTime );
 }
 
 /*

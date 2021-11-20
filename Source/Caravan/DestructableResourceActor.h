@@ -21,14 +21,16 @@ public:
 
 	ECraftResourceType GetResourceType() const { return ResourceType; }
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInteractableComponent* InteractableComponent;
 
-protected:
+	UPROPERTY(EditAnywhere, Category="Resource")
 	ECraftResourceType ResourceType{ ECraftResourceType::Invalid };
+
+protected:
 
 	UPROPERTY(EditAnywhere)
 	int ResourceDropCount;

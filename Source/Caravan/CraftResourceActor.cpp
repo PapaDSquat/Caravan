@@ -17,10 +17,12 @@ ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInit
 	PrimaryActorTick.bCanEverTick = true;
 	
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CraftResourceActor_StaticMeshComponent"));
+	// SetRootComponent(StaticMeshComponent);
 
 	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent");
 	{
 		InteractableComponent->PrimaryInteractionName = FText::FromString("Collect");
+		// InteractableComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
 

@@ -197,17 +197,17 @@ void UWorldBuilderSubsystem::ResetResourceGrid()
 					float randResourceIndex = FMath::RandRange(0.f, 1.0f);
 					if (randResourceIndex <= realTreeDensity)
 					{
-						SpawnGridCellActor<ATreeActor>(
+						SpawnGridCellActor(
+							WorldSpec->TreeActorClass,
 							cellData,
-							FName(TEXT("/Game/Caravan/Meshes/Tree1")),
 							gridPosition
 							);
 					}
 					else
 					{
-						SpawnGridCellActor<ARockActor>(
+						SpawnGridCellActor(
+							WorldSpec->RockActorClass,
 							cellData,
-							FName(TEXT("/Game/Caravan/Meshes/Rock1")),
 							gridPosition
 							);
 					}
@@ -217,13 +217,16 @@ void UWorldBuilderSubsystem::ResetResourceGrid()
 	}
 }
 
-template< class ActorClass >
-ActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(GridCellData& cellData, const FName& meshName, const FIntPoint& gridPosition)
+template< class TActorClass >
+TActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(const TSubclassOf<TActorClass>& ActorClass, GridCellData& CellData, const FIntPoint& GridPosition)
 {
+	if (!ensureMsgf(ActorClass != NULL, TEXT("[UWorldBuilderSubsystem::SpawnGridCellActor] Invalid Actor Class. Check your World Spec!")))
+		return NULL;
+
 	FVector gridOrigin = GeneratePosition;
 
 	FActorSpawnParameters SpawnParameters;
-	if (ActorClass* spawnedActor = GetWorld()->SpawnActor<ActorClass>(SpawnParameters))
+	if (TActorClass* spawnedActor = GetWorld()->SpawnActor<TActorClass>(ActorClass.Get(), SpawnParameters))
 	{
 		// Random scale
 		float scaleAmount = FMath::RandRange(WorldSpec->CraftActorScaleMin, WorldSpec->CraftActorScaleMax);
@@ -233,16 +236,15 @@ ActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(GridCellData& cellData, c
 		FBox actorBB;
 		if (spawnedActor->StaticMeshComponent)
 		{
-			if (UStaticMesh* ResourceMesh = DynamicLoadObjFromPath<UStaticMesh>(meshName))
+			if (UStaticMesh* ResourceMesh = spawnedActor->StaticMeshComponent->GetStaticMesh())
 			{
 				actorBB = ResourceMesh->GetBoundingBox();
 				//actorBB.ExpandBy(scale);
-				spawnedActor->StaticMeshComponent->SetStaticMesh(ResourceMesh);
 			}
 		}
 
 		FVector cellTopLeft, cellBottomRight;
-		GetGridCellBounds(gridPosition, cellTopLeft, cellBottomRight);
+		GetGridCellBounds(GridPosition, cellTopLeft, cellBottomRight);
 
 		// Position in random position within the cell
 		float randomX = FMath::RandRange(cellTopLeft.X, cellBottomRight.X);
@@ -271,8 +273,8 @@ ActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(GridCellData& cellData, c
 		spawnedActor->SetActorRotation(rotation);
 
 		// Update the cell data
-		cellData.Actor = spawnedActor;
-		cellData.GridPosition = gridPosition;
+		CellData.Actor = spawnedActor;
+		CellData.GridPosition = GridPosition;
 
 		return spawnedActor;
 	}
