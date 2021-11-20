@@ -25,8 +25,11 @@ public:
 	// TODO: Move this into a tickable Time System
 	void UpdateTime(float DeltaTime);
 
-	bool GenerateNewWorld(const FVector& Position, UWorldGenerationSpec const * Spec, const struct FWorldGenerationActors& Actors, const struct FWorldGenerationTimeParams& TimeParams);
+	bool GenerateNewWorld(const FVector& Position, UWorldGenerationSpec* Spec, const struct FWorldGenerationActors& Actors, const struct FWorldGenerationTimeParams& TimeParams);
 	void ResetResourceGrid();
+
+	UFUNCTION(BlueprintCallable)
+	UWorldGenerationSpec* GetWorldSpec() const { return WorldSpec; }
 
 	UFUNCTION(BlueprintCallable)
 	class ADestructableResourceActor* FindClosestDestructableResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange = -1.f);
@@ -76,7 +79,7 @@ private:
 	bool IsInGrid(const FIntPoint& inGridPos) const;
 
 	FVector GeneratePosition;
-	UWorldGenerationSpec const* WorldSpec = NULL;
+	UWorldGenerationSpec* WorldSpec = NULL;
 	ACaravanCharacter const * PlayerCharacter = NULL;
 	ACaravanActor const * CaravanActor = NULL;
 

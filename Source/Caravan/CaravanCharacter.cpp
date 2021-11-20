@@ -515,7 +515,7 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& Trace
 	{
 		if (IsValid(ClosestInteractable))
 		{
-			GEngine->AddOnScreenDebugMessage(2, 1.0f, FColor::Emerald, FString::Printf(TEXT("Location: %f, %f, %f"), ClosestInteractable->GetComponentLocation().X, ClosestInteractable->GetComponentLocation().Y, ClosestInteractable->GetComponentLocation().Z));
+			// GEngine->AddOnScreenDebugMessage(2, 1.0f, FColor::Emerald, FString::Printf(TEXT("Location: %f, %f, %f"), ClosestInteractable->GetComponentLocation().X, ClosestInteractable->GetComponentLocation().Y, ClosestInteractable->GetComponentLocation().Z));
 		}
 
 		// Slightly bigger blue line for closest result

@@ -8,6 +8,8 @@
 #include "DrawDebugHelpers.h"
 #include "Math/UnrealMathUtility.h"
 #include "Utils/CaravanEngineUtils.h"
+#include "WorldBuilder/WorldBuilderSubsystem.h"
+#include "WorldBuilder/WorldGenerationSpec.h"
 
 ADestructableResourceActor::ADestructableResourceActor(const class FObjectInitializer& ObjInitializer)
 	: ADestructableResourceActor(ObjInitializer, ECraftResourceType::Invalid)
@@ -46,41 +48,63 @@ void ADestructableResourceActor::OnInteract(APawn* InteractingPawn, UInteractabl
 	if (Health <= 0)
 	{
 		// Drop craft resource actorsw
-		static float LOCATION_OFFSET_LENGTH = 100.f;
+		UWorldGenerationSpec* WorldSpec = NULL;
+		if (UWorldBuilderSubsystem* WorldBuilderSubsystem = GetGameInstance()->GetSubsystem<UWorldBuilderSubsystem>())
+		{
+			WorldSpec = WorldBuilderSubsystem->GetWorldSpec();
+		}
 
-		FBox thisBB = GetComponentsBoundingBox();
-		FBox resourceBB;
-		FVector position, offset;
-		FRotator rotation;
+		if (!ensure(WorldSpec != NULL))
+			return;
 
 		for (int i = 0; i < ResourceDropCount; ++i)
 		{
-			FActorSpawnParameters SpawnParameters;
-			//if (TActorClass* spawnedActor = GetWorld()->SpawnActor<TActorClass>(ActorClass.Get(), SpawnParameters))
-			if (ACraftResourceActor* resourceActor = GetWorld()->SpawnActor<ACraftResourceActor>(SpawnParameters))
+			TSubclassOf<ACraftResourceActor> ActorClass = NULL;
+			switch (ResourceType)
 			{
-				resourceBB = resourceActor->GetComponentsBoundingBox();
-
-				// Offset position along forward, rotated around up by a fixed amount interval relative to amount of wood dropped
-				offset = GetActorForwardVector().RotateAngleAxis(i * 360.f / (float)ResourceDropCount, GetActorUpVector());
-				position = thisBB.GetCenter() + (offset * LOCATION_OFFSET_LENGTH);
-
-				// Offset position along up by random range (-n < x < n)
-				float zOffset = FMath::Max(0.f, thisBB.GetExtent().Z - (resourceBB.GetExtent().Z * 1.5f));
-				position += GetActorUpVector() * FMath::RandRange(-1.f, 0.f) * zOffset;
-
-				// Rotate slightly around pitch and yaw
-				rotation = FRotator(FMath::RandRange(5, 25), FMath::RandRange(30, 330), 0.f);
-
-				SCraftResourceInitData initData;
-				initData.Type = ResourceType;
-				initData.Location = position;
-				initData.Rotation = rotation;
-
-				resourceActor->InitCraftResource(initData);
+			case ECraftResourceType::Wood: ActorClass = WorldSpec->WoodActorClass; break;
+			case ECraftResourceType::Stone: ActorClass = WorldSpec->StoneActorClass; break;
 			}
+			SpawnResourceActor(ActorClass, i);
 		}
 
 		Destroy();
 	}
+}
+
+template< class TActorClass >
+TActorClass* ADestructableResourceActor::SpawnResourceActor(const TSubclassOf<TActorClass>& ActorClass, int ActorIndex)
+{
+	if (!ensureMsgf(ActorClass != NULL, TEXT("[UWorldBuilderSubsystem::SpawnGridCellActor] Invalid Actor Class. Check your World Spec!")))
+		return NULL;
+
+	static float LOCATION_OFFSET_LENGTH = 100.f;
+
+	FActorSpawnParameters SpawnParameters;
+	//if (TActorClass* spawnedActor = GetWorld()->SpawnActor<TActorClass>(ActorClass.Get(), SpawnParameters))
+	if (ACraftResourceActor* resourceActor = GetWorld()->SpawnActor<ACraftResourceActor>(SpawnParameters))
+	{
+		const FBox thisBB = GetComponentsBoundingBox();
+		const FBox resourceBB = resourceActor->GetComponentsBoundingBox();
+
+		// Offset position along forward, rotated around up by a fixed amount interval relative to amount of wood dropped
+		const FVector offset = GetActorForwardVector().RotateAngleAxis(ActorIndex * 360.f / (float)ResourceDropCount, GetActorUpVector());
+		FVector position = thisBB.GetCenter() + (offset * LOCATION_OFFSET_LENGTH);
+
+		// Offset position along up by random range (-n < x < n)
+		float zOffset = FMath::Max(0.f, thisBB.GetExtent().Z - (resourceBB.GetExtent().Z * 1.5f));
+		position += GetActorUpVector() * FMath::RandRange(-1.f, 0.f) * zOffset;
+
+		// Rotate slightly around pitch and yaw
+		const FRotator rotation = FRotator(FMath::RandRange(5, 25), FMath::RandRange(30, 330), 0.f);
+
+		SCraftResourceInitData initData;
+		initData.Type = ResourceType;
+		initData.Location = position;
+		initData.Rotation = rotation;
+
+		resourceActor->InitCraftResource(initData);
+		return resourceActor;
+	}
+	return NULL;
 }

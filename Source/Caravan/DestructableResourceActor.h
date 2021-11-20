@@ -41,4 +41,7 @@ protected:
 private:
 	UFUNCTION()
 	void OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice);
+
+	template< class TActorClass >
+	TActorClass* SpawnResourceActor(const TSubclassOf<TActorClass>& ActorClass, int ActorIndex);
 };

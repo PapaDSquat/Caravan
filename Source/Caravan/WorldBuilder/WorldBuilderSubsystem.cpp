@@ -69,7 +69,7 @@ void UWorldBuilderSubsystem::UpdateTime(float DeltaTime)
 	}
 }
 
-bool UWorldBuilderSubsystem::GenerateNewWorld(const FVector& Position, UWorldGenerationSpec const * Spec, const struct FWorldGenerationActors& Actors, const struct FWorldGenerationTimeParams& TimeParams)
+bool UWorldBuilderSubsystem::GenerateNewWorld(const FVector& Position, UWorldGenerationSpec* Spec, const struct FWorldGenerationActors& Actors, const struct FWorldGenerationTimeParams& TimeParams)
 {
 	if (!ensureMsgf(Spec != NULL, TEXT("[UWorldBuilderSubsystem::GenerateNewWorld] World Generation Spec is invalid")))
 	{

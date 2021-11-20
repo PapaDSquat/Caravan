@@ -44,14 +44,20 @@ public:
 	virtual ECraftResourceType GetResourceType() const { return ResourceType; }
 	//virtual FString GetInteractionName() const override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* StaticMeshComponent;
+
+	UPROPERTY(VisibleAnywhere)
 	UInteractableComponent* InteractableComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Resource")
+	ECraftResourceType ResourceType;
+
+	UPROPERTY(EditAnywhere, Category = "Resource")
+	FString ResourceName;
 
 private:
 	UFUNCTION()
 	void OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice);
 
-	ECraftResourceType ResourceType;
-	FString ResourceName;
-	UStaticMeshComponent* StaticMeshComponent;
 };
