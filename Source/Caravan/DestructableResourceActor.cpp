@@ -24,7 +24,7 @@ ADestructableResourceActor::ADestructableResourceActor(const class FObjectInitia
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("TreeActor_StaticMeshComponent"));
 	SetRootComponent(StaticMeshComponent);
 
-	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent");
+	FindOrCreateComponentSafe(UInteractableComponent, InteractableComponent, "InteractableComponent")
 	{
 		InteractableComponent->PrimaryInteractionName = FText::FromString("Destroy");
 		InteractableComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);

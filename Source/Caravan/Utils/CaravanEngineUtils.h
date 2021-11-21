@@ -26,7 +26,7 @@ namespace CaravanUtils
 * Find a component, or create it if not found.
 * Can only be called from Actor constructor.
 * 
-* TODO: Move to CaravanBaseActor class…
+* TODO: Move to CaravanBaseActor class
 */
 #define FindOrCreateComponent(ComponentClass, ComponentObject, ComponentName) \
     ComponentObject = FindComponentByClass< ComponentClass >(); \
@@ -35,3 +35,8 @@ namespace CaravanUtils
     	ComponentObject = ObjInitializer.CreateDefaultSubobject< ComponentClass >(this, TEXT(ComponentName)); \
         AddOwnedComponent(ComponentObject); \
     }
+
+// Call if you mean to setup the component afterwards, using { } for scope
+#define FindOrCreateComponentSafe(ComponentClass, ComponentObject, ComponentName) \
+    FindOrCreateComponent(ComponentClass, ComponentObject, ComponentName) \
+    if(!HasAnyFlags(RF_ClassDefaultObject))

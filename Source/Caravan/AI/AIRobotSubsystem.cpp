@@ -26,6 +26,11 @@ void UAIRobotSubsystem::Deinitialize()
 
 }
 
+void UAIRobotSubsystem::Tick(float DeltaTime)
+{
+	// TODO
+}
+
 bool UAIRobotSubsystem::BuildCharacterFromSpec(const UAIRobotCharacterSpec* Spec, FRobotAIProfile& OutProfile) const
 {
 	if (Spec == nullptr)
