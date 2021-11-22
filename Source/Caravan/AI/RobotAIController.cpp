@@ -11,7 +11,7 @@ ARobotAIController::ARobotAIController(const class FObjectInitializer& ObjInitia
 	: Super(ObjInitializer)
 {
 	FindOrCreateComponent(UInventoryComponent, InventoryComponent, "InventoryComponent")
-	FindOrCreateComponentSafe(UInteractableComponent, InteractableComponent, "InteractableComponent")
+	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent")
 	{
 		InteractableComponent->PrimaryInteractionName = FText::FromString("Talk");
 	}

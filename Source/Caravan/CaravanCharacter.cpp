@@ -98,10 +98,12 @@ void ACaravanCharacter::SetupPlayerInputComponent(class UInputComponent* inputCo
 	inputComponent->BindTouch(IE_Pressed, this, &ACaravanCharacter::TouchStarted);
 	inputComponent->BindTouch(IE_Released, this, &ACaravanCharacter::TouchStopped);
 
-	// Custom actions
-	inputComponent->BindAction("Interact", IE_Pressed, this, &ACaravanCharacter::Interact);
+	// Interact
+	inputComponent->BindAction("Interact", IE_Pressed, this, &ACaravanCharacter::InteractSelect);
 	inputComponent->BindAction("Target", IE_Pressed, this, &ACaravanCharacter::OnTargetActivate);
 	inputComponent->BindAction("Target", IE_Released , this, &ACaravanCharacter::OnTargetDeactivate);
+	inputComponent->BindAction("InteractChoiceScrollUp", IE_Pressed, this, &ACaravanCharacter::InteractChoiceScrollUp);
+	inputComponent->BindAction("InteractChoiceScrollDown", IE_Pressed, this, &ACaravanCharacter::InteractChoiceScrollDown);
 
 	// Debug
 	inputComponent->BindAction("DEBUG_ResetResourceGrid", IE_Pressed, this, &ACaravanCharacter::DEBUG_ResetResourceGrid);
@@ -174,7 +176,7 @@ void ACaravanCharacter::MoveRight(float Value)
 	}
 }
 
-void ACaravanCharacter::Interact()
+void ACaravanCharacter::InteractSelect()
 {
 	if (IsCarryingCaravan())
 	{
@@ -220,6 +222,22 @@ void ACaravanCharacter::Interact()
 	}
 }
 
+void ACaravanCharacter::InteractChoiceScrollUp()
+{
+	if (IsTargeting && InteractTarget)
+	{
+		InteractTarget->SelectPrevChoice();
+	}
+}
+
+void ACaravanCharacter::InteractChoiceScrollDown()
+{
+	if (IsTargeting && InteractTarget)
+	{
+		InteractTarget->SelectNextChoice();
+	}
+}
+
 void ACaravanCharacter::OnTargetActivate()
 {
 	if (!IsTargeting) // Wait for Deactivate
@@ -230,14 +248,21 @@ void ACaravanCharacter::OnTargetActivate()
 		IsTargeting = (InteractTarget != NULL);
 		if (IsTargeting)
 		{
+			InteractTarget->SetTargeting(this, true);
+
+			IsTargetingWithChoices = InteractTarget->HasInteractionChoices();
 		}
 	}
 }
 
 void ACaravanCharacter::OnTargetDeactivate()
 {
+	if (InteractTarget)
+	{
+		InteractTarget->SetTargeting(NULL, false);
+	}
 	InteractTarget = NULL;
-	IsTargeting = false;
+	IsTargeting = IsTargetingWithChoices = false;
 }
 
 void ACaravanCharacter::Tick(float DeltaSeconds)
@@ -274,7 +299,7 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 
 		if (CVarPlayerDebug_ShowInteractionTarget.GetValueOnGameThread() == true)
 		{
-			GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, InteractTarget->PrimaryInteractionName.ToString());
+			GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, InteractTarget->GetCurrentInteractionChoice().InteractionName);
 		}
 
 		if (CVarPlayerDebug_ShowInteractionOverlay.GetValueOnGameThread() == true)

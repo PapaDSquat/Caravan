@@ -46,7 +46,10 @@ protected:
 	/** Called for side to side input */
 	void MoveRight(float Value);
 
-	void Interact();
+	//void SetInteractFocus()
+	void InteractSelect();
+	void InteractChoiceScrollUp();
+	void InteractChoiceScrollDown();
 
 	void OnTargetActivate();
 	void OnTargetDeactivate();
@@ -103,6 +106,9 @@ protected:
 	// Targeting
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	bool IsTargeting = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
+	bool IsTargetingWithChoices = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	UInteractableComponent* InteractTarget = NULL;

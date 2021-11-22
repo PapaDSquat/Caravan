@@ -27,7 +27,10 @@ struct FInteractionChoice
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	FString InteractionName;
+	FName InteractionID;
+	
+	UPROPERTY(EditAnywhere)
+	FString InteractionName; // TODO: Change to FText InteractionText
 
 	UPROPERTY(EditAnywhere)
 	EInteractionType InteractionType;
@@ -36,18 +39,18 @@ struct FInteractionChoice
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInteractTargetEvent, APawn*, InteractingPawn, class UInteractableComponent*, InteractableComponent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FInteractEvent, APawn*, InteractingPawn, class UInteractableComponent*, InteractableComponent, const FInteractionChoice&, Choice);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class CARAVAN_API UInteractableComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	UInteractableComponent();
 
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	struct InteractData
@@ -70,6 +73,16 @@ public:
 	void InteractUnFocus(const InteractData& interactData) {}
 	// Called when actor interacts with the object, returns the type of interaction that occured
 	EInteractionType InteractSelect(const InteractData& interactData) { return EInteractionType::None; }
+
+	const FInteractionChoice& GetCurrentInteractionChoice() const;
+	void SelectPrevChoice();
+	void SelectNextChoice();
+
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	bool HasInteractionChoices() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void SetInteractionChoices(const TArray< FInteractionChoice >& Choices);
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	void SetTargeting(APawn* InTargetingPawn, bool bTargeting);
@@ -95,16 +108,15 @@ public:
 	UPROPERTY(EditAnywhere, Category="Interaction")
 	FText PrimaryInteractionName;
 
-	// If true, overrides InteractionChoices to build the choices from a script function call
-	UPROPERTY(EditAnywhere, Category = "Interaction")
-	bool bBuildInteractionChoicesInScript = false;
-
 	// Choices displayed after Player interacts with this interactable object
 	UPROPERTY(EditAnywhere, Category = "Interaction", meta=(EditCondition="!bBuildInteractionChoicesInScripts"))
 	TArray< FInteractionChoice > InteractionChoices;
 	//==================================================
 
 private:
-	TWeakPtr< APawn > TargetingPawn;
-	TWeakPtr< APawn > InteractingPawn;
+	FInteractionChoice PrimaryInteractionChoice;
+	int CurrentInteractionChoiceIndex = -1;
+
+	APawn* TargetingPawn;
+	APawn* InteractingPawn;
 };

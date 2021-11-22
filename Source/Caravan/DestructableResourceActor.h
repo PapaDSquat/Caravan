@@ -24,7 +24,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere)
 	UInteractableComponent* InteractableComponent;
 
 	UPROPERTY(EditAnywhere, Category="Resource")

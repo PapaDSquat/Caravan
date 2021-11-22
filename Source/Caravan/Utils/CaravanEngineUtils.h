@@ -37,6 +37,6 @@ namespace CaravanUtils
     }
 
 // Call if you mean to setup the component afterwards, using { } for scope
-#define FindOrCreateComponentSafe(ComponentClass, ComponentObject, ComponentName) \
-    FindOrCreateComponent(ComponentClass, ComponentObject, ComponentName) \
-    if(!HasAnyFlags(RF_ClassDefaultObject))
+//#define FindOrCreateComponent(ComponentClass, ComponentObject, ComponentName) \
+//    FindOrCreateComponent(ComponentClass, ComponentObject, ComponentName) \
+//    if(!HasAnyFlags(RF_ClassDefaultObject))
