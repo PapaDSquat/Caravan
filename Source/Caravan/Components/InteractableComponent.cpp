@@ -49,7 +49,7 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			ChoicesToDraw.Add(PrimaryInteractionChoice);
 		}
 
-		FVector WorldOffset;
+		FVector WorldOffset = FVector::ZeroVector;
 
 		for(int i=0; i<ChoicesToDraw.Num(); ++i)
 		{

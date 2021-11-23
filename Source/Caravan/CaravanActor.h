@@ -68,7 +68,7 @@ protected:
 	UInteractableComponent* InteractableBackComponent;
 
 private:
-	void SetCaravanOpen(bool bOpen);
+	void SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent = false);
 
 	ACaravanBuildingPlatform* CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition);
 	ACaravanBuildingPlatform* GetBuildingAttachment(const FIntPoint& gridPosition) const;

@@ -62,7 +62,7 @@ void ACaravanActor::BeginPlay()
 		InteractableBackComponent->OnInteract.AddDynamic(this, &ACaravanActor::OnInteractWithBack);
 	}
 
-	SetCaravanOpen(bOpenOnBegin);
+	SetCaravanOpen(bOpenOnBegin, true);
 }
 
 ACaravanBuildingPlatform* ACaravanActor::CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition)
@@ -80,9 +80,10 @@ ACaravanBuildingPlatform* ACaravanActor::CreateBuildingAttachment(ECaravanBuildi
 	return buildingPlatformActor;
 }
 
-void ACaravanActor::SetCaravanOpen(bool bOpen)
+void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/)
 {
-	if (IsOpen != bOpen)
+	const bool bChanged = IsOpen != bOpen;
+	if (bChanged)
 	{
 		IsOpen = bOpen;
 
@@ -124,11 +125,15 @@ void ACaravanActor::SetCaravanOpen(bool bOpen)
 				Robots.Empty();
 			}
 		}
+	}
 
+	if (bChanged || bAlwaysFireEvent)
+	{
 		NotifyOnToggleOpen(IsOpen);
+	}
 
-		return;
-		int rows = BuildingAttachmentGrid.Num();
+	/*
+	int rows = BuildingAttachmentGrid.Num();
 		for (int gridX = 0; gridX < rows; ++gridX)
 		{
 			TArray<ACaravanBuildingPlatform*>& rowArray = BuildingAttachmentGrid[gridX];
@@ -169,7 +174,6 @@ void ACaravanActor::SetCaravanOpen(bool bOpen)
 						buildingPlatformActor->SetActorLocation(buildingPosition);
 
 						// DEBUG
-						/*
 						DrawDebugBox(
 							GetWorld(),
 							gridCellOrigin,
@@ -203,12 +207,11 @@ void ACaravanActor::SetCaravanOpen(bool bOpen)
 							false, 30.1, 0,
 							10.f
 							);
-						*/
 					}
 				}
 			}
 		}
-	}
+	*/
 }
 
 ACaravanBuildingPlatform* ACaravanActor::GetBuildingAttachment(const FIntPoint& gridPosition) const
