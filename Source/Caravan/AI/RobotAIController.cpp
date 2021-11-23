@@ -21,14 +21,6 @@ void ARobotAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	ARobotAICharacter* robotCharacter = Cast< ARobotAICharacter >(InPawn);
-	if (robotCharacter == NULL)
-	{
-		return;
-	}
-
-	BuildCharacterFromSpec(robotCharacter->CharacterSpec);
-
 	// Event Registration
 	if (IsValid(InteractableComponent))
 	{
@@ -39,6 +31,10 @@ void ARobotAIController::OnPossess(APawn* InPawn)
 void ARobotAIController::OnUnPossess()
 {
 	// Event Unregistration
+	if (IsValid(InteractableComponent))
+	{
+		InteractableComponent->OnInteract.RemoveDynamic(this, &ARobotAIController::OnInteract);
+	}
 }
 
 void ARobotAIController::BeginPlay()
@@ -46,24 +42,9 @@ void ARobotAIController::BeginPlay()
 	Super::BeginPlay();
 }
 
-bool ARobotAIController::BuildCharacterFromSpec(const UAIRobotCharacterSpec* characterSpec)
-{
-	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
-	if (UAIRobotSubsystem* AIRobotSubsystem = GameInstance->GetSubsystem<UAIRobotSubsystem>())
-	{
-		// TODO : Saved profile
-		if (AIRobotSubsystem->BuildCharacterFromSpec(characterSpec, CharacterProfile))
-		{
-			AIRobotSubsystem->RegisterRobot(this);
-			return true;
-		}
-	}
-	return false;
-}
-
 void ARobotAIController::OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice)
 {
-	
+	// TODO	
 }
 
 ARobotAICharacter* ARobotAIController::GetRobotOwner() const

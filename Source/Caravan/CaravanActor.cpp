@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "CaravanActor.h"
+#include "AI/AIRobotSubsystem.h"
 #include "Caravan.h"
 #include "CaravanCharacter.h"
 #include "CaravanBuildingPlatform.h"
@@ -84,6 +85,45 @@ void ACaravanActor::SetCaravanOpen(bool bOpen)
 	if (IsOpen != bOpen)
 	{
 		IsOpen = bOpen;
+
+		// TODO: Move this out of here
+		UGameInstance* GameInstance = GetWorld()->GetGameInstance();
+		UAIRobotSubsystem* AIRobotSubsystem = GameInstance->GetSubsystem<UAIRobotSubsystem>();
+		if (AIRobotSubsystem)
+		{
+			if (IsOpen)
+			{
+				static float s_SpawnDistance = 600.f;
+				const int TotalSpecs = DefaultRobotSpecs.Num();
+				const float AngleIncrement = 180.f / TotalSpecs;
+
+				const FVector CaravanLocation = GetActorLocation();
+				const FVector Forward = GetActorForwardVector() * FVector(-1.f, -1.f, 1.f);
+
+				float CurrentAngle = -90;
+
+				for (UAIRobotCharacterSpec* RobotSpec : DefaultRobotSpecs)
+				{
+					const FVector SpawnDirection = Forward.RotateAngleAxis(CurrentAngle, FVector::UpVector);
+					const FVector SpawnLocation = CaravanLocation + (SpawnDirection * s_SpawnDistance);
+					const FTransform SpawnTransform(SpawnDirection.ToOrientationRotator(), SpawnLocation);
+					if (ARobotAICharacter* SpawnedRobot = AIRobotSubsystem->SpawnRobotCharacter(RobotSpec, SpawnTransform))
+					{
+						Robots.Add(SpawnedRobot);
+					}
+
+					CurrentAngle += AngleIncrement;
+				}
+			}
+			else
+			{
+				for (ARobotAICharacter* Robot : Robots)
+				{
+					AIRobotSubsystem->DespawnRobotCharacter(Robot);
+				}
+				Robots.Empty();
+			}
+		}
 
 		NotifyOnToggleOpen(IsOpen);
 

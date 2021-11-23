@@ -23,8 +23,6 @@ public:
 	virtual void BeginPlay() override;
 
 public:
-	bool BuildCharacterFromSpec(const UAIRobotCharacterSpec* characterSpec);
-
 	UFUNCTION(BlueprintCallable, Category = "Caravan Robot")
 	ARobotAICharacter* GetRobotOwner() const;
 

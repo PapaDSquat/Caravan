@@ -7,6 +7,7 @@
 #include "Tickable.h"
 #include "AIRobotSubsystem.generated.h"
 
+class ARobotAICharacter;
 class ARobotAIController;
 class UAIRobotCharacterSpec;
 struct FRobotAIProfile;
@@ -25,19 +26,29 @@ public:
 	virtual void Deinitialize() override;
 	// End USubsystem
 
+	// Begin FTickableGameObject
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const
 	{
 		RETURN_QUICK_DECLARE_CYCLE_STAT(UAIRobotSubsystem, STATGROUP_Tickables);
 	}
+	// End FTickableGameObject
 
-	bool BuildCharacterFromSpec(const UAIRobotCharacterSpec* Spec, FRobotAIProfile& OutProfile) const;
-	void RegisterRobot(const ARobotAIController* robotController);
+	UFUNCTION(BlueprintCallable, Category = "AI|Spawn")
+	ARobotAICharacter* SpawnRobotCharacter(const UAIRobotCharacterSpec* Spec, const FTransform& Transform);
+
+	UFUNCTION(BlueprintCallable, Category = "AI|Spawn")
+	bool DespawnRobotCharacter(ARobotAICharacter* RobotCharacter);
 
 private:
+	bool BuildCharacterFromSpec(const UAIRobotCharacterSpec* Spec, FRobotAIProfile& OutProfile) const;
+	void RegisterRobot(ARobotAIController* Controller);
+	void UnregisterRobot(ARobotAIController* Controller);
+
 	struct FAIRobotInternalData
 	{
-		FName Name;
+		ARobotAIController* Controller;
 	};
 	TArray< FAIRobotInternalData > RegisteredRobots;
+
 };

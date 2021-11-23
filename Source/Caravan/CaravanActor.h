@@ -5,8 +5,10 @@
 #include "Components/InteractableComponent.h"
 #include "CaravanActor.generated.h"
 
-class UStaticMeshSocket;
 class ACaravanBuildingPlatform;
+class UAIRobotCharacterSpec;
+class ARobotAICharacter;
+class UStaticMeshSocket;
 
 UENUM()
 enum ECaravanBuildingType
@@ -30,13 +32,13 @@ public:
 	TSubclassOf<class ACaravanBuildingPlatform> BuildingPlatformBPClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Settings")
-	int BuildingGridTotalRows= 3;
+	int BuildingGridTotalRows= 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Settings")
-	int BuildingGridTotalColumns = 7;
+	int BuildingGridTotalColumns = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan | State")
-	bool bOpenOnBegin = true;
+	bool bOpenOnBegin = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Caravan | State")
 	bool IsOpen = false;
@@ -53,13 +55,16 @@ public:
 	//virtual void OnInteractFocus(const InteractData& interactData) override;
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	TArray< UAIRobotCharacterSpec* > DefaultRobotSpecs;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Interaction")
 	UInteractableComponent* InteractableFrontComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Interaction")
 	UInteractableComponent* InteractableBackComponent;
 
 private:
@@ -84,6 +89,8 @@ private:
 	};
 
 	TArray< TArray<ACaravanBuildingPlatform*> > BuildingAttachmentGrid;
+
+	TArray< ARobotAICharacter* > Robots;
 
 	EInteractionType FocusedInteractionType{ EInteractionType::None };
 };

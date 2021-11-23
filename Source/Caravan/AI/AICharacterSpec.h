@@ -60,11 +60,22 @@ struct CARAVAN_API FRobotAIProfile
 	ECraftResourceType PreferredCraftResource = ECraftResourceType::Invalid;
 };
 
+// TODO: Move out of here
+UCLASS()
+class CARAVAN_API UCharacterSpec : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
+	TSubclassOf< class ACharacter > CharacterClass;
+};
+
 /**
 * Create UDataAsset of this type in Editor to fill with themes
 */
 UCLASS()
-class CARAVAN_API UAICharacterSpec : public UDataAsset
+class CARAVAN_API UAICharacterSpec : public UCharacterSpec
 {
 	GENERATED_BODY()
 	

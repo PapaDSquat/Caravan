@@ -29,7 +29,4 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Robot")
 	FName GetRobotName() const;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI", meta = (ShowOnlyInnerProperties))
-	UAIRobotCharacterSpec* CharacterSpec;
 };
