@@ -12,6 +12,8 @@ class UInventoryComponent;
 class UInteractableComponent;
 struct FInteractionChoice;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRobotAIRegisterEvent, class ARobotAIController*, AIController);
+
 UCLASS()
 class CARAVAN_API ARobotAIController : public AAIController
 {
@@ -44,6 +46,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "RPG")
 	UInteractableComponent* InteractableComponent;
+
+	UPROPERTY(BlueprintAssignable)
+	FRobotAIRegisterEvent OnAIRobotRegister;
+
+	UPROPERTY(BlueprintAssignable)
+	FRobotAIRegisterEvent OnAIRobotUnregister;
 
 private:
 	UFUNCTION()
