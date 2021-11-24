@@ -3,6 +3,8 @@
 #include "GameFramework/GameMode.h"
 #include "CaravanGameMode.generated.h"
 
+class ACaravanActor;
+
 UCLASS(minimalapi)
 class ACaravanGameMode : public AGameMode
 {
@@ -10,6 +12,15 @@ class ACaravanGameMode : public AGameMode
 
 public:
 	ACaravanGameMode();
+
+	virtual void BeginPlay() override;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Caravan")
+	ACaravanActor* CaravanActor = nullptr;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Classes)
+	TSubclassOf< ACaravanActor > CaravanActorClass;
 };
 
 

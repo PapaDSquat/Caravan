@@ -3,6 +3,7 @@
 #include "CaravanCharacter.h"
 #include "Caravan.h"
 #include "CaravanActor.h"
+#include "CaravanGameMode.h"
 #include "Components/InteractableComponent.h"
 #include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
@@ -265,6 +266,15 @@ void ACaravanCharacter::OnTargetDeactivate()
 	IsTargeting = IsTargetingWithChoices = false;
 }
 
+void ACaravanCharacter::SetIsInCaravanCamp(bool bValue)
+{
+	if (bIsInCaravanCamp != bValue)
+	{
+		bIsInCaravanCamp = bValue;
+		OnInCaravanCampChangeEvent.Broadcast(this, bIsInCaravanCamp);
+	}
+}
+
 void ACaravanCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -278,6 +288,13 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 		// Continue in interacting state for now
 		// Cancel other interaction until next click where we release the caravan
 		return;
+	}
+
+	// Check if in player camp or on expedition
+	if (ACaravanActor* CaravanActor = GetCaravanGameMode()->CaravanActor)
+	{
+		const float DistanceToCaravan = (CaravanActor->GetActorLocation() - this->GetActorLocation()).Size();
+		SetIsInCaravanCamp(DistanceToCaravan < ExpeditionRange);
 	}
 
 	if (IsTargeting && IsValid(InteractTarget))
@@ -579,4 +596,13 @@ UInteractableComponent* ACaravanCharacter::GetFocusedInteractable() const
 UInteractableComponent* ACaravanCharacter::GetTargetedInteractable() const
 {
 	return InteractTarget;
+}
+
+ACaravanGameMode* ACaravanCharacter::GetCaravanGameMode() const
+{
+	if (UWorld* World = GetWorld())
+	{
+		return Cast< ACaravanGameMode >(World->GetAuthGameMode());
+	}
+	return nullptr;
 }

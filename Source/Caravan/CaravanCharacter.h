@@ -6,7 +6,10 @@
 
 class UInteractableComponent;
 class ACaravanActor;
+class ACaravanGameMode;
 class AMultiToolActor;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerInCaravanCampChangeEvent, class ACaravanCharacter*, PlayerCharacter, bool, bIsInCaravanCamp);
 
 UCLASS(config=Game)
 class ACaravanCharacter : public ACharacter
@@ -54,6 +57,8 @@ protected:
 	void OnTargetActivate();
 	void OnTargetDeactivate();
 
+	void SetIsInCaravanCamp(bool bValue);
+
 	/** 
 	 * Called via input to turn at a given rate. 
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
@@ -78,18 +83,31 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
 
+	ACaravanGameMode* GetCaravanGameMode() const;
+
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
+	// Caravan
+	UPROPERTY(BlueprintReadOnly, Category = "Caravan")
+	bool bIsInCaravanCamp = false;
+
+	// At this distance from the Caravan, the Player will be considered to be on an Expedition
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan")
+	float ExpeditionRange = 4000.f;
+
+	UPROPERTY(BlueprintAssignable)
+	FPlayerInCaravanCampChangeEvent OnInCaravanCampChangeEvent;
+
 	// Dwindle
 	// True if Player hasn't moved outside of a fixed range within a fixed amount of time
-	UPROPERTY(BlueprintReadOnly, Category = "State")
+	UPROPERTY(BlueprintReadOnly, Category = "Dwindle")
 	bool IsLoitering = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dwindle")
 	float LoiterRange = 1500.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dwindle")
 	float LoiterTime = 5.f;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
