@@ -24,9 +24,10 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	if (ACaravanCharacter* Player = Cast< ACaravanCharacter >(TargetingPawn))
 	{
-		static FVector2D s_ScreenOffset(50.f, 0.f);
-		static float s_FontSize = 1.35f;
-		static float s_ChoiceOffsetZ = 30.f;
+		static FVector2D s_ScreenOffset(50.f, 50.f);
+		static float s_FontSizeDefault = 1.35f;
+		static float s_FontSizeSelected = 1.5f;
+		static float s_ChoiceOffsetZ = 31.5f;
 
 		FVector WorldStartLocation = GetComponentLocation();
 
@@ -39,8 +40,9 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			WorldStartLocation += (CameraRight * s_ScreenOffset.X) + (CameraUp * s_ScreenOffset.Y);
 		}
 
+		const bool bHasMultipleChoices = HasInteractionChoices();
 		TArray< FInteractionChoice > ChoicesToDraw;
-		if (HasInteractionChoices())
+		if (bHasMultipleChoices)
 		{
 			ChoicesToDraw = InteractionChoices;
 		}
@@ -56,17 +58,20 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			const FInteractionChoice& Choice = ChoicesToDraw[i];
 			const bool IsSelectedChoice = ChoicesToDraw.Num() == 1 || i == CurrentInteractionChoiceIndex;
 
+			const FVector TextLocation = WorldStartLocation + WorldOffset;
+			const FString TextString = FString::Format(TEXT("{0}{1}"), { IsSelectedChoice && bHasMultipleChoices ? TEXT(">") : TEXT(""), Choice.InteractionName });
 			const FColor TextColor = IsSelectedChoice ? FColor::Cyan : FColor::White;
+			const float TextSize = IsSelectedChoice ? s_FontSizeSelected : s_FontSizeDefault;
 
 			DrawDebugString(
 				GetWorld(),
-				WorldStartLocation + WorldOffset,
-				Choice.InteractionName,
+				TextLocation,
+				TextString,
 				nullptr,
 				TextColor,
 				0.f,
 				true,
-				s_FontSize
+				TextSize
 			);
 
 			WorldOffset.Z -= s_ChoiceOffsetZ;
