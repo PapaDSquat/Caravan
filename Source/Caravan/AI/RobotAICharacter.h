@@ -8,11 +8,13 @@
 #include "RobotAICharacter.generated.h"
 
 class ARobotAIController;
+class UInteractableComponent;
+class UInventoryComponent;
 
 UCLASS()
 class CARAVAN_API ARobotAICharacter : public ACharacter
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 
 public:
 	ARobotAICharacter();
@@ -29,4 +31,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Robot")
 	FName GetRobotName() const;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+	UInteractableComponent* InteractableComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG")
+	UInventoryComponent* InventoryComponent;
 };

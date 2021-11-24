@@ -5,24 +5,29 @@
 #include "AI/RobotAIController.h"
 #include "AI/AICharacterSpec.h"
 #include "BrainComponent.h"
+#include "Components/InteractableComponent.h"
 #include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
+#include "RPG/InventoryComponent.h"
 #include "Utils/CaravanEngineUtils.h"
 
-// Sets default values
-ARobotAICharacter::ARobotAICharacter()
+ARobotAICharacter::ARobotAICharacter(const FObjectInitializer& ObjInitializer)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	FindOrCreateComponent(UInventoryComponent, InventoryComponent, "InventoryComponent")
+	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent")
+	{
+		InteractableComponent->PrimaryInteractionName = FText::FromString("Talk");
+		InteractableComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+	}
 }
 
-// Called when the game starts or when spawned
 void ARobotAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-// Called every frame
 void ARobotAICharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

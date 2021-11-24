@@ -4,36 +4,39 @@
 #include "AI/RobotAICharacter.h"
 #include "AI/AIRobotSubsystem.h"
 #include "Components/InteractableComponent.h"
-#include "RPG/InventoryComponent.h"
-#include "Utils/CaravanEngineUtils.h"
 
-ARobotAIController::ARobotAIController(const class FObjectInitializer& ObjInitializer)
+ARobotAIController::ARobotAIController(const FObjectInitializer& ObjInitializer)
 	: Super(ObjInitializer)
 {
-	FindOrCreateComponent(UInventoryComponent, InventoryComponent, "InventoryComponent")
-	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent")
-	{
-		InteractableComponent->PrimaryInteractionName = FText::FromString("Talk");
-	}
 }
 
 void ARobotAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
+	ARobotAICharacter* RobotCharacter = GetRobotOwner();
+	if (!RobotCharacter)
+		return;
+
 	// Event Registration
-	if (IsValid(InteractableComponent))
+	if (IsValid(RobotCharacter->InteractableComponent))
 	{
-		InteractableComponent->OnInteract.AddDynamic(this, &ARobotAIController::OnInteract);
+		RobotCharacter->InteractableComponent->OnInteract.AddDynamic(this, &ARobotAIController::OnInteract);
 	}
 }
 
 void ARobotAIController::OnUnPossess()
 {
+	Super::OnUnPossess();
+	
+	ARobotAICharacter* RobotCharacter = GetRobotOwner();
+	if (!RobotCharacter)
+		return;
+
 	// Event Unregistration
-	if (IsValid(InteractableComponent))
+	if (IsValid(RobotCharacter->InteractableComponent))
 	{
-		InteractableComponent->OnInteract.RemoveDynamic(this, &ARobotAIController::OnInteract);
+		RobotCharacter->InteractableComponent->OnInteract.RemoveDynamic(this, &ARobotAIController::OnInteract);
 	}
 }
 
@@ -49,7 +52,7 @@ void ARobotAIController::OnInteract(APawn* InteractingPawn, UInteractableCompone
 
 ARobotAICharacter* ARobotAIController::GetRobotOwner() const
 {
-	return Cast< ARobotAICharacter >(GetOwner());
+	return Cast< ARobotAICharacter >(GetCharacter());
 }
 
 FName ARobotAIController::GetRobotName() const
@@ -57,7 +60,22 @@ FName ARobotAIController::GetRobotName() const
 	return CharacterProfile.Name;
 }
 
+ERobotAILocale ARobotAIController::GetCurrentAILocale() const
+{
+	return RobotState.Locale;
+}
+
 void ARobotAIController::SetCurrentAILocale(ERobotAILocale newLocale)
 {
-	CurrentAILocale = newLocale;
+	RobotState.Locale = newLocale;
+}
+
+bool ARobotAIController::GetIsOnExpedition() const
+{
+	return RobotState.bFollowPlayerRequested;
+}
+
+void ARobotAIController::SetIsOnExpedition(bool bIsOnExpedition)
+{
+	RobotState.bFollowPlayerRequested = bIsOnExpedition;
 }

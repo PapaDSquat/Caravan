@@ -8,11 +8,21 @@
 #include "RobotAIController.generated.h"
 
 enum class ERobotAILocale : uint8;
-class UInventoryComponent;
-class UInteractableComponent;
 struct FInteractionChoice;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRobotAIRegisterEvent, class ARobotAIController*, AIController);
+
+USTRUCT(BlueprintType)
+struct CARAVAN_API FRobotAIState
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadOnly, Category = "AI State")
+	bool bFollowPlayerRequested = false;
+
+	UPROPERTY(BlueprintReadOnly, Category = "AI State")
+	ERobotAILocale Locale = ERobotAILocale::Invalid;
+};
 
 UCLASS()
 class CARAVAN_API ARobotAIController : public AAIController
@@ -25,27 +35,29 @@ public:
 	virtual void BeginPlay() override;
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "Caravan Robot")
+	UFUNCTION(BlueprintCallable, Category = "AI")
 	ARobotAICharacter* GetRobotOwner() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Caravan Robot")
+	UFUNCTION(BlueprintCallable, Category = "AI")
 	FName GetRobotName() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Caravan AI")
+	UFUNCTION(BlueprintCallable, Category = "AI|State")
+	ERobotAILocale GetCurrentAILocale() const;
+
+	UFUNCTION(BlueprintCallable, Category = "AI|State")
 	void SetCurrentAILocale(ERobotAILocale newLocale);
 
+	UFUNCTION(BlueprintCallable, Category = "AI|State")
+	bool GetIsOnExpedition() const;
+
+	UFUNCTION(BlueprintCallable, Category = "AI|State")
+	void SetIsOnExpedition( bool bIsOnExpedition );
 
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
 	FRobotAIProfile CharacterProfile;
-
-	UPROPERTY(BlueprintReadOnly, Category = "AI")
-	ERobotAILocale CurrentAILocale;
-
-	UPROPERTY(BlueprintReadOnly, Category = "RPG")
-	UInventoryComponent* InventoryComponent;
-
-	UPROPERTY(BlueprintReadOnly, Category = "RPG")
-	UInteractableComponent* InteractableComponent;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "AI|State")
+	FRobotAIState RobotState;
 
 	UPROPERTY(BlueprintAssignable)
 	FRobotAIRegisterEvent OnAIRobotRegister;
