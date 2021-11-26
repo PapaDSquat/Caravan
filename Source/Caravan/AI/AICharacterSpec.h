@@ -35,6 +35,7 @@ enum class ERobotAIQuirk : uint8
 	Invalid
 };
 
+// TODO : Rename to EWorldLocale - used by Player as well, potentionally by other Objects
 UENUM(BlueprintType)
 enum class ERobotAILocale : uint8
 {

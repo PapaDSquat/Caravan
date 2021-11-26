@@ -1,5 +1,7 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 #pragma once
+
+#include "AI/AICharacterSpec.h"
 #include "GameFramework/Character.h"
 #include "CraftResourceActor.h"
 #include "CaravanCharacter.generated.h"
@@ -9,7 +11,7 @@ class ACaravanActor;
 class ACaravanGameMode;
 class AMultiToolActor;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerInCaravanCampChangeEvent, class ACaravanCharacter*, PlayerCharacter, bool, bIsInCaravanCamp);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerLocaleChangeEvent, class ACaravanCharacter*, PlayerCharacter, ERobotAILocale, Locale);
 
 UCLASS(config=Game)
 class ACaravanCharacter : public ACharacter
@@ -39,6 +41,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	UInteractableComponent* GetTargetedInteractable() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	ERobotAILocale GetWorldLocale() const { return WorldLocale; }
+
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
@@ -57,7 +62,7 @@ protected:
 	void OnTargetActivate();
 	void OnTargetDeactivate();
 
-	void SetIsInCaravanCamp(bool bValue);
+	void SetIsInCaravanCamp(bool bInCamp);
 
 	/** 
 	 * Called via input to turn at a given rate. 
@@ -97,7 +102,7 @@ protected:
 	float ExpeditionRange = 4000.f;
 
 	UPROPERTY(BlueprintAssignable)
-	FPlayerInCaravanCampChangeEvent OnInCaravanCampChangeEvent;
+	FPlayerLocaleChangeEvent OnLocaleChangeEvent;
 
 	// Dwindle
 	// True if Player hasn't moved outside of a fixed range within a fixed amount of time
@@ -189,5 +194,7 @@ private:
 		FVector LastActorLocation;
 	};
 	FDwindleState DwindleState;
+
+	ERobotAILocale WorldLocale;
 };
 

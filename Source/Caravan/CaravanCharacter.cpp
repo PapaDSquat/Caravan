@@ -266,12 +266,22 @@ void ACaravanCharacter::OnTargetDeactivate()
 	IsTargeting = IsTargetingWithChoices = false;
 }
 
-void ACaravanCharacter::SetIsInCaravanCamp(bool bValue)
+void ACaravanCharacter::SetIsInCaravanCamp(bool bInCamp)
 {
-	if (bIsInCaravanCamp != bValue)
+	ERobotAILocale NewLocale;
+	if (bInCamp)
 	{
-		bIsInCaravanCamp = bValue;
-		OnInCaravanCampChangeEvent.Broadcast(this, bIsInCaravanCamp);
+		NewLocale = ERobotAILocale::CaravanCamp;
+	}
+	else
+	{
+		NewLocale = ERobotAILocale::PlayerExpedition;
+	}
+
+	if (WorldLocale != NewLocale)
+	{
+		WorldLocale = NewLocale;
+		OnLocaleChangeEvent.Broadcast(this, WorldLocale);
 	}
 }
 
