@@ -15,7 +15,7 @@ void UInteractableComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PrimaryInteractionChoice.InteractionName = PrimaryInteractionName.ToString();
+	PrimaryInteractionChoice.InteractionName = PrimaryInteractionName;
 }
 
 void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -104,7 +104,7 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			const FInteractionChoice& Choice = ChoicesToDraw[i];
 			const bool IsSelectedChoice = ChoicesToDraw.Num() == 1 || i == CurrentInteractionChoiceIndex;
 
-			const FString TextString = FString::Format(TEXT("{0}{1}"), { IsSelectedChoice && bHasMultipleChoices ? TEXT(">") : TEXT(""), Choice.InteractionName });
+			const FString TextString = FString::Format(TEXT("{0}{1}"), { IsSelectedChoice && bHasMultipleChoices ? TEXT(">") : TEXT(""), Choice.InteractionName.ToString() });
 			const FColor TextColor = IsSelectedChoice ? s_ColorChoiceSelected : s_ColorChoiceDefault;
 			const float TextSize = IsSelectedChoice ? s_FontSizeChoiceSelected : s_FontSizeChoiceDefault;
 
@@ -157,6 +157,11 @@ const FInteractionChoice& UInteractableComponent::GetCurrentInteractionChoice() 
 void UInteractableComponent::SetInteractionChoices(const TArray< FInteractionChoice >& Choices)
 {
 	InteractionChoices = Choices;
+}
+
+void UInteractableComponent::RebuildInteractionChoices()
+{
+	OnRebuildInteractionChoices.Broadcast(InteractingPawn, this);
 }
 
 void UInteractableComponent::SetTargeting(APawn* InTargetingPawn, bool bTargeting)

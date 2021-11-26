@@ -26,18 +26,19 @@ struct FInteractionChoice
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName InteractionID;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FString InteractionName; // TODO: Change to FText InteractionText
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText InteractionName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EInteractionType InteractionType;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInteractTargetEvent, APawn*, InteractingPawn, class UInteractableComponent*, InteractableComponent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FInteractEvent, APawn*, InteractingPawn, class UInteractableComponent*, InteractableComponent, const FInteractionChoice&, Choice);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInteractRebuildChoicesEvent, APawn*, InteractingPawn, class UInteractableComponent*, InteractableComponent);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class CARAVAN_API UInteractableComponent : public USceneComponent
@@ -85,6 +86,9 @@ public:
 	void SetInteractionChoices(const TArray< FInteractionChoice >& Choices);
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void RebuildInteractionChoices();
+
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	void SetTargeting(APawn* InTargetingPawn, bool bTargeting);
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
@@ -101,6 +105,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FInteractEvent OnInteract;
+
+	UPROPERTY(BlueprintAssignable)
+	FInteractRebuildChoicesEvent OnRebuildInteractionChoices;
 
 	//==================================================
 	// Config Properties
@@ -122,6 +129,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	FVector2D InteractionChoiceScreenOffset = FVector2D(50.f, 100.f);
+
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	bool bBuildInteractionChoicesDynamic = false;
 	//==================================================
 
 private:

@@ -316,7 +316,7 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 
 		if (CVarPlayerDebug_ShowInteractionTarget.GetValueOnGameThread() == true)
 		{
-			GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, InteractTarget->GetCurrentInteractionChoice().InteractionName);
+			GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, InteractTarget->GetCurrentInteractionChoice().InteractionName.ToString());
 		}
 
 		if (CVarPlayerDebug_ShowInteractionOverlay.GetValueOnGameThread() == true)
