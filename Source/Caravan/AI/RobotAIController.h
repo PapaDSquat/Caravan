@@ -34,6 +34,9 @@ public:
 	virtual void OnUnPossess() override;
 	virtual void BeginPlay() override;
 
+	void OnRegisterToSubsystem();
+	void OnUnregisterFromSubsystem();
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	ARobotAICharacter* GetRobotOwner() const;

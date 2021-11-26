@@ -104,13 +104,24 @@ public:
 
 	//==================================================
 	// Config Properties
+	// Optional : Name of the Interactable Object itself, displayed in Interaction UI
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	FText InteractableObjectName;
+
+	// Optional : Sub-title displayed in Interaction UI
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	FText InteractableObjectSubTitle;
+
 	// Interaction name displayed when targeting the interactable (before opening interaction menu)
 	UPROPERTY(EditAnywhere, Category="Interaction")
 	FText PrimaryInteractionName;
 
 	// Choices displayed after Player interacts with this interactable object
-	UPROPERTY(EditAnywhere, Category = "Interaction", meta=(EditCondition="!bBuildInteractionChoicesInScripts"))
+	UPROPERTY(EditAnywhere, Category = "Interaction")
 	TArray< FInteractionChoice > InteractionChoices;
+
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	FVector2D InteractionChoiceScreenOffset = FVector2D(50.f, 100.f);
 	//==================================================
 
 private:

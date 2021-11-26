@@ -81,8 +81,7 @@ TActorClass* ADestructableResourceActor::SpawnResourceActor(const TSubclassOf<TA
 	static float LOCATION_OFFSET_LENGTH = 100.f;
 
 	FActorSpawnParameters SpawnParameters;
-	//if (TActorClass* spawnedActor = GetWorld()->SpawnActor<TActorClass>(ActorClass.Get(), SpawnParameters))
-	if (ACraftResourceActor* resourceActor = GetWorld()->SpawnActor<ACraftResourceActor>(SpawnParameters))
+	if (TActorClass* resourceActor = GetWorld()->SpawnActor<TActorClass>(ActorClass.Get(), SpawnParameters))
 	{
 		const FBox thisBB = GetComponentsBoundingBox();
 		const FBox resourceBB = resourceActor->GetComponentsBoundingBox();

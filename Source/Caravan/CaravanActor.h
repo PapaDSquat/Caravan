@@ -17,6 +17,22 @@ enum ECaravanBuildingType
 	CraftStation
 };
 
+// Temporary container for choosing default robots in the Caravan
+USTRUCT(BlueprintType)
+struct FCaravanInitialRobotData
+{
+	GENERATED_BODY()
+
+	bool ShouldSpawn() const { return bEnabled && RobotSpec != nullptr; }
+
+	// If false, will not be spawned
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnabled = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAIRobotCharacterSpec* RobotSpec = nullptr;
+};
+
 // TODO : Rename
 UCLASS()
 class ACaravanActor : public AActor
@@ -31,19 +47,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Classes)
 	TSubclassOf<class ACaravanBuildingPlatform> BuildingPlatformBPClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|Building Settings")
 	int BuildingGridTotalRows= 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|Building Settings")
 	int BuildingGridTotalColumns = 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan | State")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan|State")
 	bool bOpenOnBegin = false;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Caravan | State")
+	UPROPERTY(BlueprintReadOnly, Category = "Caravan|State")
 	bool IsOpen = false;
 	
-	UFUNCTION(BlueprintImplementableEvent, Category = "Caravan | State")
+	UFUNCTION(BlueprintImplementableEvent, Category = "Caravan|State")
 	void NotifyOnToggleOpen(bool Open);
 
 	const UStaticMeshSocket* GetCarrySocket() const;
@@ -55,16 +71,16 @@ public:
 	//virtual void OnInteractFocus(const InteractData& interactData) override;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-	TArray< UAIRobotCharacterSpec* > DefaultRobotSpecs;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|AI")
+	TArray< FCaravanInitialRobotData > InitialRobots;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Interaction")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	UInteractableComponent* InteractableFrontComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components|Interaction")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	UInteractableComponent* InteractableBackComponent;
 
 private:

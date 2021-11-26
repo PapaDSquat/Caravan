@@ -24,12 +24,19 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	if (ACaravanCharacter* Player = Cast< ACaravanCharacter >(TargetingPawn))
 	{
-		static FVector2D s_ScreenOffset(50.f, 50.f);
-		static float s_FontSizeDefault = 1.35f;
-		static float s_FontSizeSelected = 1.5f;
+		static float s_FontSizeObjectName = 2.f;
+		static float s_FontSizeSubTitle = 1.1f;
+		static float s_FontSizeChoiceDefault = 1.35f;
+		static float s_FontSizeChoiceSelected = 1.5f;
+		static FColor s_ColorObjectName = FColor::Green;
+		static FColor s_ColorSubTitle = FColor::Emerald;
+		static FColor s_ColorChoiceDefault = FColor::White;
+		static FColor s_ColorChoiceSelected = FColor::Cyan;
+		static float s_ObjectNameOffsetZ = 40.f;
+		static float s_SubTitleOffsetZ = 44.f;
 		static float s_ChoiceOffsetZ = 31.5f;
 
-		FVector WorldStartLocation = GetComponentLocation();
+		FVector InitialWorldLocation = GetComponentLocation();
 
 		// Offset based on Camera orientation
 		class UCameraComponent* Camera = Player->GetFollowCamera();
@@ -37,8 +44,11 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		{
 			const FVector CameraUp = Camera->GetUpVector();
 			const FVector CameraRight = Camera->GetRightVector();
-			WorldStartLocation += (CameraRight * s_ScreenOffset.X) + (CameraUp * s_ScreenOffset.Y);
+			const FVector CameraForward = Camera->GetForwardVector();
+			InitialWorldLocation += (CameraRight * InteractionChoiceScreenOffset.X) + (CameraUp * InteractionChoiceScreenOffset.Y);
 		}
+
+		FVector TextWorldLocation = InitialWorldLocation;
 
 		const bool bHasMultipleChoices = HasInteractionChoices();
 		TArray< FInteractionChoice > ChoicesToDraw;
@@ -51,21 +61,56 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			ChoicesToDraw.Add(PrimaryInteractionChoice);
 		}
 
-		FVector WorldOffset = FVector::ZeroVector;
+		const bool bHasTitle = !InteractableObjectName.IsEmpty();
+		const bool bHasSubTitle = !InteractableObjectSubTitle.IsEmpty();
+
+		if (bHasTitle)
+		{
+			DrawDebugString(
+				GetWorld(),
+				TextWorldLocation,
+				InteractableObjectName.ToString(),
+				nullptr,
+				s_ColorObjectName,
+				0.f,
+				true,
+				s_FontSizeObjectName
+			);
+
+			if(bHasSubTitle)
+				TextWorldLocation.Z -= s_ObjectNameOffsetZ;
+			else
+				TextWorldLocation.Z -= s_SubTitleOffsetZ;
+		}
+
+		if (bHasSubTitle)
+		{
+			DrawDebugString(
+				GetWorld(),
+				TextWorldLocation,
+				InteractableObjectSubTitle.ToString(),
+				nullptr,
+				s_ColorSubTitle,
+				0.f,
+				true,
+				s_FontSizeSubTitle
+			);
+
+			TextWorldLocation.Z -= s_SubTitleOffsetZ;
+		}
 
 		for(int i=0; i<ChoicesToDraw.Num(); ++i)
 		{
 			const FInteractionChoice& Choice = ChoicesToDraw[i];
 			const bool IsSelectedChoice = ChoicesToDraw.Num() == 1 || i == CurrentInteractionChoiceIndex;
 
-			const FVector TextLocation = WorldStartLocation + WorldOffset;
 			const FString TextString = FString::Format(TEXT("{0}{1}"), { IsSelectedChoice && bHasMultipleChoices ? TEXT(">") : TEXT(""), Choice.InteractionName });
-			const FColor TextColor = IsSelectedChoice ? FColor::Cyan : FColor::White;
-			const float TextSize = IsSelectedChoice ? s_FontSizeSelected : s_FontSizeDefault;
+			const FColor TextColor = IsSelectedChoice ? s_ColorChoiceSelected : s_ColorChoiceDefault;
+			const float TextSize = IsSelectedChoice ? s_FontSizeChoiceSelected : s_FontSizeChoiceDefault;
 
 			DrawDebugString(
 				GetWorld(),
-				TextLocation,
+				TextWorldLocation,
 				TextString,
 				nullptr,
 				TextColor,
@@ -74,7 +119,7 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 				TextSize
 			);
 
-			WorldOffset.Z -= s_ChoiceOffsetZ;
+			TextWorldLocation.Z -= s_ChoiceOffsetZ;
 		}
 	}
 }

@@ -4,6 +4,7 @@
 #include "AI/RobotAICharacter.h"
 #include "AI/AIRobotSubsystem.h"
 #include "Components/InteractableComponent.h"
+#include "Utils/CaravanEngineUtils.h"
 
 ARobotAIController::ARobotAIController(const FObjectInitializer& ObjInitializer)
 	: Super(ObjInitializer)
@@ -43,6 +44,27 @@ void ARobotAIController::OnUnPossess()
 void ARobotAIController::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ARobotAIController::OnRegisterToSubsystem()
+{
+	OnAIRobotRegister.Broadcast(this);
+
+	ARobotAICharacter* RobotCharacter = GetRobotOwner();
+	if (!RobotCharacter)
+		return;
+
+	// Setup Interactable
+	if (IsValid(RobotCharacter->InteractableComponent))
+	{
+		RobotCharacter->InteractableComponent->InteractableObjectName = FText::FromName(CharacterProfile.Name);
+		RobotCharacter->InteractableComponent->InteractableObjectSubTitle = FText::FromString(CaravanUtils::EnumToString(CharacterProfile.PrimarySkill));
+	}
+}
+
+void ARobotAIController::OnUnregisterFromSubsystem()
+{
+	OnAIRobotUnregister.Broadcast(this);
 }
 
 void ARobotAIController::OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice)

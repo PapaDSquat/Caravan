@@ -110,7 +110,7 @@ void UAIRobotSubsystem::RegisterRobot(ARobotAIController* Controller)
 	FAIRobotInternalData& Data = RegisteredRobots.Emplace_GetRef();
 	Data.Controller = Controller;
 
-	Controller->OnAIRobotRegister.Broadcast(Controller);
+	Controller->OnRegisterToSubsystem();
 }
 
 void UAIRobotSubsystem::UnregisterRobot(ARobotAIController* Controller)
@@ -122,7 +122,7 @@ void UAIRobotSubsystem::UnregisterRobot(ARobotAIController* Controller)
 		[Controller](const FAIRobotInternalData& Data) { return Data.Controller == Controller; });
 	if (FoundIndex != INDEX_NONE)
 	{
-		Controller->OnAIRobotUnregister.Broadcast(Controller);
+		Controller->OnUnregisterFromSubsystem();
 
 		RegisteredRobots.RemoveAt(FoundIndex);
 	}

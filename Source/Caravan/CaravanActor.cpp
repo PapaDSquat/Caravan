@@ -90,21 +90,35 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 		// TODO: Move this out of here
 		UGameInstance* GameInstance = GetWorld()->GetGameInstance();
 		UAIRobotSubsystem* AIRobotSubsystem = GameInstance->GetSubsystem<UAIRobotSubsystem>();
-		if (AIRobotSubsystem)
+		if (AIRobotSubsystem && InitialRobots.Num() > 0)
 		{
 			if (IsOpen)
 			{
+				int TotalRobotsToSpawn = 0;
+				for (const FCaravanInitialRobotData& RobotData : InitialRobots)
+				{
+					if (RobotData.ShouldSpawn())
+						++TotalRobotsToSpawn;
+				}
+
+				static float s_SpawnAngleRange = 90.f;
 				static float s_SpawnDistance = 600.f;
-				const int TotalSpecs = DefaultRobotSpecs.Num();
-				const float AngleIncrement = 180.f / TotalSpecs;
+				const float AngleIncrement = s_SpawnAngleRange / (TotalRobotsToSpawn - 1);
 
 				const FVector CaravanLocation = GetActorLocation();
 				const FVector Forward = GetActorForwardVector() * FVector(-1.f, -1.f, 1.f);
 
-				float CurrentAngle = -90;
+				float CurrentAngle = TotalRobotsToSpawn == 1 ? 0.f : (s_SpawnAngleRange * -0.5f);
 
-				for (UAIRobotCharacterSpec* RobotSpec : DefaultRobotSpecs)
+				for (const FCaravanInitialRobotData& RobotData : InitialRobots)
 				{
+					if (!RobotData.bEnabled)
+						continue;
+
+					UAIRobotCharacterSpec* RobotSpec = RobotData.RobotSpec;
+					if (!RobotSpec)
+						continue;
+
 					const FVector SpawnDirection = Forward.RotateAngleAxis(CurrentAngle, FVector::UpVector);
 					const FVector SpawnLocation = CaravanLocation + (SpawnDirection * s_SpawnDistance);
 					const FTransform SpawnTransform(SpawnDirection.ToOrientationRotator(), SpawnLocation);
