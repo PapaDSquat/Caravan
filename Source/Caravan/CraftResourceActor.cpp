@@ -22,7 +22,7 @@ ACraftResourceActor::ACraftResourceActor(const class FObjectInitializer& ObjInit
 	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent")
 	{
 		InteractableComponent->PrimaryInteractionName = FText::FromString("Collect");
-		InteractableComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+		InteractableComponent->SetupAttachment(RootComponent);
 	}
 }
 

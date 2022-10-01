@@ -382,17 +382,17 @@ T* UWorldBuilderSubsystem::FindClosestResourceActor(const AActor* SearchActor, E
 
 	for (const FHitResult& hit : outResults)
 	{
-		if (!hit.Actor.IsValid())
+		if (!IsValid(hit.GetActor()))
 			continue;
 
-		T* resourceActor = Cast< T >(hit.Actor.Get());
+		T* resourceActor = Cast< T >(hit.GetActor());
 		if (resourceActor == NULL)
 			continue;
 
 		if (resourceActor->GetResourceType() != Type)
 			continue;
 
-		const float distance = FVector::Distance(actorLocation, hit.Actor->GetActorLocation());
+		const float distance = FVector::Distance(actorLocation, resourceActor->GetActorLocation());
 		if (distance < shortestDistance)
 		{
 			outActor = resourceActor;

@@ -19,7 +19,7 @@ ARobotAICharacter::ARobotAICharacter(const FObjectInitializer& ObjInitializer)
 	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent")
 	{
 		InteractableComponent->PrimaryInteractionName = FText::FromString("Talk");
-		InteractableComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+		InteractableComponent->SetupAttachment(RootComponent);
 	}
 }
 
