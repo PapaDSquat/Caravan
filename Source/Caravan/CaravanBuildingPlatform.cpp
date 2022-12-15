@@ -38,6 +38,6 @@ void ACaravanBuildingPlatform::SetActive(bool bActive)
 	{
 		IsActive = bActive;
 
-		//SetActorHiddenInGame(!IsActive);
+		SetActorHiddenInGame(!IsActive);
 	}
 }

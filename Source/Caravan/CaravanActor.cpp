@@ -1,14 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "CaravanActor.h"
+
 #include "AI/AIRobotSubsystem.h"
 #include "Caravan.h"
 #include "CaravanCharacter.h"
 #include "CaravanBuildingPlatform.h"
-#include "Utils/CaravanEngineUtils.h"
+#include "Components/ArrowComponent.h"
 #include "Components/InteractableComponent.h"
-#include "Engine.h"
 #include "DrawDebugHelpers.h"
+#include "Engine.h"
+#include "Utils/CaravanEngineUtils.h"
 
 static const FName SOCKET_PULL("PullSocket");
 static const FName SOCKET_TOGGLE_OPEN("ToggleOpenSocket");
@@ -20,17 +20,16 @@ ACaravanActor::ACaravanActor(const class FObjectInitializer& ObjInitializer)
 	SetRootComponent(SkeletalMesh);
 
 	StaticMeshComponent = ObjInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CaravanActor_StaticMeshComponent"));
+	StaticMeshComponent->SetupAttachment(RootComponent);
+
+	BuildDirectionComponent = ObjInitializer.CreateDefaultSubobject<UArrowComponent>(this, TEXT("BuildDirection"));
+	BuildDirectionComponent->SetupAttachment(RootComponent);
 
 	InteractableFrontComponent = ObjInitializer.CreateDefaultSubobject<UInteractableComponent>(this, TEXT("InteractableFrontComponent"));
-	{
-		AddOwnedComponent(InteractableFrontComponent);
-		InteractableFrontComponent->PrimaryInteractionName = FText::FromString("Travel");
-	}
+	InteractableFrontComponent->SetupAttachment(RootComponent);
+
 	InteractableBackComponent = ObjInitializer.CreateDefaultSubobject<UInteractableComponent>(this, TEXT("InteractableBackComponent"));
-	{
-		AddOwnedComponent(InteractableBackComponent);
-		InteractableBackComponent->PrimaryInteractionName = FText::FromString("Open/Close");
-	}
+	InteractableBackComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -146,86 +145,86 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 		NotifyOnToggleOpen(IsOpen);
 	}
 
-	/*
+
+	// Start position at the center of rows and 0 position of columns
+	const FVector caravanBackward = GetActorForwardVector() * -1.f;
+	const FVector caravanLeft = GetActorRightVector() * -1.f;
+
+	const FVector socketLocation = BuildDirectionComponent->GetComponentLocation();
+
+	// Position platforms in grid
+	// Grid direction is along the normal of the back face of the Caravan.
+	// The Cell Count Y is for rows, and X for columns.
+	const FVector gridTotalSize = BuildingGridCellSize * FVector((float)BuildingGridTotalColumns, (float)BuildingGridTotalRows, 1.f);
+
+	const FVector gridOffset(0.f, gridTotalSize.X * 0.5f, 0.f);
+
 	int rows = BuildingAttachmentGrid.Num();
-		for (int gridX = 0; gridX < rows; ++gridX)
+	for (int gridX = 0; gridX < rows; ++gridX)
+	{
+		TArray<ACaravanBuildingPlatform*>& rowArray = BuildingAttachmentGrid[gridX];
+		int columns = rowArray.Num();
+		for (int gridY = 0; gridY < columns; ++gridY)
 		{
-			TArray<ACaravanBuildingPlatform*>& rowArray = BuildingAttachmentGrid[gridX];
-			int columns = rowArray.Num();
-			for (int gridY = 0; gridY < columns; ++gridY)
+			FIntPoint gridPosition(gridX, gridY);
+			
+			// Offset by half rows so it is centered
+			FVector positionOffset = (FVector((float)gridPosition.Y, (float)gridPosition.X, 0.f) * BuildingGridCellSize) - gridOffset;
+
+			FVector buildingPosition = socketLocation;
+			buildingPosition += caravanBackward * positionOffset.X;
+			buildingPosition += caravanLeft * positionOffset.Y;
+
+			if (ACaravanBuildingPlatform* buildingPlatformActor = rowArray[gridY])
 			{
-				FIntPoint gridPosition(gridX, gridY);
-				if (ACaravanBuildingPlatform* buildingPlatformActor = rowArray[gridY])
-				{
-					buildingPlatformActor->SetActive(bOpen);
+				buildingPlatformActor->SetActive(bOpen);
 
-					// Position platforms in grid
-					// Grid direction is along the normal of the back face of the Caravan.
-					// The Cell Count Y is for rows, and X for columns.
-					if (bOpen && StaticMeshComponent)
-					{
-						// Start position at the center of rows and 0 position of columns
-						const FVector caravanBackward = GetActorForwardVector() * -1.f;
-						const FVector caravanLeft = GetActorRightVector() * -1.f;
-						
-						const FVector socketLocation = StaticMeshComponent->GetSocketLocation(SOCKET_BUILDING_ATTACHMENT);
-
-						FVector gridCellOrigin, gridCellSize;
-						buildingPlatformActor->GetActorBounds(true, gridCellOrigin, gridCellSize);
-						gridCellSize *= 2.f;
-
-						const FVector gridTotalSize = gridCellSize * FVector((float)BuildingGridTotalColumns, (float)BuildingGridTotalRows, 1.f);
-
-						// Offset by half rows so it is centered
-						int rowOffset = BuildingGridTotalRows / 2;
-						FVector positionOffset = FVector((float)gridPosition.Y, (float)(gridPosition.X- rowOffset), 0.f) * gridCellSize;
-
-						FVector buildingPosition = socketLocation;
-						buildingPosition += caravanBackward * positionOffset.X;
-						buildingPosition += caravanLeft * positionOffset.Y;
-
-						buildingPlatformActor->SetActorRotation(GetActorRotation());
-						buildingPlatformActor->SetActorLocation(buildingPosition);
-
-						// DEBUG
-						DrawDebugBox(
-							GetWorld(),
-							gridCellOrigin,
-							gridCellSize,
-							FColor(255, 0, 255), // Pink
-							false, 30.1f
-							);
-
-						DrawDebugSphere(
-							GetWorld(),
-							socketLocation,
-							75.f,
-							16,
-							FColor(255, 0, 255),// Pink
-							false, 30.1
-							);
-						DrawDebugLine(
-							GetWorld(),
-							socketLocation,
-							socketLocation + caravanBackward * 500.f,
-							FColor(0, 0, 255),// Blue
-							false, 30.1, 0,
-							10.f
-							);
-
-						DrawDebugLine(
-							GetWorld(),
-							socketLocation,
-							socketLocation + caravanLeft * 500.f,
-							FColor(255, 0, 255),// pink
-							false, 30.1, 0,
-							10.f
-							);
-					}
-				}
+				buildingPlatformActor->SetActorRotation(GetActorRotation());
+				buildingPlatformActor->SetActorLocation(buildingPosition);
 			}
+
+			DrawDebugSphere(
+				GetWorld(),
+				buildingPosition,
+				32.f,
+				16,
+				FColor::White,
+				false, 
+				30.f
+			);
 		}
-	*/
+	}
+
+	// DEBUG
+	DrawDebugSphere(
+		GetWorld(),
+		socketLocation,
+		64.f,
+		16,
+		FColor::Green,
+		false, 
+		30.f
+	);
+	DrawDebugLine(
+		GetWorld(),
+		socketLocation,
+		socketLocation + caravanBackward * 500.f,
+		FColor::Blue,
+		false, 
+		30.f, 
+		0,
+		10.f
+	);
+
+	DrawDebugLine(
+		GetWorld(),
+		socketLocation,
+		socketLocation + caravanLeft * 500.f,
+		FColor::Red,
+		false, 30.f, 
+		0,
+		10.f
+	);
 }
 
 ACaravanBuildingPlatform* ACaravanActor::GetBuildingAttachment(const FIntPoint& gridPosition) const

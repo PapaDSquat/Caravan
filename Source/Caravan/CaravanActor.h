@@ -1,13 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Components/InteractableComponent.h"
+
 #include "CaravanActor.generated.h"
 
 class ACaravanBuildingPlatform;
-class UAIRobotCharacterSpec;
 class ARobotAICharacter;
+class UAIRobotCharacterSpec;
+class UArrowComponent;
 class UStaticMeshSocket;
 
 UENUM()
@@ -53,6 +53,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|Building Settings")
 	int BuildingGridTotalColumns = 5;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|Building Settings")
+	FVector BuildingGridCellSize = FVector(50.f,50.f,0.f);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan|State")
 	bool bOpenOnBegin = false;
 
@@ -75,13 +78,16 @@ protected:
 	TArray< FCaravanInitialRobotData > InitialRobots;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-	UStaticMeshComponent* StaticMeshComponent;
+	UArrowComponent* BuildDirectionComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* StaticMeshComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	UInteractableComponent* InteractableFrontComponent;
+	UInteractableComponent* InteractableFrontComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	UInteractableComponent* InteractableBackComponent;
+	UInteractableComponent* InteractableBackComponent = nullptr;
 
 private:
 	void SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent = false);
