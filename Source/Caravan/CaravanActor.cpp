@@ -156,8 +156,7 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 	// Grid direction is along the normal of the back face of the Caravan.
 	// The Cell Count Y is for rows, and X for columns.
 	const FVector gridTotalSize = BuildingGridCellSize * FVector((float)BuildingGridTotalColumns, (float)BuildingGridTotalRows, 1.f);
-
-	const FVector gridOffset(0.f, gridTotalSize.X * 0.5f, 0.f);
+	const FVector gridOffset(0.f, gridTotalSize.Y * 0.5f - BuildingGridCellSize.Y * 0.5f, 0.f);
 
 	int rows = BuildingAttachmentGrid.Num();
 	for (int gridX = 0; gridX < rows; ++gridX)
