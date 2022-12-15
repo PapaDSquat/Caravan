@@ -551,6 +551,9 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& Trace
 
 		for (UInteractableComponent* Comp : InteractableComponents)
 		{
+			if (!Comp->IsActive())
+				continue;
+
 			const FVector CompLocation = Comp->GetComponentLocation();
 			const float distance = (CompLocation - hitResult.Location).Size();
 			if (distance < ClosestInteractableDistance)

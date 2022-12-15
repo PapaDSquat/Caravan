@@ -31,7 +31,6 @@ void ACaravanBuildingPlatform::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 }
 
-
 void ACaravanBuildingPlatform::SetActive(bool bActive)
 {
 	if (IsActive != bActive)
@@ -39,5 +38,6 @@ void ACaravanBuildingPlatform::SetActive(bool bActive)
 		IsActive = bActive;
 
 		SetActorHiddenInGame(!IsActive);
+		InteractableComponent->SetActive(bActive);
 	}
 }

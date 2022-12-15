@@ -8,6 +8,7 @@
 UInteractableComponent::UInteractableComponent()
 	: PrimaryInteractionName( FText::FromString("UNNAMED_INTERACTION") )
 {
+	bAutoActivate = true;
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
