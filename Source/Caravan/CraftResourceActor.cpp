@@ -101,7 +101,7 @@ void ACraftResourceActor::OnInteract(APawn* InteractingPawn, UInteractableCompon
 	if (InteractingPawn != NULL)
 	{
 		APawn* pawnWithInventory = NULL;
-		if (CVarRPGDebug_AlwaysUsePlayerInventory.GetValueOnGameThread() == true)
+		if (CVarRPGDebug_AlwaysUsePlayerInventory->GetBool())
 		{
 			if (APlayerController* playerController = GetWorld()->GetFirstPlayerController())
 			{

@@ -324,12 +324,12 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 
 		TargetBaseLocation = targetLocation;
 
-		if (CVarPlayerDebug_ShowInteractionTarget.GetValueOnGameThread() == true)
+		if (CVarPlayerDebug_ShowInteractionTarget->GetBool())
 		{
 			GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, InteractTarget->GetCurrentInteractionChoice().InteractionName.ToString());
 		}
 
-		if (CVarPlayerDebug_ShowInteractionOverlay.GetValueOnGameThread() == true)
+		if (CVarPlayerDebug_ShowInteractionOverlay->GetBool())
 		{
 			const AActor* targetActor = GetTargetedActor();
 			FVector targetOrigin, targetExtent;
@@ -566,7 +566,7 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& Trace
 		}
 	}
 
-	if (CVarPlayerDebug_ShowInteractionOverlay.GetValueOnGameThread() == true)
+	if (CVarPlayerDebug_ShowInteractionOverlay->GetBool())
 	{
 		if (IsValid(ClosestInteractable))
 		{

@@ -64,12 +64,12 @@ void ARobotAICharacter::Tick(float DeltaTime)
 		};
 
 		int idx = 0;
-		if (CVarAIDebug_Profile.GetValueOnGameThread() == true)
+		if (CVarAIDebug_Profile->GetBool())
 		{
 			DrawAIPropertyString(idx++, controller->GetRobotName().ToString());
 			DrawAIPropertyString(idx++, CaravanUtils::EnumToString(controller->CharacterProfile.PrimarySkill));
 		}
-		if (CVarAIDebug_Behaviour.GetValueOnGameThread() == true)
+		if (CVarAIDebug_Behaviour->GetBool())
 		{
 			if (UBrainComponent* brainComponent = controller->GetBrainComponent())
 			{

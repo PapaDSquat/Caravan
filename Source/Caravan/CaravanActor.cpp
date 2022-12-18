@@ -6,6 +6,7 @@
 #include "CaravanBuildingPlatform.h"
 #include "Components/ArrowComponent.h"
 #include "Components/InteractableComponent.h"
+#include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
 #include "Engine.h"
 #include "Utils/CaravanEngineUtils.h"
@@ -44,10 +45,10 @@ void ACaravanActor::BeginPlay()
 		row.SetNum(BuildingGridTotalColumns);
 	}
 	
-	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(1, 0));
-	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(0, 1));
+	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(0, 0));
+	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(2, 0));
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(1, 1));
-	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(2, 1));
+	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(1, 1));
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(0, 2));
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(2, 2));
 	
@@ -151,6 +152,9 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 	const FVector caravanLeft = GetActorRightVector() * -1.f;
 
 	const FVector socketLocation = BuildDirectionComponent->GetComponentLocation();
+	const FRotator socketRotation = BuildDirectionComponent->GetComponentRotation();
+
+	constexpr float DEBUG_LIFETIME = 10.f;
 
 	// Position platforms in grid
 	// Grid direction is along the normal of the back face of the Caravan.
@@ -174,7 +178,9 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 			buildingPosition += caravanBackward * positionOffset.X;
 			buildingPosition += caravanLeft * positionOffset.Y;
 
-			if (ACaravanBuildingPlatform* buildingPlatformActor = rowArray[gridY])
+			ACaravanBuildingPlatform* const buildingPlatformActor = rowArray[gridY];
+			bool bHasBuilding = IsValid(buildingPlatformActor);
+			if (bHasBuilding)
 			{
 				buildingPlatformActor->SetActive(bOpen);
 
@@ -182,48 +188,36 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 				buildingPlatformActor->SetActorLocation(buildingPosition);
 			}
 
-			DrawDebugSphere(
-				GetWorld(),
-				buildingPosition,
-				32.f,
-				16,
-				FColor::White,
-				false, 
-				30.f
-			);
+			if (CVarCaravanDebug_Generation->GetBool())
+			{
+				DrawDebugSphere(
+					GetWorld(),
+					buildingPosition,
+					32.f,
+					16,
+					bHasBuilding ? FColor::Orange : FColor::White,
+					false,
+					DEBUG_LIFETIME
+				);
+			}
 		}
 	}
 
-	// DEBUG
-	DrawDebugSphere(
-		GetWorld(),
-		socketLocation,
-		64.f,
-		16,
-		FColor::Green,
-		false, 
-		30.f
-	);
-	DrawDebugLine(
-		GetWorld(),
-		socketLocation,
-		socketLocation + caravanBackward * 500.f,
-		FColor::Blue,
-		false, 
-		30.f, 
-		0,
-		10.f
-	);
+	if (CVarCaravanDebug_Generation->GetBool())
+	{
+		DrawDebugCoordinateSystem(
+			GetWorld(),
+			socketLocation,
+			socketRotation,
+			65.f,
+			false,
+			DEBUG_LIFETIME,
+			0,
+			3.f
+		);
 
-	DrawDebugLine(
-		GetWorld(),
-		socketLocation,
-		socketLocation + caravanLeft * 500.f,
-		FColor::Red,
-		false, 30.f, 
-		0,
-		10.f
-	);
+		// TODO : Draw box around total area
+	}
 }
 
 ACaravanBuildingPlatform* ACaravanActor::GetBuildingAttachment(const FIntPoint& gridPosition) const
