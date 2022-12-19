@@ -44,6 +44,15 @@ public:
 
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable, Category = "Caravan")
+	const FVector& GetCampAreaCenter() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Caravan")
+	float GetCampAreaRadius() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Caravan")
+	bool IsCampAreaObstructed() const;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Classes)
 	TSubclassOf<class ACaravanBuildingPlatform> BuildingPlatformBPClass;
 
@@ -111,6 +120,7 @@ private:
 	};
 
 	TArray< TArray<ACaravanBuildingPlatform*> > BuildingAttachmentGrid;
+	FVector GridWorldCenter;
 
 	TArray< ARobotAICharacter* > Robots;
 

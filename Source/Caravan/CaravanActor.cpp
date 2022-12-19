@@ -10,6 +10,7 @@
 #include "DrawDebugHelpers.h"
 #include "Engine.h"
 #include "Utils/CaravanEngineUtils.h"
+#include "WorldBuilder/WorldBuilderSubsystem.h"
 
 static const FName SOCKET_PULL("PullSocket");
 static const FName SOCKET_TOGGLE_OPEN("ToggleOpenSocket");
@@ -162,6 +163,9 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 	const FVector gridTotalSize = BuildingGridCellSize * FVector((float)BuildingGridTotalColumns, (float)BuildingGridTotalRows, 1.f);
 	const FVector gridOffset(0.f, gridTotalSize.Y * 0.5f - BuildingGridCellSize.Y * 0.5f, 0.f);
 
+	// TODO : Should use socketRotation instead of caravanBackward
+	GridWorldCenter = socketLocation + (caravanBackward * gridTotalSize.X * 0.5f);
+
 	int rows = BuildingAttachmentGrid.Num();
 	for (int gridX = 0; gridX < rows; ++gridX)
 	{
@@ -195,7 +199,7 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 					buildingPosition,
 					32.f,
 					16,
-					bHasBuilding ? FColor::Orange : FColor::White,
+					bHasBuilding ? FColor::Green : FColor::White,
 					false,
 					DEBUG_LIFETIME
 				);
@@ -214,6 +218,16 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 			DEBUG_LIFETIME,
 			0,
 			3.f
+		);
+
+		DrawDebugSphere(
+			GetWorld(),
+			GridWorldCenter,
+			32.f,
+			16,
+			FColor::Cyan,
+			false,
+			DEBUG_LIFETIME
 		);
 
 		// TODO : Draw box around total area
@@ -328,4 +342,25 @@ FVector ACaravanActor::GetCarrySocketLocation() const
 FRotator ACaravanActor::GetCarrySocketRotation() const
 {
 	return StaticMeshComponent->GetSocketRotation(SOCKET_PULL);
+}
+
+const FVector& ACaravanActor::GetCampAreaCenter() const
+{
+	return GridWorldCenter;
+}	
+
+float ACaravanActor::GetCampAreaRadius() const
+{
+	const float RowCircum = BuildingGridCellSize.X * BuildingGridTotalRows;
+	const float ColCircum = BuildingGridCellSize.Y * BuildingGridTotalColumns;
+	return FMath::Max(RowCircum, ColCircum) * 0.5f;
+}
+
+bool ACaravanActor::IsCampAreaObstructed() const
+{
+	if (!IsOpen)
+		return false;
+
+	UWorldBuilderSubsystem* WorldBuilderSubsystem = GetGameInstance()->GetSubsystem<UWorldBuilderSubsystem>();
+	return WorldBuilderSubsystem && WorldBuilderSubsystem->HasNearbyResourceActor(GetCampAreaCenter(), GetCampAreaRadius());
 }

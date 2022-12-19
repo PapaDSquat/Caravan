@@ -4,6 +4,7 @@
 #include "Caravan.h"
 #include "CaravanActor.h"
 #include "CaravanCharacter.h"
+#include "CraftResourceActor.h"
 #include "DestructableResourceActor.h"
 #include "Math/UnrealMathUtility.h"
 #include "RockActor.h"
@@ -350,32 +351,16 @@ bool UWorldBuilderSubsystem::IsInGrid(const FIntPoint& inGridPos) const
 		&& inGridPos.Y < GridData.Num();
 }
 
-ADestructableResourceActor* UWorldBuilderSubsystem::FindClosestDestructableResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange /*= -1.f*/)
-{
-	return FindClosestResourceActor< ADestructableResourceActor >(SearchActor, Type, MaxRange);
-}
-
-ACraftResourceActor* UWorldBuilderSubsystem::FindClosestCraftResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange /*= -1.f*/)
-{
-	return FindClosestResourceActor< ACraftResourceActor >(SearchActor, Type, MaxRange);
-}
-
 template< typename T >
-T* UWorldBuilderSubsystem::FindClosestResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange /*= -1.f*/)
+T* UWorldBuilderSubsystem::FindClosestResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const
 {
-	if (!ensureMsgf(SearchActor != NULL, TEXT("UWorldBuilderSubsystem::FindClosestResourceActor Search Actor is invalid")))
-	{
-		return NULL;
-	}
-	const FVector actorLocation = SearchActor->GetActorLocation();
+	FCollisionQueryParams TraceParams(FName(TEXT("FindClosestResourceActorTrace")), false);
 
-	FCollisionQueryParams TraceParams(FName(TEXT("PlayerInteractTrace")), true, SearchActor);
-	TraceParams.AddIgnoredActor(PlayerCharacter);
-
-	const float searchRadius = MaxRange * 0.5f;
+	// Search around search location
+	const float searchRadius = Range * 0.5f;
 	FCollisionShape MySphere = FCollisionShape::MakeSphere(searchRadius); // 5M Radius
 	TArray<FHitResult> outResults; outResults.Reserve(16);
-	GetWorld()->SweepMultiByObjectType(outResults, actorLocation, actorLocation + FVector(searchRadius, searchRadius, 0.f), FQuat::Identity, ECC_WorldDynamic | CARAVAN_OBJECT_CHANNEL_INTERACTABLE, MySphere, TraceParams);
+	GetWorld()->SweepMultiByObjectType(outResults, SearchLocation, SearchLocation + FVector(searchRadius, searchRadius, 0.f), FQuat::Identity, ECC_WorldDynamic | CARAVAN_OBJECT_CHANNEL_INTERACTABLE, MySphere, TraceParams);
 
 	T* outActor = NULL;
 	float shortestDistance = TNumericLimits<float>::Max();
@@ -392,7 +377,8 @@ T* UWorldBuilderSubsystem::FindClosestResourceActor(const AActor* SearchActor, E
 		if (resourceActor->GetResourceType() != Type)
 			continue;
 
-		const float distance = FVector::Distance(actorLocation, resourceActor->GetActorLocation());
+		// Closest to instigator
+		const float distance = FVector::Distance(InstigatorLocation, resourceActor->GetActorLocation());
 		if (distance < shortestDistance)
 		{
 			outActor = resourceActor;
@@ -401,6 +387,30 @@ T* UWorldBuilderSubsystem::FindClosestResourceActor(const AActor* SearchActor, E
 	}
 
 	return outActor;
+}
+
+ADestructableResourceActor* UWorldBuilderSubsystem::FindClosestDestructableResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const
+{
+	return FindClosestResourceActor< ADestructableResourceActor >(InstigatorLocation, SearchLocation, Range, Type);
+}
+
+ACraftResourceActor* UWorldBuilderSubsystem::FindClosestCraftResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const
+{
+	return FindClosestResourceActor< ACraftResourceActor >(InstigatorLocation, SearchLocation, Range, Type);
+}
+
+bool UWorldBuilderSubsystem::HasNearbyResourceActor(const FVector& SearchLocation, float Range) const
+{
+	// TODO : Ouch!
+	for(ECraftResourceType Type : TEnumRange<ECraftResourceType>())
+	{
+		if( FindClosestDestructableResourceActor(SearchLocation, SearchLocation, Range, Type) ||
+			FindClosestCraftResourceActor(SearchLocation, SearchLocation, Range, Type))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 // Debug

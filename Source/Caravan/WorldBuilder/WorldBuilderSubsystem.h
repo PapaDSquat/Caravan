@@ -31,11 +31,28 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UWorldGenerationSpec* GetWorldSpec() const { return WorldSpec; }
 
+	/*
+		TODO
+			MaxRange should not have default value
+			Rename MaxRange to radius and actually treat it as such!!
+			Overload for Position and Radius
+			Move Pos & Radius as first 2 params. Type will eventually change
+	*/
+
+	template< typename T >
+	T* FindClosestResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const;
+
+	// Helpers
 	UFUNCTION(BlueprintCallable)
-	class ADestructableResourceActor* FindClosestDestructableResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange = -1.f);
+	class ADestructableResourceActor* FindClosestDestructableResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const;
 	
 	UFUNCTION(BlueprintCallable)
-	class ACraftResourceActor* FindClosestCraftResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange = -1.f);
+	class ACraftResourceActor* FindClosestCraftResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const;
+
+	bool HasNearbyResourceActor(const FVector& SearchLocation, float Range) const;
+
+	//template< typename T >
+	//T* FindClosestResourceActor(const FVector& SearchActor, ECraftResourceType Type, float MaxRange = -1.f);
 
 	// Time
 	UFUNCTION(BlueprintCallable)
@@ -68,9 +85,6 @@ private:
 
 	bool PerformTerrainRaycast(const AActor* Actor, FHitResult& hitResult);
 	bool PerformTerrainRaycast(const FVector& traceStart, float length, FHitResult& hitResult);
-
-	template< typename T >
-	T* FindClosestResourceActor(const AActor* SearchActor, ECraftResourceType Type, float MaxRange = -1.f);
 
 	// Grid Helpers
 	void GetGridCellBounds(const FIntPoint& cellPosition, FVector& topLeft, FVector& bottomRight) const;

@@ -12,6 +12,7 @@ enum class ECraftResourceType : uint8
 	Stone,
 	Invalid
 };
+ENUM_RANGE_BY_COUNT(ECraftResourceType, ECraftResourceType::Invalid);
 
 struct CraftResourceHelpers
 {
