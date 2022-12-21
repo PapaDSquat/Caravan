@@ -18,6 +18,8 @@ static const FName SOCKET_BUILDING_ATTACHMENT("BuildingAttachmentSocket");
 
 ACaravanActor::ACaravanActor(const class FObjectInitializer& ObjInitializer)
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	USkeletalMeshComponent* SkeletalMesh = ObjInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("SkeletalMesh"));;
 	SetRootComponent(SkeletalMesh);
 
@@ -67,6 +69,47 @@ void ACaravanActor::BeginPlay()
 	SetCaravanOpen(bOpenOnBegin, true);
 }
 
+void ACaravanActor::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+
+
+	if (CVarCaravanDebug_Generation->GetBool())
+	{
+		const FVector socketLocation = BuildDirectionComponent->GetComponentLocation();
+		const FRotator socketRotation = BuildDirectionComponent->GetComponentRotation();
+
+		DrawDebugCoordinateSystem(
+			GetWorld(),
+			socketLocation,
+			socketRotation,
+			65.f,
+			false,
+			0,
+			3.f
+		);
+
+		DrawDebugSphere(
+			GetWorld(),
+			CampAreaCenterLocation,
+			32.f,
+			16,
+			FColor::Cyan
+		);
+
+		DrawDebugSphere(
+			GetWorld(),
+			CampAreaCenterLocation,
+			GetCampAreaRadius(),
+			32,
+			FColor::Cyan
+		);
+
+		// TODO : Draw box around total area
+	}
+}
+
 ACaravanBuildingPlatform* ACaravanActor::CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition)
 {
 	// TODO: Use GridGenerator sub-cells to generate positions
@@ -83,8 +126,6 @@ ACaravanBuildingPlatform* ACaravanActor::CreateBuildingAttachment(ECaravanBuildi
 
 void ACaravanActor::GenerateCampArea()
 {
-	constexpr float DEBUG_LIFETIME = 10.f;
-
 	// Start position at the center of rows and 0 position of columns
 	const FVector caravanBackward = GetActorForwardVector() * -1.f;
 	const FVector caravanLeft = GetActorRightVector() * -1.f;
@@ -105,12 +146,10 @@ void ACaravanActor::GenerateCampArea()
 	constexpr float RadiusBufferMult = 1.5f;
 	CampAreaRadius = (FMath::Max(BuildingGridTotalRows, BuildingGridTotalColumns) + RadiusBufferMult) * BuildingGridCellSize * 0.5f;
 
-	int rows = BuildingAttachmentGrid.Num();
-	for (int gridX = 0; gridX < rows; ++gridX)
+	for (int gridX = 0; gridX < BuildingAttachmentGrid.Num(); ++gridX)
 	{
 		TArray<ACaravanBuildingPlatform*>& rowArray = BuildingAttachmentGrid[gridX];
-		int columns = rowArray.Num();
-		for (int gridY = 0; gridY < columns; ++gridY)
+		for (int gridY = 0; gridY < rowArray.Num(); ++gridY)
 		{
 			FIntPoint gridPosition(gridX, gridY);
 
@@ -131,6 +170,7 @@ void ACaravanActor::GenerateCampArea()
 				buildingPlatformActor->SetActorLocation(buildingPosition);
 			}
 
+			// TODO : Move
 			if (CVarCaravanDebug_Generation->GetBool())
 			{
 				DrawDebugSphere(
@@ -140,46 +180,10 @@ void ACaravanActor::GenerateCampArea()
 					16,
 					bHasBuilding ? FColor::Green : FColor::White,
 					false,
-					DEBUG_LIFETIME
+					10.f
 				);
 			}
 		}
-	}
-
-	if (CVarCaravanDebug_Generation->GetBool())
-	{
-		DrawDebugCoordinateSystem(
-			GetWorld(),
-			socketLocation,
-			socketRotation,
-			65.f,
-			false,
-			DEBUG_LIFETIME,
-			0,
-			3.f
-		);
-
-		DrawDebugSphere(
-			GetWorld(),
-			CampAreaCenterLocation,
-			32.f,
-			16,
-			FColor::Cyan,
-			false,
-			DEBUG_LIFETIME
-		);
-
-		DrawDebugSphere(
-			GetWorld(),
-			CampAreaCenterLocation,
-			GetCampAreaRadius(),
-			32,
-			FColor::Cyan,
-			false,
-			DEBUG_LIFETIME
-		);
-
-		// TODO : Draw box around total area
 	}
 }
 

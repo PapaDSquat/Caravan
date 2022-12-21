@@ -43,6 +43,7 @@ public:
 	ACaravanActor(const class FObjectInitializer& ObjInitializer);
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Caravan")
 	const FVector& GetCampAreaCenter() const;
