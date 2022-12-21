@@ -46,13 +46,14 @@ void ACaravanActor::BeginPlay()
 		row.SetNum(BuildingGridTotalColumns);
 	}
 	
+	// TODO : Procedural positioning
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(0, 0));
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(2, 0));
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(1, 1));
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(1, 1));
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(0, 2));
 	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(2, 2));
-	
+
 	// Event Registration
 	if (IsValid(InteractableFrontComponent))
 	{
@@ -69,7 +70,6 @@ void ACaravanActor::BeginPlay()
 ACaravanBuildingPlatform* ACaravanActor::CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition)
 {
 	// TODO: Use GridGenerator sub-cells to generate positions
-	// TODO if grid position is available
 
 	FActorSpawnParameters SpawnParameters;
 	ACaravanBuildingPlatform* buildingPlatformActor = GetWorld()->SpawnActor<ACaravanBuildingPlatform>(BuildingPlatformBPClass, SpawnParameters);
@@ -81,72 +81,9 @@ ACaravanBuildingPlatform* ACaravanActor::CreateBuildingAttachment(ECaravanBuildi
 	return buildingPlatformActor;
 }
 
-void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/)
+void ACaravanActor::GenerateCampArea()
 {
-	const bool bChanged = IsOpen != bOpen;
-	if (bChanged)
-	{
-		IsOpen = bOpen;
-
-		// TODO: Move this out of here
-		UGameInstance* GameInstance = GetWorld()->GetGameInstance();
-		UAIRobotSubsystem* AIRobotSubsystem = GameInstance->GetSubsystem<UAIRobotSubsystem>();
-		if (AIRobotSubsystem && InitialRobots.Num() > 0)
-		{
-			if (IsOpen)
-			{
-				int TotalRobotsToSpawn = 0;
-				for (const FCaravanInitialRobotData& RobotData : InitialRobots)
-				{
-					if (RobotData.ShouldSpawn())
-						++TotalRobotsToSpawn;
-				}
-
-				static float s_SpawnAngleRange = 90.f;
-				static float s_SpawnDistance = 600.f;
-				const float AngleIncrement = s_SpawnAngleRange / (TotalRobotsToSpawn - 1);
-
-				const FVector CaravanLocation = GetActorLocation();
-				const FVector Forward = GetActorForwardVector() * FVector(-1.f, -1.f, 1.f);
-
-				float CurrentAngle = TotalRobotsToSpawn == 1 ? 0.f : (s_SpawnAngleRange * -0.5f);
-
-				for (const FCaravanInitialRobotData& RobotData : InitialRobots)
-				{
-					if (!RobotData.bEnabled)
-						continue;
-
-					UAIRobotCharacterSpec* RobotSpec = RobotData.RobotSpec;
-					if (!RobotSpec)
-						continue;
-
-					const FVector SpawnDirection = Forward.RotateAngleAxis(CurrentAngle, FVector::UpVector);
-					const FVector SpawnLocation = CaravanLocation + (SpawnDirection * s_SpawnDistance);
-					const FTransform SpawnTransform(SpawnDirection.ToOrientationRotator(), SpawnLocation);
-					if (ARobotAICharacter* SpawnedRobot = AIRobotSubsystem->SpawnRobotCharacter(RobotSpec, SpawnTransform))
-					{
-						Robots.Add(SpawnedRobot);
-					}
-
-					CurrentAngle += AngleIncrement;
-				}
-			}
-			else
-			{
-				for (ARobotAICharacter* Robot : Robots)
-				{
-					AIRobotSubsystem->DespawnRobotCharacter(Robot);
-				}
-				Robots.Empty();
-			}
-		}
-	}
-
-	if (bChanged || bAlwaysFireEvent)
-	{
-		NotifyOnToggleOpen(IsOpen);
-	}
-
+	constexpr float DEBUG_LIFETIME = 10.f;
 
 	// Start position at the center of rows and 0 position of columns
 	const FVector caravanBackward = GetActorForwardVector() * -1.f;
@@ -155,16 +92,18 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 	const FVector socketLocation = BuildDirectionComponent->GetComponentLocation();
 	const FRotator socketRotation = BuildDirectionComponent->GetComponentRotation();
 
-	constexpr float DEBUG_LIFETIME = 10.f;
-
 	// Position platforms in grid
 	// Grid direction is along the normal of the back face of the Caravan.
 	// The Cell Count Y is for rows, and X for columns.
 	const FVector gridTotalSize = BuildingGridCellSize * FVector((float)BuildingGridTotalColumns, (float)BuildingGridTotalRows, 1.f);
-	const FVector gridOffset(0.f, gridTotalSize.Y * 0.5f - BuildingGridCellSize.Y * 0.5f, 0.f);
+	const FVector gridOffset(BuildingGridCellSize * -0.5f, gridTotalSize.Y * 0.5f - BuildingGridCellSize * 0.5f, 0.f);
 
 	// TODO : Should use socketRotation instead of caravanBackward
-	GridWorldCenter = socketLocation + (caravanBackward * gridTotalSize.X * 0.5f);
+	const float GridRadius = (FMath::Max(BuildingGridTotalRows, BuildingGridTotalColumns)) * BuildingGridCellSize * 0.5f;
+	CampAreaCenterLocation = socketLocation + (caravanBackward * GridRadius);
+
+	constexpr float RadiusBufferMult = 1.5f;
+	CampAreaRadius = (FMath::Max(BuildingGridTotalRows, BuildingGridTotalColumns) + RadiusBufferMult) * BuildingGridCellSize * 0.5f;
 
 	int rows = BuildingAttachmentGrid.Num();
 	for (int gridX = 0; gridX < rows; ++gridX)
@@ -174,7 +113,7 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 		for (int gridY = 0; gridY < columns; ++gridY)
 		{
 			FIntPoint gridPosition(gridX, gridY);
-			
+
 			// Offset by half rows so it is centered
 			FVector positionOffset = (FVector((float)gridPosition.Y, (float)gridPosition.X, 0.f) * BuildingGridCellSize) - gridOffset;
 
@@ -186,7 +125,7 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 			bool bHasBuilding = IsValid(buildingPlatformActor);
 			if (bHasBuilding)
 			{
-				buildingPlatformActor->SetActive(bOpen);
+				buildingPlatformActor->SetActive(IsOpen);
 
 				buildingPlatformActor->SetActorRotation(GetActorRotation());
 				buildingPlatformActor->SetActorLocation(buildingPosition);
@@ -222,7 +161,7 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 
 		DrawDebugSphere(
 			GetWorld(),
-			GridWorldCenter,
+			CampAreaCenterLocation,
 			32.f,
 			16,
 			FColor::Cyan,
@@ -230,7 +169,90 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 			DEBUG_LIFETIME
 		);
 
+		DrawDebugSphere(
+			GetWorld(),
+			CampAreaCenterLocation,
+			GetCampAreaRadius(),
+			32,
+			FColor::Cyan,
+			false,
+			DEBUG_LIFETIME
+		);
+
 		// TODO : Draw box around total area
+	}
+}
+
+void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/)
+{
+	const bool bChanged = IsOpen != bOpen;
+	if (bChanged)
+	{
+		IsOpen = bOpen;
+
+		// TODO : Not necessary when closing, should just clean up
+		GenerateCampArea();
+
+		// TODO: Move this out of here
+		UAIRobotSubsystem* AIRobotSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UAIRobotSubsystem>();
+		if (AIRobotSubsystem)
+		{
+			if (IsOpen)
+			{
+				// Position robots
+				if (!InitialRobots.IsEmpty())
+				{
+					int TotalRobotsToSpawn = 0;
+					for (const FCaravanInitialRobotData& RobotData : InitialRobots)
+					{
+						if (RobotData.ShouldSpawn())
+							++TotalRobotsToSpawn;
+					}
+
+					static float s_SpawnAngleRange = 90.f;
+					static float s_SpawnDistance = 600.f;
+					const float AngleIncrement = s_SpawnAngleRange / (TotalRobotsToSpawn - 1);
+
+					const FVector CaravanLocation = GetActorLocation();
+					const FVector Forward = GetActorForwardVector() * FVector(-1.f, -1.f, 1.f);
+
+					float CurrentAngle = TotalRobotsToSpawn == 1 ? 0.f : (s_SpawnAngleRange * -0.5f);
+
+					for (const FCaravanInitialRobotData& RobotData : InitialRobots)
+					{
+						if (!RobotData.bEnabled)
+							continue;
+
+						UAIRobotCharacterSpec* RobotSpec = RobotData.RobotSpec;
+						if (!RobotSpec)
+							continue;
+
+						const FVector SpawnDirection = Forward.RotateAngleAxis(CurrentAngle, FVector::UpVector);
+						const FVector SpawnLocation = CaravanLocation + (SpawnDirection * s_SpawnDistance);
+						const FTransform SpawnTransform(SpawnDirection.ToOrientationRotator(), SpawnLocation);
+						if (ARobotAICharacter* SpawnedRobot = AIRobotSubsystem->SpawnRobotCharacter(RobotSpec, SpawnTransform))
+						{
+							Robots.Add(SpawnedRobot);
+						}
+
+						CurrentAngle += AngleIncrement;
+					}
+				}
+			}
+			else
+			{
+				for (ARobotAICharacter* Robot : Robots)
+				{
+					AIRobotSubsystem->DespawnRobotCharacter(Robot);
+				}
+				Robots.Empty();
+			}
+		}
+	}
+
+	if (bChanged || bAlwaysFireEvent)
+	{
+		NotifyOnToggleOpen(IsOpen);
 	}
 }
 
@@ -346,14 +368,12 @@ FRotator ACaravanActor::GetCarrySocketRotation() const
 
 const FVector& ACaravanActor::GetCampAreaCenter() const
 {
-	return GridWorldCenter;
+	return CampAreaCenterLocation;
 }	
 
 float ACaravanActor::GetCampAreaRadius() const
 {
-	const float RowCircum = BuildingGridCellSize.X * BuildingGridTotalRows;
-	const float ColCircum = BuildingGridCellSize.Y * BuildingGridTotalColumns;
-	return FMath::Max(RowCircum, ColCircum) * 0.5f;
+	return CampAreaRadius;
 }
 
 bool ACaravanActor::IsCampAreaObstructed() const

@@ -63,7 +63,7 @@ public:
 	int BuildingGridTotalColumns = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|Building Settings")
-	FVector BuildingGridCellSize = FVector(50.f,50.f,0.f);
+	float BuildingGridCellSize = 500.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan|State")
 	bool bOpenOnBegin = false;
@@ -99,6 +99,7 @@ protected:
 	UInteractableComponent* InteractableBackComponent = nullptr;
 
 private:
+	void GenerateCampArea();
 	void SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent = false);
 
 	ACaravanBuildingPlatform* CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition);
@@ -120,7 +121,8 @@ private:
 	};
 
 	TArray< TArray<ACaravanBuildingPlatform*> > BuildingAttachmentGrid;
-	FVector GridWorldCenter;
+	FVector CampAreaCenterLocation;
+	float CampAreaRadius = 0.f;
 
 	TArray< ARobotAICharacter* > Robots;
 
