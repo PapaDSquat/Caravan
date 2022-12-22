@@ -50,7 +50,7 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		}
 
 		FVector TextWorldLocation = InitialWorldLocation;
-
+		
 		const bool bHasMultipleChoices = HasInteractionChoices();
 		TArray< FInteractionChoice > ChoicesToDraw;
 		if (bHasMultipleChoices)
@@ -170,6 +170,12 @@ void UInteractableComponent::SetTargeting(APawn* InTargetingPawn, bool bTargetin
 	if (bTargeting)
 	{
 		TargetingPawn = InTargetingPawn;
+
+		if (bBuildInteractionChoicesDynamic)
+		{
+			RebuildInteractionChoices();
+		}
+
 		if (HasInteractionChoices())
 		{
 			CurrentInteractionChoiceIndex = 0;
