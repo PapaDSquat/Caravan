@@ -171,6 +171,7 @@ void UInteractableComponent::SetTargeting(APawn* InTargetingPawn, bool bTargetin
 	{
 		TargetingPawn = InTargetingPawn;
 
+		// If using dynamic choices, rebuild before showing
 		if (bBuildInteractionChoicesDynamic)
 		{
 			RebuildInteractionChoices();
@@ -196,9 +197,15 @@ bool UInteractableComponent::Interact(APawn* InInteractingPawn)
 	InteractData data(InInteractingPawn);
 	InteractSelect(data);
 
-	// TODO
 	const FInteractionChoice& Choice = GetCurrentInteractionChoice();
 	OnInteract.Broadcast(InInteractingPawn, this, Choice);
+
+	// If using dynamic choices, rebuild after interaction, just in case the interaction has changed the choices
+	if (bBuildInteractionChoicesDynamic)
+	{
+		RebuildInteractionChoices();
+	}
+
 	return true;
 }
 
