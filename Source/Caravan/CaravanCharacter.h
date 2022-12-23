@@ -45,7 +45,7 @@ public:
 	ERobotAILocale GetWorldLocale() const { return WorldLocale; }
 
 	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE class UCameraComponent* GetCameraComponent() const { return TopDownCameraComponent; }
 
 protected:
 	/** Called for forwards/backward input */
@@ -175,13 +175,13 @@ private:
 
 	SInteractTraceResult LastTraceResult;
 
-	/** Camera boom positioning the camera behind the character */
+	// Camera boom positioning the camera above the character
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
-	/** Follow camera */
+	// Camera attached to the boom
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+	class UCameraComponent* TopDownCameraComponent;
 
 	// Movement
 	ACaravanActor* ActiveCaravan{ nullptr };

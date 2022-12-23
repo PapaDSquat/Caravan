@@ -40,7 +40,7 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		FVector InitialWorldLocation = GetComponentLocation();
 
 		// Offset based on Camera orientation
-		class UCameraComponent* Camera = Player->GetFollowCamera();
+		class UCameraComponent* Camera = Player->GetCameraComponent();
 		if (IsValid(Camera))
 		{
 			const FVector CameraUp = Camera->GetUpVector();
