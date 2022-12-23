@@ -19,6 +19,17 @@ void ACampBuildingActor::BeginPlay()
 	SetBuildingState(IsConstructed() ? ECampBuildingState::Constructed : ECampBuildingState::Unconstructed);
 }
 
+void ACampBuildingActor::SetActive(bool bValue)
+{
+	if (bActive != bValue)
+	{
+		bActive = bValue;
+
+		SetActorHiddenInGame(!bActive);
+		InteractableComponent->SetActive(bActive);
+	}
+}
+
 void ACampBuildingActor::ConstructBuilding(float PercentAmount)
 {
 	if (!ensureMsgf(PercentAmount > 0.f, TEXT("[ACampBuildingActor::ConstructBuilding] Percent amount cannot be a negative number")))

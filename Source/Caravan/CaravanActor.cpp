@@ -1,9 +1,10 @@
 #include "CaravanActor.h"
 
 #include "AI/AIRobotSubsystem.h"
+#include "CampBuildingActor.h"
+#include "CampBuildingSpec.h"
 #include "Caravan.h"
 #include "CaravanCharacter.h"
-#include "CaravanBuildingPlatform.h"
 #include "Components/ArrowComponent.h"
 #include "Components/InteractableComponent.h"
 #include "Debug/CaravanConsoleVariables.h"
@@ -43,18 +44,26 @@ void ACaravanActor::BeginPlay()
 	
 	// Initialize the grid to its fixed size
 	BuildingAttachmentGrid.SetNum(BuildingGridTotalRows);
-	for (TArray<ACaravanBuildingPlatform*>& row : BuildingAttachmentGrid)
+	for (TArray<ACampBuildingActor*>& Row : BuildingAttachmentGrid)
 	{
-		row.SetNum(BuildingGridTotalColumns);
+		Row.SetNum(BuildingGridTotalColumns);
 	}
 	
 	// TODO : Procedural positioning
-	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(0, 0));
-	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(2, 0));
-	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(1, 1));
-	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(1, 1));
-	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(0, 2));
-	CreateBuildingAttachment(ECaravanBuildingType::CraftStation, FIntPoint(2, 2));
+	static FIntPoint DefaultGridPosition[6] =
+	{
+		FIntPoint(0, 0),
+		FIntPoint(2, 0),
+		FIntPoint(1, 1),
+		FIntPoint(1, 1),
+		FIntPoint(0, 2),
+		FIntPoint(2, 2)
+	};
+	for(int i=0; i<InitialBuildings.Num(); ++i)
+	{
+		UCampBuildingSpec* BuildingSpec = InitialBuildings[i];
+		CreateBuildingAttachment(BuildingSpec, DefaultGridPosition[i]);
+	}
 
 	// Event Registration
 	if (IsValid(InteractableFrontComponent))
@@ -110,18 +119,15 @@ void ACaravanActor::Tick(float DeltaSeconds)
 	}
 }
 
-ACaravanBuildingPlatform* ACaravanActor::CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition)
+ACampBuildingActor* ACaravanActor::CreateBuildingAttachment(UCampBuildingSpec* Spec, const FIntPoint& GridPosition)
 {
-	// TODO: Use GridGenerator sub-cells to generate positions
-
 	FActorSpawnParameters SpawnParameters;
-	ACaravanBuildingPlatform* buildingPlatformActor = GetWorld()->SpawnActor<ACaravanBuildingPlatform>(BuildingPlatformBPClass, SpawnParameters);
-	if (buildingPlatformActor)
+	ACampBuildingActor* SpawnedActor = GetWorld()->SpawnActor<ACampBuildingActor>(Spec->BuildingActorClass, SpawnParameters);
+	if (SpawnedActor)
 	{
-		// TODO: Attach?
-		SetBuildingAttachment(gridPosition, buildingPlatformActor);
+		SetBuildingAttachment(GridPosition, SpawnedActor);
 	}
-	return buildingPlatformActor;
+	return SpawnedActor;
 }
 
 void ACaravanActor::GenerateCampArea()
@@ -148,7 +154,7 @@ void ACaravanActor::GenerateCampArea()
 
 	for (int gridX = 0; gridX < BuildingAttachmentGrid.Num(); ++gridX)
 	{
-		TArray<ACaravanBuildingPlatform*>& rowArray = BuildingAttachmentGrid[gridX];
+		TArray<ACampBuildingActor*>& rowArray = BuildingAttachmentGrid[gridX];
 		for (int gridY = 0; gridY < rowArray.Num(); ++gridY)
 		{
 			FIntPoint gridPosition(gridX, gridY);
@@ -160,12 +166,11 @@ void ACaravanActor::GenerateCampArea()
 			buildingPosition += caravanBackward * positionOffset.X;
 			buildingPosition += caravanLeft * positionOffset.Y;
 
-			ACaravanBuildingPlatform* const buildingPlatformActor = rowArray[gridY];
+			ACampBuildingActor* const buildingPlatformActor = rowArray[gridY];
 			bool bHasBuilding = IsValid(buildingPlatformActor);
 			if (bHasBuilding)
 			{
 				buildingPlatformActor->SetActive(IsOpen);
-
 				buildingPlatformActor->SetActorRotation(GetActorRotation());
 				buildingPlatformActor->SetActorLocation(buildingPosition);
 			}
@@ -260,14 +265,14 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 	}
 }
 
-ACaravanBuildingPlatform* ACaravanActor::GetBuildingAttachment(const FIntPoint& gridPosition) const
+ACampBuildingActor* ACaravanActor::GetBuildingAttachment(const FIntPoint& gridPosition) const
 {
-	ACaravanBuildingPlatform* foundBuildingPlatformActor = NULL;
+	ACampBuildingActor* foundBuildingPlatformActor = NULL;
 
 	// ASSERT
 	if (gridPosition.X < BuildingAttachmentGrid.Num())
 	{
-		const TArray<ACaravanBuildingPlatform*>& column = BuildingAttachmentGrid[gridPosition.X];
+		const TArray<ACampBuildingActor*>& column = BuildingAttachmentGrid[gridPosition.X];
 		if (gridPosition.Y < column.Num())
 		{
 			return column[gridPosition.Y];
@@ -277,11 +282,11 @@ ACaravanBuildingPlatform* ACaravanActor::GetBuildingAttachment(const FIntPoint& 
 	return foundBuildingPlatformActor;
 }
 
-bool ACaravanActor::SetBuildingAttachment(const FIntPoint& gridPosition, ACaravanBuildingPlatform* actor)
+bool ACaravanActor::SetBuildingAttachment(const FIntPoint& gridPosition, ACampBuildingActor* actor)
 {
 	if (gridPosition.X < BuildingAttachmentGrid.Num())
 	{
-		TArray<ACaravanBuildingPlatform*>& column = BuildingAttachmentGrid[gridPosition.X];
+		TArray<ACampBuildingActor*>& column = BuildingAttachmentGrid[gridPosition.X];
 		if (gridPosition.Y < column.Num())
 		{
 			column[gridPosition.Y] = actor;

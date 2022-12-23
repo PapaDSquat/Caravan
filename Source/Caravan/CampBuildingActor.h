@@ -2,7 +2,9 @@
 
 #include "CampBuildingActor.generated.h"
 
+class UCampBuildingSpec;
 class UInteractableComponent;
+
 
 UENUM(BlueprintType)
 enum class ECampBuildingState : uint8
@@ -23,6 +25,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	void SetActive(bool bValue);
+
 	UFUNCTION(BlueprintCallable)
 	void ConstructBuilding(float PercentAmount);
 
@@ -42,6 +46,11 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnBuildingConstructed();
 
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly);
+	UCampBuildingSpec* CampBuildingSpec;
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* StaticMeshComponent;
 
@@ -54,4 +63,7 @@ protected:
 	// Currently not saved as it is set on BeginPlay based on Constructed state
 	UPROPERTY(Transient, BlueprintReadOnly);
 	ECampBuildingState BuildingState = ECampBuildingState::Invalid;
+
+	// Active when the Caravan is open and the building is available to interact with
+	bool bActive = false;
 };

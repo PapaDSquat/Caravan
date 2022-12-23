@@ -4,18 +4,13 @@
 
 #include "CaravanActor.generated.h"
 
-class ACaravanBuildingPlatform;
+class ACampBuildingActor;
 class ARobotAICharacter;
 class UAIRobotCharacterSpec;
 class UArrowComponent;
+class UCampBuildingSpec;
 class UStaticMeshSocket;
-
-UENUM()
-enum ECaravanBuildingType
-{
-	Invalid,
-	CraftStation
-};
+enum class ECampBuildingType : uint8;
 
 // Temporary container for choosing default robots in the Caravan
 USTRUCT(BlueprintType)
@@ -55,7 +50,7 @@ public:
 	bool IsCampAreaObstructed() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Classes)
-	TSubclassOf<class ACaravanBuildingPlatform> BuildingPlatformBPClass;
+	TSubclassOf<class ACampBuildingActor> BuildingPlatformBPClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|Building Settings")
 	int BuildingGridTotalRows= 5;
@@ -87,6 +82,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|AI")
 	TArray< FCaravanInitialRobotData > InitialRobots;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|AI")
+	TArray< UCampBuildingSpec* > InitialBuildings;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	UArrowComponent* BuildDirectionComponent = nullptr;
 
@@ -103,9 +101,9 @@ private:
 	void GenerateCampArea();
 	void SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent = false);
 
-	ACaravanBuildingPlatform* CreateBuildingAttachment(ECaravanBuildingType buildingType, const FIntPoint& gridPosition);
-	ACaravanBuildingPlatform* GetBuildingAttachment(const FIntPoint& gridPosition) const;
-	bool SetBuildingAttachment(const FIntPoint& gridPosition, ACaravanBuildingPlatform* actor);
+	ACampBuildingActor* CreateBuildingAttachment(UCampBuildingSpec* Spec, const FIntPoint& GridPosition);
+	ACampBuildingActor* GetBuildingAttachment(const FIntPoint& gridPosition) const;
+	bool SetBuildingAttachment(const FIntPoint& gridPosition, ACampBuildingActor* actor);
 
 	UFUNCTION()
 	void OnInteractWithFront(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice);
@@ -121,7 +119,7 @@ private:
 		FName SocketName;
 	};
 
-	TArray< TArray<ACaravanBuildingPlatform*> > BuildingAttachmentGrid;
+	TArray< TArray<ACampBuildingActor*> > BuildingAttachmentGrid;
 	FVector CampAreaCenterLocation;
 	float CampAreaRadius = 0.f;
 
