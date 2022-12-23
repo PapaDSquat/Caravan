@@ -9,7 +9,7 @@ class UInteractableComponent;
 UENUM(BlueprintType)
 enum class ECampBuildingState : uint8
 {
-	Unconstructed,
+	Deconstructed,
 	Constructed,
 	// Open/Close?
 	Invalid
@@ -29,6 +29,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ConstructBuilding(float PercentAmount);
+
+	UFUNCTION(BlueprintCallable)
+	void DeconstructBuilding();
 
 	UFUNCTION(BlueprintCallable)
 	bool IsConstructed() const { return ConstructedPercent == 1.f; }

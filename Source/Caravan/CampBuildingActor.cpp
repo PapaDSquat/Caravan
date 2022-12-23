@@ -16,7 +16,7 @@ void ACampBuildingActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SetBuildingState(IsConstructed() ? ECampBuildingState::Constructed : ECampBuildingState::Unconstructed);
+	SetBuildingState(IsConstructed() ? ECampBuildingState::Constructed : ECampBuildingState::Deconstructed);
 }
 
 void ACampBuildingActor::SetActive(bool bValue)
@@ -27,6 +27,11 @@ void ACampBuildingActor::SetActive(bool bValue)
 
 		SetActorHiddenInGame(!bActive);
 		InteractableComponent->SetActive(bActive);
+
+		if (!bValue)
+		{
+			DeconstructBuilding();
+		}
 	}
 }
 
@@ -47,6 +52,12 @@ void ACampBuildingActor::ConstructBuilding(float PercentAmount)
 		SetBuildingState(ECampBuildingState::Constructed);
 		OnBuildingConstructed();
 	}
+}
+
+void ACampBuildingActor::DeconstructBuilding()
+{
+	ConstructedPercent = 0.f; // Reset construction progress
+	SetBuildingState(ECampBuildingState::Deconstructed);
 }
 
 void ACampBuildingActor::SetBuildingState(ECampBuildingState InState)
