@@ -38,6 +38,7 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		static float s_ChoiceOffsetZ = 31.5f;
 
 		FVector InitialWorldLocation = GetComponentLocation();
+		FVector TextOffsetDirection = FVector::ZeroVector;
 
 		// Offset based on Camera orientation
 		class UCameraComponent* Camera = Player->GetCameraComponent();
@@ -47,6 +48,8 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			const FVector CameraRight = Camera->GetRightVector();
 			const FVector CameraForward = Camera->GetForwardVector();
 			InitialWorldLocation += (CameraRight * InteractionChoiceScreenOffset.X) + (CameraUp * InteractionChoiceScreenOffset.Y);
+
+			TextOffsetDirection = CameraUp * -1.f;
 		}
 
 		FVector TextWorldLocation = InitialWorldLocation;
@@ -79,9 +82,9 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			);
 
 			if(bHasSubTitle)
-				TextWorldLocation.Z -= s_ObjectNameOffsetZ;
+				TextWorldLocation += TextOffsetDirection * s_ObjectNameOffsetZ;
 			else
-				TextWorldLocation.Z -= s_SubTitleOffsetZ;
+				TextWorldLocation += TextOffsetDirection * s_SubTitleOffsetZ;
 		}
 
 		if (bHasSubTitle)
@@ -97,7 +100,7 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 				s_FontSizeSubTitle
 			);
 
-			TextWorldLocation.Z -= s_SubTitleOffsetZ;
+			TextWorldLocation += TextOffsetDirection * s_SubTitleOffsetZ;
 		}
 
 		for(int i=0; i<ChoicesToDraw.Num(); ++i)
@@ -120,7 +123,7 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 				TextSize
 			);
 
-			TextWorldLocation.Z -= s_ChoiceOffsetZ;
+			TextWorldLocation += TextOffsetDirection * s_ChoiceOffsetZ;
 		}
 	}
 }
