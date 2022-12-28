@@ -4,7 +4,6 @@
 #include "Caravan.h"
 #include "Components/InteractableComponent.h"
 #include "DrawDebugHelpers.h"
-#include "Debug/CaravanConsoleVariables.h"
 #include "Engine.h"
 #include "GameFramework/Pawn.h"
 #include "RPG/InventoryComponent.h"
@@ -100,25 +99,23 @@ void ACraftResourceActor::OnInteract(APawn* InteractingPawn, UInteractableCompon
 
 	if (InteractingPawn != NULL)
 	{
-		APawn* pawnWithInventory = NULL;
-		if (CVarRPGDebug_AlwaysUsePlayerInventory->GetBool())
+		UInventoryComponent* InventoryComponent = nullptr;
+
+		// Local inventory?
+		// InventoryComponent = InteractingPawn->FindComponentByClass<UInventoryComponent>();
+
+		// Always deposit into player inventory
+		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 		{
-			if (APlayerController* playerController = GetWorld()->GetFirstPlayerController())
+			if (APawn* PlayerPawn = Cast<APawn>(PlayerController->GetPawn()))
 			{
-				if (APawn* playerPawn = Cast<APawn>(playerController->GetPawn()))
-				{
-					pawnWithInventory = playerPawn;
-				}
+				InventoryComponent = PlayerPawn->FindComponentByClass<UInventoryComponent>();
 			}
 		}
-		else
-		{
-			pawnWithInventory = InteractingPawn;
-		}
 
-		if (UInventoryComponent* const inventory = FindInventoryComponent(pawnWithInventory))
+		if (InventoryComponent)
 		{
-			inventory->AddCraftResource(this);
+			InventoryComponent->AddCraftResource(this);
 		}
 	}
 

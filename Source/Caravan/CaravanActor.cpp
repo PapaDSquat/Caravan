@@ -7,7 +7,6 @@
 #include "CaravanCharacter.h"
 #include "Components/ArrowComponent.h"
 #include "Components/InteractableComponent.h"
-#include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
 #include "Engine.h"
 #include "Utils/CaravanEngineUtils.h"
@@ -16,6 +15,12 @@
 static const FName SOCKET_PULL("PullSocket");
 static const FName SOCKET_TOGGLE_OPEN("ToggleOpenSocket");
 static const FName SOCKET_BUILDING_ATTACHMENT("BuildingAttachmentSocket");
+
+TAutoConsoleVariable CVar_GenerationDebug(
+	TEXT("Caravan.Generation"),
+	false,
+	TEXT("Toggle debug overlay for Caravan camp generation on open"),
+	ECVF_Cheat);
 
 ACaravanActor::ACaravanActor(const class FObjectInitializer& ObjInitializer)
 {
@@ -84,7 +89,7 @@ void ACaravanActor::Tick(float DeltaSeconds)
 
 
 
-	if (CVarCaravanDebug_Generation->GetBool())
+	if (CVar_GenerationDebug->GetBool())
 	{
 		const FVector socketLocation = BuildDirectionComponent->GetComponentLocation();
 		const FRotator socketRotation = BuildDirectionComponent->GetComponentRotation();
@@ -176,7 +181,7 @@ void ACaravanActor::GenerateCampArea()
 			}
 
 			// TODO : Move
-			if (CVarCaravanDebug_Generation->GetBool())
+			if (CVar_GenerationDebug->GetBool())
 			{
 				DrawDebugSphere(
 					GetWorld(),

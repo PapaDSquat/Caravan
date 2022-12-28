@@ -5,10 +5,21 @@
 #include "BrainComponent.h"
 #include "Components/InteractableComponent.h"
 #include "Components/InteractionComponent.h"
-#include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
 #include "RPG/InventoryComponent.h"
 #include "Utils/CaravanEngineUtils.h"
+
+TAutoConsoleVariable CVar_ProfileDebug(
+	TEXT("AI.Robot.Profile"),
+	false,
+	TEXT("Toggle AI Profile HUD Overlay"),
+	ECVF_Cheat);
+
+TAutoConsoleVariable CVar_BehaviourDebug(
+	TEXT("AI.Robot.Behaviour"),
+	false,
+	TEXT("Toggle AI Behaviour HUD Overlay"),
+	ECVF_Cheat);
 
 ARobotAICharacter::ARobotAICharacter(const FObjectInitializer& ObjInitializer)
 {
@@ -66,12 +77,12 @@ void ARobotAICharacter::Tick(float DeltaTime)
 		};
 
 		int idx = 0;
-		if (CVarAIDebug_Profile->GetBool())
+		if (CVar_ProfileDebug->GetBool())
 		{
 			DrawAIPropertyString(idx++, controller->GetRobotName().ToString());
 			DrawAIPropertyString(idx++, CaravanUtils::EnumToString(controller->CharacterProfile.PrimarySkill));
 		}
-		if (CVarAIDebug_Behaviour->GetBool())
+		if (CVar_BehaviourDebug->GetBool())
 		{
 			if (UBrainComponent* brainComponent = controller->GetBrainComponent())
 			{

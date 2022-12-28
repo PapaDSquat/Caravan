@@ -6,7 +6,6 @@
 #include "CaravanGameMode.h"
 #include "Components/InteractableComponent.h"
 #include "Components/InteractionComponent.h"
-#include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "MultiToolActor.h"
@@ -14,6 +13,19 @@
 #include "Utils/CaravanEngineUtils.h"
 #include "Utils/CaravanCollisionTypes.h"
 #include "WorldBuilder/WorldBuilderSubsystem.h"
+
+TAutoConsoleVariable CVar_InteractionTargetDebug(
+	TEXT("Interaction.Target"),
+	false,
+	TEXT("Toggle target name for Player interaction"),
+
+	ECVF_Cheat);
+
+TAutoConsoleVariable CVar_InteractionOverlayDebug(
+	TEXT("Interaction.Overlay"),
+	false,
+	TEXT("Toggle debug overlay for Player interaction"),
+	ECVF_Cheat);
 
 ACaravanCharacter::ACaravanCharacter(const class FObjectInitializer& ObjInitializer)
 {
@@ -328,12 +340,12 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 
 		TargetBaseLocation = targetLocation;
 
-		if (CVarPlayerDebug_ShowInteractionTarget->GetBool())
+		if (CVar_InteractionTargetDebug->GetBool())
 		{
 			GEngine->AddOnScreenDebugMessage(0, -1.f, FColor::Green, InteractTarget->GetCurrentInteractionChoice().InteractionName.ToString());
 		}
 
-		if (CVarPlayerDebug_ShowInteractionOverlay->GetBool())
+		if (CVar_InteractionOverlayDebug->GetBool())
 		{
 			const AActor* targetActor = GetTargetedActor();
 			FVector targetOrigin, targetExtent;
@@ -529,7 +541,7 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& Trace
 
 		const AActor* HitActor = hitResult.GetActor();
 
-		if (CVarPlayerDebug_ShowInteractionOverlay.GetValueOnGameThread() == true)
+		if (CVar_InteractionOverlayDebug.GetValueOnGameThread() == true)
 		{
 			FColor debugColor = !IsValid(HitActor)
 				? FColor(255, 0, 0)  // Red for miss
@@ -570,7 +582,7 @@ bool ACaravanCharacter::TryInteractTrace(const TArray<SInteractTraceData>& Trace
 		}
 	}
 
-	if (CVarPlayerDebug_ShowInteractionOverlay->GetBool())
+	if (CVar_InteractionOverlayDebug->GetBool())
 	{
 		if (IsValid(ClosestInteractable))
 		{
