@@ -1,14 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AI/AICharacterSpec.h"
+#include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "RobotAICharacter.generated.h"
 
 class ARobotAIController;
 class UInteractableComponent;
+class UInteractionComponent;
 class UInventoryComponent;
 
 UCLASS()
@@ -31,6 +31,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Robot")
 	FName GetRobotName() const;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+	TObjectPtr<UInteractionComponent> InteractionComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
 	UInteractableComponent* InteractableComponent;

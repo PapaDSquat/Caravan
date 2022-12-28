@@ -19,7 +19,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
-	void Interact(ACharacter* InteractingCharacter, UInteractableComponent* Interactable);
+	bool Interact(ACharacter* InteractingCharacter, UInteractableComponent* Interactable);
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	AActor* GetFocusedActor() const;

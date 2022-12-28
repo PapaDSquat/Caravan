@@ -1,11 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "AI/RobotAICharacter.h"
+
 #include "AI/RobotAIController.h"
 #include "AI/AICharacterSpec.h"
 #include "BrainComponent.h"
 #include "Components/InteractableComponent.h"
+#include "Components/InteractionComponent.h"
 #include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
 #include "RPG/InventoryComponent.h"
@@ -14,6 +13,9 @@
 ARobotAICharacter::ARobotAICharacter(const FObjectInitializer& ObjInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
+	AddOwnedComponent(InteractionComponent);
 
 	FindOrCreateComponent(UInventoryComponent, InventoryComponent, "InventoryComponent")
 	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent")

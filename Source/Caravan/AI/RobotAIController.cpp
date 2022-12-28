@@ -1,9 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "AI/RobotAIController.h"
+
 #include "AI/RobotAICharacter.h"
 #include "AI/AIRobotSubsystem.h"
 #include "Components/InteractableComponent.h"
+#include "Components/InteractionComponent.h"
 #include "Utils/CaravanEngineUtils.h"
 
 ARobotAIController::ARobotAIController(const FObjectInitializer& ObjInitializer)
@@ -100,4 +100,13 @@ bool ARobotAIController::GetIsOnExpedition() const
 void ARobotAIController::SetIsOnExpedition(bool bIsOnExpedition)
 {
 	RobotState.bFollowPlayerRequested = bIsOnExpedition;
+}
+
+bool ARobotAIController::Interact(UInteractableComponent* Interactable)
+{
+	if (ARobotAICharacter* RobotCharacter = GetRobotOwner())
+	{
+		return RobotCharacter->InteractionComponent->Interact(RobotCharacter, Interactable);
+	}
+	return false;
 }

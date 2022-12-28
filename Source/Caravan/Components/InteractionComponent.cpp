@@ -22,14 +22,14 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	Interacting = false;
 }
 
-void UInteractionComponent::Interact(ACharacter* InteractingCharacter, UInteractableComponent* Interactable)
+bool UInteractionComponent::Interact(ACharacter* InteractingCharacter, UInteractableComponent* Interactable)
 {
 	if (!InteractingCharacter || !Interactable)
-		return;
+		return false;
 
 	Interacting = true; // For one frame
 
-	Interactable->Interact(InteractingCharacter);
+	return Interactable->Interact(InteractingCharacter);
 }
 
 AActor* UInteractionComponent::GetFocusedActor() const

@@ -1,12 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AI/AICharacterSpec.h"
 #include "AIController.h"
+#include "CoreMinimal.h"
 #include "RobotAIController.generated.h"
 
+class UInteractableComponent;
 enum class ERobotAILocale : uint8;
 struct FInteractionChoice;
 
@@ -55,6 +54,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "AI|State")
 	void SetIsOnExpedition( bool bIsOnExpedition );
+
+	UFUNCTION(BlueprintCallable, Category = "AI|Interaction")
+	bool Interact(UInteractableComponent* Interactable);
 
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
 	FRobotAIProfile CharacterProfile;
