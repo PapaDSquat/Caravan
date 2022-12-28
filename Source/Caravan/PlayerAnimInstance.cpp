@@ -1,14 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "PlayerAnimInstance.h"
 #include "Caravan.h"
 #include "CaravanCharacter.h"
+#include "Components/InteractionComponent.h"
 #include "GameFramework/Pawn.h"
-
 
 UPlayerAnimInstance::UPlayerAnimInstance(const class FObjectInitializer& ObjInitializer)
 {
-	
 }
 
 void UPlayerAnimInstance::NativeInitializeAnimation()
@@ -16,6 +13,10 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	OwningCharacter = Cast<ACharacter>(TryGetPawnOwner());
+	if (IsValid(OwningCharacter))
+	{
+		InteractionComponent = OwningCharacter->FindComponentByClass<UInteractionComponent>();
+	}
 }
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTimeX)
@@ -38,6 +39,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTimeX)
 	Speed = OwningCharacter->GetVelocity().Size();
 
 	// INTERACTION
-	// TODO : Get from InteractableComponent
-	// IsInteracting = OwningCharacter->Interacting;
+	if (InteractionComponent)
+	{
+		IsInteracting = InteractionComponent->IsInteracting();
+	}
 }

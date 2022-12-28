@@ -1,11 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Animation/AnimInstance.h"
 #include "PlayerAnimInstance.generated.h"
 
 class ACaravanCharacter;
+class UInteractionComponent;
 
 UCLASS()
 class CARAVAN_API UPlayerAnimInstance : public UAnimInstance
@@ -35,4 +34,7 @@ public:
 private:
 	UPROPERTY(Transient)
 	ACharacter* OwningCharacter;
+
+	UPROPERTY(Transient)
+	UInteractionComponent* InteractionComponent;
 };

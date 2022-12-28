@@ -5,6 +5,7 @@
 #include "CaravanActor.h"
 #include "CaravanGameMode.h"
 #include "Components/InteractableComponent.h"
+#include "Components/InteractionComponent.h"
 #include "Debug/CaravanConsoleVariables.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -31,6 +32,9 @@ ACaravanCharacter::ACaravanCharacter(const class FObjectInitializer& ObjInitiali
 	GetCharacterMovement()->AirControl = 0.2f;
 	// GetCharacterMovement()->bConstrainToPlane = true;
 	// GetCharacterMovement()->bSnapToPlaneAtStart = true;
+
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
+	AddOwnedComponent(InteractionComponent);
 
 	// Create a camera boom
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -192,11 +196,9 @@ void ACaravanCharacter::InteractSelect()
 	}
 	else if (IsValid(InteractFocus))
 	{
-		const UInteractableComponent::InteractData interactData(this, LastTraceResult.HitResult);
-		InteractFocus->Interact(this);
+		InteractionComponent->Interact(this, InteractFocus);
 		/*
 		const EInteractionType interactionType = InteractFocus->InteractSelect(interactData);
-		Interacting = true; // Reset on next tick
 
 		switch (interactionType)
 		{
@@ -294,8 +296,6 @@ void ACaravanCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	UpdateDwindleState(DeltaSeconds);
-
-	Interacting = false;
 
 	if (IsCarryingCaravan())
 	{

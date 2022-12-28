@@ -6,10 +6,11 @@
 #include "CraftResourceActor.h"
 #include "CaravanCharacter.generated.h"
 
-class UInteractableComponent;
 class ACaravanActor;
 class ACaravanGameMode;
 class AMultiToolActor;
+class UInteractableComponent;
+class UInteractionComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerLocaleChangeEvent, class ACaravanCharacter*, PlayerCharacter, ERobotAILocale, Locale);
 
@@ -23,8 +24,6 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
-
-	bool Interacting{ false };
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	bool IsCarryingCaravan() const { return (ActiveCaravan != NULL); }
@@ -174,6 +173,9 @@ private:
 	bool TryInteractTrace(const TArray<SInteractTraceData>& traceDataList, SInteractTraceResult& outTraceResult);
 
 	SInteractTraceResult LastTraceResult;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInteractionComponent> InteractionComponent = nullptr;
 
 	// Camera boom positioning the camera above the character
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
