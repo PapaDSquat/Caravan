@@ -68,7 +68,7 @@ class CARAVAN_API UCharacterSpec : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
 	TSubclassOf< class ACharacter > CharacterClass;
 };
 
@@ -114,4 +114,14 @@ public:
 	// Traits have positive & negative BlueprintReadOnly on robot’s AI behaviour
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan Robot")
 	// TArray< ERobotAIQuirk > Quirks;
+};
+
+UCLASS()
+class CARAVAN_API UAIEnemyCharacterSpec : public UAICharacterSpec
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
+	TObjectPtr<class UBehaviorTree> DefaultBehaviorTree;
 };

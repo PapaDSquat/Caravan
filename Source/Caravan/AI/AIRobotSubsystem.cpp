@@ -3,6 +3,8 @@
 
 #include "AI/AIRobotSubsystem.h"
 #include "AI/AICharacterSpec.h"
+#include "AI/BaseAICharacter.h"
+#include "AI/EnemyAIController.h"
 #include "AI/RobotAICharacter.h"
 #include "AI/RobotAIController.h"
 #include "Utils/CaravanSpawnUtils.h"
@@ -31,6 +33,23 @@ void UAIRobotSubsystem::Deinitialize()
 void UAIRobotSubsystem::Tick(float DeltaTime)
 {
 	// TODO
+}
+
+ABaseAICharacter* UAIRobotSubsystem::SpawnEnemyCharacter(const UAIEnemyCharacterSpec* Spec, const FTransform& Transform)
+{
+	ABaseAICharacter* SpawnedAICharacter = Cast< ABaseAICharacter >(CaravanSpawnUtils::SpawnActor(GetWorld(), Spec, Transform));
+	if (SpawnedAICharacter != nullptr)
+	{
+		if (AEnemyAIController* EnemyController = Cast< AEnemyAIController >(SpawnedAICharacter->GetController());
+			ensure(EnemyController))
+		{
+			if (Spec->DefaultBehaviorTree != nullptr)
+			{
+				EnemyController->RunBehaviorTree(Spec->DefaultBehaviorTree);
+			}
+		}
+	}
+	return SpawnedAICharacter;
 }
 
 ARobotAICharacter* UAIRobotSubsystem::SpawnRobotCharacter(const UAIRobotCharacterSpec* Spec, const FTransform& Transform)

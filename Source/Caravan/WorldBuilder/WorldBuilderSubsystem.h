@@ -81,7 +81,7 @@ private:
 	TArray< TArray<GridCellData> > GridData;
 
 	template< class TActorClass >
-	TActorClass* SpawnGridCellActor(const TSubclassOf<TActorClass>& ActorClass, GridCellData& CellData, const FIntPoint& GridPosition);
+	TActorClass* SpawnGridCellActor(const TSubclassOf<TActorClass>& ActorClass, const FIntPoint& GridPosition, GridCellData& OutCellData);
 
 	bool PerformTerrainRaycast(const AActor* Actor, FHitResult& hitResult);
 	bool PerformTerrainRaycast(const FVector& traceStart, float length, FHitResult& hitResult);

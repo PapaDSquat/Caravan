@@ -7,13 +7,14 @@
 #include "Tickable.h"
 #include "AIRobotSubsystem.generated.h"
 
+class ABaseAICharacter;
 class ARobotAICharacter;
 class ARobotAIController;
 class UAIRobotCharacterSpec;
 struct FRobotAIProfile;
 
 /**
- * 
+ * TODO : Rename to UAISubsystem
  */
 UCLASS()
 class CARAVAN_API UAIRobotSubsystem : public UGameInstanceSubsystem, public FTickableGameObject
@@ -33,6 +34,9 @@ public:
 		RETURN_QUICK_DECLARE_CYCLE_STAT(UAIRobotSubsystem, STATGROUP_Tickables);
 	}
 	// End FTickableGameObject
+
+	UFUNCTION(BlueprintCallable, Category = "AI|Spawn")
+	ABaseAICharacter* SpawnEnemyCharacter(const UAIEnemyCharacterSpec* Spec, const FTransform& Transform);
 
 	UFUNCTION(BlueprintCallable, Category = "AI|Spawn")
 	ARobotAICharacter* SpawnRobotCharacter(const UAIRobotCharacterSpec* Spec, const FTransform& Transform);

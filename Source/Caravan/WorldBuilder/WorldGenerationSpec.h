@@ -10,6 +10,7 @@ class ACaravanActor;
 class ACaravanCharacter;
 class ACraftResourceActor;
 class ADestructableResourceActor;
+class UAIEnemyCharacterSpec;
 
 USTRUCT(BlueprintType)
 struct FWorldGenerationActors
@@ -59,17 +60,20 @@ class CARAVAN_API UWorldGenerationSpec : public UDataAsset
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "Actors|Destructable Resource")
+	UPROPERTY(EditDefaultsOnly, Category = "Crafting")
 	TSubclassOf<ADestructableResourceActor> TreeActorClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Actors|Destructable Resource")
+	UPROPERTY(EditDefaultsOnly, Category = "Crafting")
 	TSubclassOf<ADestructableResourceActor> RockActorClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Actors|Craft Resource")
+	UPROPERTY(EditDefaultsOnly, Category = "Crafting")
 	TSubclassOf<ACraftResourceActor> WoodActorClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Actors|Craft Resource")
+	UPROPERTY(EditDefaultsOnly, Category = "Crafting")
 	TSubclassOf<ACraftResourceActor> StoneActorClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	TArray<UAIEnemyCharacterSpec*> EnemyAISpecs;
 
 	// Toggle whether to spawn trees, rocks, etc.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flags")
@@ -79,30 +83,37 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flags")
 	bool SpawnGameActorsEnabled = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid Settings")
+	// Toggle whether to spawn Enemy AI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flags")
+	bool SpawnEnemyAIEnabled = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
 	int GridCellCountX = 10;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
 	int GridCellCountY = 10;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
 	float GridCellSizeX = 500.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid")
 	float GridCellSizeY = 500.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid Crafting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crafting")
 	float TotalCraftActorDensity = 0.75f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid Crafting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crafting")
 	float TreeDensity = 0.8f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid Crafting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crafting")
 	float RockDensity = 0.4f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid Crafting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crafting")
 	float CraftActorScaleMin = 0.75f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid Crafting")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crafting")
 	float CraftActorScaleMax = 2.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	float EnemyAIDensity = 0.2f;
 };

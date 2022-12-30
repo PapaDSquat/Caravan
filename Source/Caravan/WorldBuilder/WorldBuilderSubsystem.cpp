@@ -16,6 +16,12 @@ static const float CELL_ACTOR_SPAWN_RAYCAST_LENGTH = 5000.f;
 static const float CELL_ACTOR_SPAWN_OFFSET_Y = 30.f; // To ensure the bottom edge isn't visible
 static const float DEBUG_TIME_REVERSE_FORWARD_SPEED = 50.f; // 1.0 = default speed
 
+TAutoConsoleVariable CVar_WorldBuilderSpawnDebug(
+	TEXT("WorldBuilder.SpawnDebug"),
+	false,
+	TEXT("Toggle debug for WorldBuilder spawning of resources, AI, etc."),
+	ECVF_Cheat);
+
 void UWorldBuilderSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 
@@ -200,17 +206,38 @@ void UWorldBuilderSubsystem::ResetResourceGrid()
 					{
 						SpawnGridCellActor(
 							WorldSpec->TreeActorClass,
-							cellData,
-							gridPosition
+							gridPosition,
+							cellData
 							);
 					}
 					else
 					{
 						SpawnGridCellActor(
 							WorldSpec->RockActorClass,
-							cellData,
-							gridPosition
+							gridPosition,
+							cellData
 							);
+					}
+				}
+
+				if (WorldSpec->SpawnEnemyAIEnabled && !WorldSpec->EnemyAISpecs.IsEmpty())
+				{
+					// Spawn random enemy
+					if (FMath::RandRange(0.f, 1.0f) <= WorldSpec->EnemyAIDensity)
+					{
+						const int SpecIndex = FMath::RandRange(0, WorldSpec->EnemyAISpecs.Num() - 1);
+						if (UAIEnemyCharacterSpec* EnemySpec = WorldSpec->EnemyAISpecs[SpecIndex])
+						{
+							// TODO : Spawn AI in grid
+							/*
+							SpawnGridCellActor(
+								EnemySpec->CharacterClass,
+								gridPosition,
+								cellData
+							);
+							*/
+						}
+						//EnemyAIClasses
 					}
 				}
 			}
@@ -219,67 +246,82 @@ void UWorldBuilderSubsystem::ResetResourceGrid()
 }
 
 template< class TActorClass >
-TActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(const TSubclassOf<TActorClass>& ActorClass, GridCellData& CellData, const FIntPoint& GridPosition)
+TActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(const TSubclassOf<TActorClass>& ActorClass, const FIntPoint& GridPosition, GridCellData& OutCellData)
 {
 	if (!ensureMsgf(ActorClass != NULL, TEXT("[UWorldBuilderSubsystem::SpawnGridCellActor] Invalid Actor Class. Check your World Spec!")))
 		return NULL;
 
-	FVector gridOrigin = GeneratePosition;
+	FVector GridOrigin = GeneratePosition;
 
 	FActorSpawnParameters SpawnParameters;
-	if (TActorClass* spawnedActor = GetWorld()->SpawnActor<TActorClass>(ActorClass.Get(), SpawnParameters))
+	if (TActorClass* SpawnedActor = GetWorld()->SpawnActor<TActorClass>(ActorClass.Get(), SpawnParameters))
 	{
-		// Random scale
-		float scaleAmount = FMath::RandRange(WorldSpec->CraftActorScaleMin, WorldSpec->CraftActorScaleMax);
-		FVector scale = FVector(scaleAmount, scaleAmount, scaleAmount);
-		spawnedActor->SetActorScale3D(scale);
-
-		FBox actorBB;
-		if (spawnedActor->StaticMeshComponent)
-		{
-			if (UStaticMesh* ResourceMesh = spawnedActor->StaticMeshComponent->GetStaticMesh())
-			{
-				actorBB = ResourceMesh->GetBoundingBox();
-				//actorBB.ExpandBy(scale);
-			}
-		}
-
-		FVector cellTopLeft, cellBottomRight;
-		GetGridCellBounds(GridPosition, cellTopLeft, cellBottomRight);
+		FVector CellTopLeft, CellBottomRight;
+		GetGridCellBounds(GridPosition, CellTopLeft, CellBottomRight);
 
 		// Position in random position within the cell
-		float randomX = FMath::RandRange(cellTopLeft.X, cellBottomRight.X);
-		float randomY = FMath::RandRange(cellTopLeft.Y, cellBottomRight.Y);
+		float RandomX = FMath::RandRange(CellTopLeft.X, CellBottomRight.X);
+		float RandomY = FMath::RandRange(CellTopLeft.Y, CellBottomRight.Y);
 
-		FVector finalPosition(randomX, randomY, gridOrigin.Z);
+		FVector FinalPosition(RandomX, RandomY, GridOrigin.Z);
+
+		// Random scale
+		float ScaleAmount = FMath::RandRange(WorldSpec->CraftActorScaleMin, WorldSpec->CraftActorScaleMax);
+		FVector Scale = FVector(ScaleAmount, ScaleAmount, ScaleAmount);
+		SpawnedActor->SetActorScale3D(Scale);
+
+		// Get actor bounds
+		// TODO : This doesn't work for current resource actors because their static meshes have wrong pivots.
+		//		  For now, override it with the logic just below.
+		FVector ActorOrigin, ActorExtent;
+		SpawnedActor->GetActorBounds(true, ActorOrigin, ActorExtent, true);
+
+		// TODO BEGIN : Remove
+		FBox StaticMeshBB;
+		if (SpawnedActor->StaticMeshComponent)
+		{
+			if (UStaticMesh* ResourceMesh = SpawnedActor->StaticMeshComponent->GetStaticMesh())
+			{
+				StaticMeshBB = ResourceMesh->GetBoundingBox();
+			}
+		}
+		ActorOrigin = StaticMeshBB.GetCenter();
+		ActorExtent = StaticMeshBB.GetExtent();
+		// TODO END : Remove
 
 		// We've selected random X and Y, now raycast downwards to find the Z on the terrain
-		FHitResult hitResult(ForceInit);
-		if (PerformTerrainRaycast(finalPosition, CELL_ACTOR_SPAWN_RAYCAST_LENGTH, hitResult))
+		FHitResult HitResult(ForceInit);
+		if (PerformTerrainRaycast(FinalPosition, CELL_ACTOR_SPAWN_RAYCAST_LENGTH, HitResult))
 		{
 			// Offset the actor by its bounding box so it's bottom rests on the terrain
-			float offsetFromCenter = spawnedActor->GetActorLocation().Z - actorBB.GetCenter().Z;
-			float halfHeight = actorBB.GetExtent().Z;
-			float totalOffset = (offsetFromCenter + halfHeight - CELL_ACTOR_SPAWN_OFFSET_Y) * scaleAmount;
-			if (hitResult.IsValidBlockingHit())
+			const float OffsetFromCenter = SpawnedActor->GetActorLocation().Z - ActorOrigin.Z;
+			const float HalfHeight = ActorExtent.Z;
+			const float TotalOffset = (OffsetFromCenter + HalfHeight - CELL_ACTOR_SPAWN_OFFSET_Y) * ScaleAmount;
+			if (HitResult.IsValidBlockingHit())
 			{
-				finalPosition.Z = hitResult.ImpactPoint.Z + totalOffset;
+				FinalPosition.Z = HitResult.ImpactPoint.Z + TotalOffset;
 			}
 		}
 
-		spawnedActor->SetActorLocation(finalPosition);
+		SpawnedActor->SetActorLocation(FinalPosition);
+
+		if (CVar_WorldBuilderSpawnDebug->GetBool())
+		{
+			DrawDebugSphere(GetWorld(), FinalPosition, 32.f, 16, FColor::Cyan, false, 20.f, 0, 2.5f);
+			DrawDebugBox(GetWorld(), FinalPosition, ActorExtent, FColor::Cyan, false, 20.f, 0, 2.5f);
+		}
 
 		// Random yaw orientation
 		FRotator rotation(0.f, FMath::RandRange(0.f, 360.f), 0.f);
-		spawnedActor->SetActorRotation(rotation);
+		SpawnedActor->SetActorRotation(rotation);
 
 		// Update the cell data
-		CellData.Actor = spawnedActor;
-		CellData.GridPosition = GridPosition;
+		OutCellData.Actor = SpawnedActor;
+		OutCellData.GridPosition = GridPosition;
 
-		return spawnedActor;
+		return SpawnedActor;
 	}
-	return NULL;
+	return nullptr;
 }
 
 bool UWorldBuilderSubsystem::PerformTerrainRaycast(const AActor* Actor, FHitResult& hitResult)
@@ -303,6 +345,16 @@ bool UWorldBuilderSubsystem::PerformTerrainRaycast(const FVector& traceStart, fl
 
 	// TODO: Handle when already colliding
 	bool bHit = GetWorld()->LineTraceSingleByObjectType(hitResult, traceStart, traceEnd, TraceObjectParams, TraceParams);
+
+	if (CVar_WorldBuilderSpawnDebug->GetBool())
+	{
+		DrawDebugLine(GetWorld(), traceStart, traceEnd, FColor::Red, false, 20.f, 0, 5.f);
+		if (bHit)
+		{
+			DrawDebugSphere(GetWorld(), hitResult.Location, 32.f, 32, FColor::Green, false, 20.f, 0, 5.f);
+		}
+	}
+
 	return bHit;
 }
 
