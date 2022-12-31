@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "WorldBuilder/WorldBuilderSubsystem.h"
+
+#include "AI/EnemyAIController.h"
 #include "Caravan.h"
 #include "CaravanActor.h"
 #include "CaravanCharacter.h"
@@ -111,6 +113,8 @@ bool UWorldBuilderSubsystem::GenerateNewWorld(const FVector& Position, UWorldGen
 
 void UWorldBuilderSubsystem::ResetResourceGrid()
 {
+	FlushPersistentDebugLines(GetWorld());
+
 	struct GridCellReserveSlot
 	{
 		GridCellReserveSlot(FIntPoint cellPosition, AActor* actor)
@@ -204,19 +208,21 @@ void UWorldBuilderSubsystem::ResetResourceGrid()
 					float randResourceIndex = FMath::RandRange(0.f, 1.0f);
 					if (randResourceIndex <= realTreeDensity)
 					{
-						SpawnGridCellActor(
+						SpawnGridCellActor<ADestructableResourceActor>(
 							WorldSpec->TreeActorClass,
 							gridPosition,
-							cellData
-							);
+							cellData,
+							[](ADestructableResourceActor* SpawnedActor) {}
+						);
 					}
 					else
 					{
-						SpawnGridCellActor(
+						SpawnGridCellActor<ADestructableResourceActor>(
 							WorldSpec->RockActorClass,
 							gridPosition,
-							cellData
-							);
+							cellData,
+							[](ADestructableResourceActor* SpawnedActor) {}
+						);
 					}
 				}
 
@@ -229,13 +235,22 @@ void UWorldBuilderSubsystem::ResetResourceGrid()
 						if (UAIEnemyCharacterSpec* EnemySpec = WorldSpec->EnemyAISpecs[SpecIndex])
 						{
 							// TODO : Spawn AI in grid
-							/*
-							SpawnGridCellActor(
+							SpawnGridCellActor<ACharacter>(
 								EnemySpec->CharacterClass,
 								gridPosition,
-								cellData
+								cellData,
+								[EnemySpec](ACharacter* SpawnedActor)
+								{
+									SpawnedActor->SpawnDefaultController();
+									if (AEnemyAIController* EnemyController = Cast< AEnemyAIController >(SpawnedActor->GetController()))
+									{
+										if (EnemySpec->DefaultBehaviorTree != nullptr)
+										{
+											EnemyController->RunBehaviorTree(EnemySpec->DefaultBehaviorTree);
+										}
+									}
+								}
 							);
-							*/
 						}
 						//EnemyAIClasses
 					}
@@ -246,7 +261,7 @@ void UWorldBuilderSubsystem::ResetResourceGrid()
 }
 
 template< class TActorClass >
-TActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(const TSubclassOf<TActorClass>& ActorClass, const FIntPoint& GridPosition, GridCellData& OutCellData)
+TActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(const TSubclassOf<TActorClass>& ActorClass, const FIntPoint& GridPosition, GridCellData& OutCellData, std::function<void(TActorClass*)> InitializeFunc)
 {
 	if (!ensureMsgf(ActorClass != NULL, TEXT("[UWorldBuilderSubsystem::SpawnGridCellActor] Invalid Actor Class. Check your World Spec!")))
 		return NULL;
@@ -274,19 +289,23 @@ TActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(const TSubclassOf<TActor
 		// TODO : This doesn't work for current resource actors because their static meshes have wrong pivots.
 		//		  For now, override it with the logic just below.
 		FVector ActorOrigin, ActorExtent;
-		SpawnedActor->GetActorBounds(true, ActorOrigin, ActorExtent, true);
+		SpawnedActor->GetActorBounds(true, ActorOrigin, ActorExtent, false);
 
 		// TODO BEGIN : Remove
+		/*
 		FBox StaticMeshBB;
 		if (SpawnedActor->StaticMeshComponent)
 		{
+			
 			if (UStaticMesh* ResourceMesh = SpawnedActor->StaticMeshComponent->GetStaticMesh())
 			{
+				
 				StaticMeshBB = ResourceMesh->GetBoundingBox();
 			}
 		}
 		ActorOrigin = StaticMeshBB.GetCenter();
 		ActorExtent = StaticMeshBB.GetExtent();
+		*/
 		// TODO END : Remove
 
 		// We've selected random X and Y, now raycast downwards to find the Z on the terrain
@@ -296,7 +315,7 @@ TActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(const TSubclassOf<TActor
 			// Offset the actor by its bounding box so it's bottom rests on the terrain
 			const float OffsetFromCenter = SpawnedActor->GetActorLocation().Z - ActorOrigin.Z;
 			const float HalfHeight = ActorExtent.Z;
-			const float TotalOffset = (OffsetFromCenter + HalfHeight - CELL_ACTOR_SPAWN_OFFSET_Y) * ScaleAmount;
+			const float TotalOffset = (OffsetFromCenter + HalfHeight /* - CELL_ACTOR_SPAWN_OFFSET_Y*/) * ScaleAmount;
 			if (HitResult.IsValidBlockingHit())
 			{
 				FinalPosition.Z = HitResult.ImpactPoint.Z + TotalOffset;
@@ -307,13 +326,15 @@ TActorClass* UWorldBuilderSubsystem::SpawnGridCellActor(const TSubclassOf<TActor
 
 		if (CVar_WorldBuilderSpawnDebug->GetBool())
 		{
-			DrawDebugSphere(GetWorld(), FinalPosition, 32.f, 16, FColor::Cyan, false, 20.f, 0, 2.5f);
-			DrawDebugBox(GetWorld(), FinalPosition, ActorExtent, FColor::Cyan, false, 20.f, 0, 2.5f);
+			DrawDebugSphere(GetWorld(), FinalPosition, 32.f, 16, FColor::Cyan, true, 0.f, 0, 2.5f);
+			DrawDebugBox(GetWorld(), FinalPosition, ActorExtent, FColor::Cyan, true, 0.f, 0, 2.5f);
 		}
 
 		// Random yaw orientation
 		FRotator rotation(0.f, FMath::RandRange(0.f, 360.f), 0.f);
 		SpawnedActor->SetActorRotation(rotation);
+
+		InitializeFunc(SpawnedActor);
 
 		// Update the cell data
 		OutCellData.Actor = SpawnedActor;
@@ -348,10 +369,10 @@ bool UWorldBuilderSubsystem::PerformTerrainRaycast(const FVector& traceStart, fl
 
 	if (CVar_WorldBuilderSpawnDebug->GetBool())
 	{
-		DrawDebugLine(GetWorld(), traceStart, traceEnd, FColor::Red, false, 20.f, 0, 5.f);
+		DrawDebugLine(GetWorld(), traceStart, traceEnd, FColor::Red, true, 0.f, 0, 5.f);
 		if (bHit)
 		{
-			DrawDebugSphere(GetWorld(), hitResult.Location, 32.f, 32, FColor::Green, false, 20.f, 0, 5.f);
+			DrawDebugSphere(GetWorld(), hitResult.Location, 32.f, 32, FColor::Green, true, 0.f, 0, 5.f);
 		}
 	}
 

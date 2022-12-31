@@ -14,7 +14,7 @@ class UAIRobotCharacterSpec;
 struct FRobotAIProfile;
 
 /**
- * TODO : Rename to UAISubsystem
+ * TODO : Rename to UAISubsystem, change to UTickableWorldSubsystem
  */
 UCLASS()
 class CARAVAN_API UAIRobotSubsystem : public UGameInstanceSubsystem, public FTickableGameObject
