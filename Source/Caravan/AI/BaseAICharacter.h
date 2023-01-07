@@ -15,7 +15,8 @@ class CARAVAN_API ABaseAICharacter : public ACharacter
 	GENERATED_UCLASS_BODY()
 
 public:
-	ABaseAICharacter();
+	UInteractableComponent* GetInteractableComponent() { return InteractableComponent; }
+	UInventoryComponent* GetInventoryComponent() { return InventoryComponent; }
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")

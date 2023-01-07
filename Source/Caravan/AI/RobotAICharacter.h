@@ -1,8 +1,8 @@
 #pragma once
 
+#include "AI/BaseAICharacter.h"
 #include "AI/AICharacterSpec.h"
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 
 #include "RobotAICharacter.generated.h"
 
@@ -12,7 +12,7 @@ class UInteractionComponent;
 class UInventoryComponent;
 
 UCLASS()
-class CARAVAN_API ARobotAICharacter : public ACharacter
+class CARAVAN_API ARobotAICharacter : public ABaseAICharacter
 {
 	GENERATED_UCLASS_BODY()
 
@@ -34,10 +34,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
 	TObjectPtr<UInteractionComponent> InteractionComponent = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
-	UInteractableComponent* InteractableComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG")
-	UInventoryComponent* InventoryComponent;
 };

@@ -41,8 +41,8 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		FVector TextOffsetDirection = FVector::ZeroVector;
 
 		// Offset based on Camera orientation
-		class UCameraComponent* Camera = Player->GetCameraComponent();
-		if (IsValid(Camera))
+		if (class UCameraComponent* Camera = Player->GetCameraComponent();
+			IsValid(Camera))
 		{
 			const FVector CameraUp = Camera->GetUpVector();
 			const FVector CameraRight = Camera->GetRightVector();
@@ -53,17 +53,6 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		}
 
 		FVector TextWorldLocation = InitialWorldLocation;
-		
-		const bool bHasMultipleChoices = HasInteractionChoices();
-		TArray< FInteractionChoice > ChoicesToDraw;
-		if (bHasMultipleChoices)
-		{
-			ChoicesToDraw = InteractionChoices;
-		}
-		else
-		{
-			ChoicesToDraw.Add(PrimaryInteractionChoice);
-		}
 
 		const bool bHasTitle = !InteractableObjectName.IsEmpty();
 		const bool bHasSubTitle = !InteractableObjectSubTitle.IsEmpty();
@@ -101,6 +90,18 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			);
 
 			TextWorldLocation += TextOffsetDirection * s_SubTitleOffsetZ;
+		}
+
+		// Input choices
+		const bool bHasMultipleChoices = HasInteractionChoices();
+		TArray< FInteractionChoice > ChoicesToDraw;
+		if (bHasMultipleChoices)
+		{
+			ChoicesToDraw = InteractionChoices;
+		}
+		else
+		{
+			ChoicesToDraw.Add(PrimaryInteractionChoice);
 		}
 
 		for(int i=0; i<ChoicesToDraw.Num(); ++i)

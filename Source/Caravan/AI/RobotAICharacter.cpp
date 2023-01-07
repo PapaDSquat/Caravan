@@ -27,13 +27,6 @@ ARobotAICharacter::ARobotAICharacter(const FObjectInitializer& ObjInitializer)
 	
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 	AddOwnedComponent(InteractionComponent);
-
-	FindOrCreateComponent(UInventoryComponent, InventoryComponent, "InventoryComponent")
-	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent")
-	{
-		InteractableComponent->PrimaryInteractionName = FText::FromString("Talk");
-		InteractableComponent->SetupAttachment(RootComponent);
-	}
 }
 
 void ARobotAICharacter::BeginPlay()

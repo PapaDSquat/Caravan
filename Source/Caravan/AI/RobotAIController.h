@@ -47,7 +47,7 @@ public:
 	ERobotAILocale GetCurrentAILocale() const;
 
 	UFUNCTION(BlueprintCallable, Category = "AI|State")
-	void SetCurrentAILocale(ERobotAILocale newLocale);
+	void SetCurrentAILocale(ERobotAILocale NewLocale);
 
 	UFUNCTION(BlueprintCallable, Category = "AI|State")
 	bool GetIsOnExpedition() const;
@@ -57,6 +57,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "AI|Interaction")
 	bool Interact(UInteractableComponent* Interactable);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnAILocaleChanged(ERobotAILocale OldLocale, ERobotAILocale NewLocale);
 
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
 	FRobotAIProfile CharacterProfile;

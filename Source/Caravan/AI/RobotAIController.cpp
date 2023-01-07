@@ -16,13 +16,13 @@ void ARobotAIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	ARobotAICharacter* RobotCharacter = GetRobotOwner();
-	if (!RobotCharacter)
+	if (!IsValid(RobotCharacter))
 		return;
 
 	// Event Registration
-	if (IsValid(RobotCharacter->InteractableComponent))
+	if (UInteractableComponent* InteractableComponent = RobotCharacter->GetInteractableComponent())
 	{
-		RobotCharacter->InteractableComponent->OnInteract.AddDynamic(this, &ARobotAIController::OnInteract);
+		InteractableComponent->OnInteract.AddDynamic(this, &ARobotAIController::OnInteract);
 	}
 }
 
@@ -35,9 +35,9 @@ void ARobotAIController::OnUnPossess()
 		return;
 
 	// Event Unregistration
-	if (IsValid(RobotCharacter->InteractableComponent))
+	if (UInteractableComponent* InteractableComponent = RobotCharacter->GetInteractableComponent())
 	{
-		RobotCharacter->InteractableComponent->OnInteract.RemoveDynamic(this, &ARobotAIController::OnInteract);
+		InteractableComponent->OnInteract.RemoveDynamic(this, &ARobotAIController::OnInteract);
 	}
 }
 
@@ -55,10 +55,10 @@ void ARobotAIController::OnRegisterToSubsystem()
 		return;
 
 	// Setup Interactable
-	if (IsValid(RobotCharacter->InteractableComponent))
+	if (UInteractableComponent* InteractableComponent = RobotCharacter->GetInteractableComponent())
 	{
-		RobotCharacter->InteractableComponent->InteractableObjectName = FText::FromName(CharacterProfile.Name);
-		RobotCharacter->InteractableComponent->InteractableObjectSubTitle = FText::FromString(CaravanUtils::EnumToString(CharacterProfile.PrimarySkill));
+		InteractableComponent->InteractableObjectName = FText::FromName(CharacterProfile.Name);
+		InteractableComponent->InteractableObjectSubTitle = FText::FromString(CaravanUtils::EnumToString(CharacterProfile.PrimarySkill));
 	}
 }
 
@@ -87,9 +87,11 @@ ERobotAILocale ARobotAIController::GetCurrentAILocale() const
 	return RobotState.Locale;
 }
 
-void ARobotAIController::SetCurrentAILocale(ERobotAILocale newLocale)
+void ARobotAIController::SetCurrentAILocale(ERobotAILocale NewLocale)
 {
-	RobotState.Locale = newLocale;
+	const ERobotAILocale OldLocale = RobotState.Locale;
+	RobotState.Locale = NewLocale;
+	OnAILocaleChanged(OldLocale, NewLocale);
 }
 
 bool ARobotAIController::GetIsOnExpedition() const
