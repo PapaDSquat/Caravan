@@ -22,7 +22,10 @@ void AWorldGenerator::BeginPlay()
 			TimeParams.InitialTimeOfDayRatio = FMath::RandRange(0.f, 1.f);
 		}
 
-		WorldBuilderSubsystem->GenerateNewWorld(GetActorLocation(), WorldGenerationSpec, WorldActors, InitialTimeParams);
+		if (bEnableGeneration)
+		{
+			WorldBuilderSubsystem->GenerateNewWorld(GetActorLocation(), WorldGenerationSpec, WorldActors, InitialTimeParams);
+		}
 	}
 }
 

@@ -6,7 +6,6 @@
 #include "DrawDebugHelpers.h"
 
 UInteractableComponent::UInteractableComponent()
-	: PrimaryInteractionName( FText::FromString("UNNAMED_INTERACTION") )
 {
 	bAutoActivate = true;
 	PrimaryComponentTick.bCanEverTick = true;
@@ -15,8 +14,6 @@ UInteractableComponent::UInteractableComponent()
 void UInteractableComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	PrimaryInteractionChoice.InteractionName = PrimaryInteractionName;
 }
 
 void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

@@ -209,8 +209,8 @@ void ACaravanActor::SetCaravanOpen(bool bOpen, bool bAlwaysFireEvent /*= false*/
 		GenerateCampArea();
 
 		// TODO: Move this out of here
-		UAIRobotSubsystem* AIRobotSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UAIRobotSubsystem>();
-		if (AIRobotSubsystem)
+		if (UAIRobotSubsystem* AIRobotSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UAIRobotSubsystem>();
+			AIRobotSubsystem && bEnableRobots)
 		{
 			if (IsOpen)
 			{

@@ -119,9 +119,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	FText InteractableObjectSubTitle;
 
-	// Interaction name displayed when targeting the interactable (before opening interaction menu)
-	UPROPERTY(EditAnywhere, Category="Interaction")
-	FText PrimaryInteractionName;
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	FInteractionChoice PrimaryInteractionChoice;
 
 	// Choices displayed after Player interacts with this interactable object
 	UPROPERTY(EditAnywhere, Category = "Interaction")
@@ -135,7 +134,7 @@ public:
 	//==================================================
 
 private:
-	FInteractionChoice PrimaryInteractionChoice;
+	// TODO : Interaction choice index should be in InteractionComponent
 	int CurrentInteractionChoiceIndex = -1;
 
 	APawn* TargetingPawn;

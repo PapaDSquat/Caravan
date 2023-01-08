@@ -26,7 +26,6 @@ ADestructableResourceActor::ADestructableResourceActor(const class FObjectInitia
 
 	FindOrCreateComponent(UInteractableComponent, InteractableComponent, "InteractableComponent")
 	{
-		InteractableComponent->PrimaryInteractionName = FText::FromString("Destroy");
 		InteractableComponent->SetupAttachment(RootComponent);
 	}
 }

@@ -18,6 +18,9 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "World Generation")
+	bool bEnableGeneration = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "World Generation")
 	UWorldGenerationSpec* WorldGenerationSpec;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "World Generation")

@@ -83,6 +83,9 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|AI")
+	bool bEnableRobots = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|AI")
 	TArray< FCaravanInitialRobotData > InitialRobots;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Caravan|AI")
