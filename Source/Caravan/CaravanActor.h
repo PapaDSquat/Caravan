@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Caravan")
 	bool IsCampAreaObstructed() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Caravan")
+	TArray<ACampBuildingActor*> GetUnconstructedBuildings() const;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Classes)
 	TSubclassOf<class ACampBuildingActor> BuildingPlatformBPClass;
 
@@ -118,6 +121,9 @@ private:
 		EInteractionType InteractionType;
 		FName SocketName;
 	};
+
+	UPROPERTY(Transient)
+	TArray< TObjectPtr<ACampBuildingActor> > Buildings;
 
 	TArray< TArray<ACampBuildingActor*> > BuildingAttachmentGrid;
 	FVector CampAreaCenterLocation;

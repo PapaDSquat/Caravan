@@ -130,6 +130,7 @@ ACampBuildingActor* ACaravanActor::CreateBuildingAttachment(UCampBuildingSpec* S
 	ACampBuildingActor* SpawnedActor = GetWorld()->SpawnActor<ACampBuildingActor>(Spec->BuildingActorClass, SpawnParameters);
 	if (SpawnedActor)
 	{
+		Buildings.Add(SpawnedActor);
 		SetBuildingAttachment(GridPosition, SpawnedActor);
 	}
 	return SpawnedActor;
@@ -397,4 +398,17 @@ bool ACaravanActor::IsCampAreaObstructed() const
 
 	UWorldBuilderSubsystem* WorldBuilderSubsystem = GetGameInstance()->GetSubsystem<UWorldBuilderSubsystem>();
 	return WorldBuilderSubsystem && WorldBuilderSubsystem->HasNearbyResourceActor(GetCampAreaCenter(), GetCampAreaRadius());
+}
+
+TArray<ACampBuildingActor*> ACaravanActor::GetUnconstructedBuildings() const
+{
+	TArray<ACampBuildingActor*> OutBuildings;
+	for (ACampBuildingActor* Building : Buildings)
+	{
+		if (!Building->IsConstructed())
+		{
+			OutBuildings.Add(Building);
+		}
+	}
+	return OutBuildings;
 }
