@@ -45,7 +45,8 @@ public:
 	bool DespawnRobotCharacter(ARobotAICharacter* RobotCharacter);
 
 private:
-	bool BuildCharacterFromSpec(const UAIRobotCharacterSpec* Spec, FRobotAIProfile& OutProfile) const;
+	bool BuildAIProfileFromSpec(const UAIRobotCharacterSpec* Spec, FRobotAIProfile& OutProfile) const;
+	void InitializeRobot(const UAIRobotCharacterSpec* Spec, ARobotAICharacter* Character, ARobotAIController* Controller) const;
 	void RegisterRobot(ARobotAIController* Controller);
 	void UnregisterRobot(ARobotAIController* Controller);
 

@@ -103,6 +103,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
 	ECraftResourceType PreferredCraftResource;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
+	TArray<TObjectPtr<class UMaterialInterface>> MeshMaterials;
+
 	// Skills that can be learned and advanced in order to perform new tasks and change primary job
 	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caravan Robot")
 	// TArray< ERobotAISkill > SecondaryInterests;

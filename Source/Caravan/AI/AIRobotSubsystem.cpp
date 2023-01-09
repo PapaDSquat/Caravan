@@ -7,6 +7,8 @@
 #include "AI/EnemyAIController.h"
 #include "AI/RobotAICharacter.h"
 #include "AI/RobotAIController.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialInterface.h"
 #include "Utils/CaravanSpawnUtils.h"
 
 template< typename T >
@@ -60,7 +62,8 @@ ARobotAICharacter* UAIRobotSubsystem::SpawnRobotCharacter(const UAIRobotCharacte
 		ARobotAIController* RobotController = Cast< ARobotAIController >(SpawnedAICharacter->GetController());
 		if (ensure(RobotController))
 		{
-			BuildCharacterFromSpec(Spec, RobotController->CharacterProfile);
+			BuildAIProfileFromSpec(Spec, RobotController->CharacterProfile);
+			InitializeRobot(Spec, SpawnedAICharacter, RobotController);
 			RegisterRobot(RobotController);
 		}
 	}
@@ -82,7 +85,7 @@ bool UAIRobotSubsystem::DespawnRobotCharacter(ARobotAICharacter* RobotCharacter)
 	return bSuccess;
 }
 
-bool UAIRobotSubsystem::BuildCharacterFromSpec(const UAIRobotCharacterSpec* Spec, FRobotAIProfile& OutProfile) const
+bool UAIRobotSubsystem::BuildAIProfileFromSpec(const UAIRobotCharacterSpec* Spec, FRobotAIProfile& OutProfile) const
 {
 	if (Spec == nullptr)
 		return false;
@@ -119,6 +122,23 @@ bool UAIRobotSubsystem::BuildCharacterFromSpec(const UAIRobotCharacterSpec* Spec
 	}
 
 	return true;
+}
+
+void UAIRobotSubsystem::InitializeRobot(const UAIRobotCharacterSpec* Spec, ARobotAICharacter* Character, ARobotAIController* Controller) const
+{
+	// Set random mesh material
+	if (USkeletalMeshComponent* Mesh = Character->GetMesh())
+	{
+		TObjectPtr<UMaterialInterface> Material = nullptr;
+		PickRandom(Spec->MeshMaterials, Material);
+		if (Material)
+		{
+			for (int MaterialIdx = 0; MaterialIdx < Mesh->GetNumMaterials(); ++MaterialIdx)
+			{
+				Mesh->SetMaterial(MaterialIdx, Material);
+			}
+		}
+	}
 }
 
 void UAIRobotSubsystem::RegisterRobot(ARobotAIController* Controller)
