@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "CraftResourceActor.h"
+#include "Engine/DataTable.h"
+#include "RPG/InventoryItemData.h"
+
 #include "InventoryComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -12,7 +15,7 @@ class CARAVAN_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	UInventoryComponent();
 
 protected:
@@ -20,6 +23,12 @@ protected:
 
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void AddItems(const FDataTableRowHandle& ItemHandle, int Count = 0);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void AddItemStack(const FItemStack& ItemHandle);
 
 	UFUNCTION(BlueprintCallable, Category = "Crafting")
 	void AddCraftResource(const ACraftResourceActor* resourceActor);
@@ -30,6 +39,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Crafting")
 	int GetCraftResourceCount(ECraftResourceType resourceType) const;
 
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "General")
+	TArray<FItemStack> DefaultItems;
+
 private:
+	FItemStack* FindItemStack(const FDataTableRowHandle& ItemHandle);
+
+	UPROPERTY(SaveGame)
+	TArray<FItemStack> Items;
+
 	int CraftResourceCount[ECraftResourceType::Invalid];
 };
