@@ -21,7 +21,13 @@ struct CARAVAN_API FInventoryItemDataRow : public FTableRowBase
 	FText Description;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UTexture2D> UIIcon;
+	TObjectPtr<UStaticMesh> StaticMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector MeshScale = FVector::OneVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UTexture2D> UIIcon = nullptr;
 };
 
 USTRUCT(BlueprintType)

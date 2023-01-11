@@ -30,6 +30,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddItemStack(const FItemStack& ItemHandle);
 
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void DropAllItems();
+
+	// TODO : Remove
 	UFUNCTION(BlueprintCallable, Category = "Crafting")
 	void AddCraftResource(const ACraftResourceActor* resourceActor);
 
@@ -40,14 +44,16 @@ public:
 	int GetCraftResourceCount(ECraftResourceType resourceType) const;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "General")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
 	TArray<FItemStack> DefaultItems;
 
 private:
 	FItemStack* FindItemStack(const FDataTableRowHandle& ItemHandle);
 
+
 	UPROPERTY(SaveGame)
 	TArray<FItemStack> Items;
 
+	// TODO : remove
 	int CraftResourceCount[ECraftResourceType::Invalid];
 };

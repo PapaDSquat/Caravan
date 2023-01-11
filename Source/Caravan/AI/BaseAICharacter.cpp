@@ -25,5 +25,7 @@ void ABaseAICharacter::BeginPlay()
 
 void ABaseAICharacter::OnKill(UHealthComponent* InHealthComponent, AActor* InInstigator)
 {
+	InventoryComponent->DropAllItems();
+
 	Destroy();
 }
