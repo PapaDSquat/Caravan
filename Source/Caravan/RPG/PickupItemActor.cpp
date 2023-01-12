@@ -61,7 +61,7 @@ void APickupItemActor::OnInteract(APawn* InteractingPawn, UInteractableComponent
 
 		if (InventoryComponent)
 		{
-			InventoryComponent->AddItems(ItemHandle);
+			InventoryComponent->AddItems(ItemHandle, 1);
 		}
 	}
 

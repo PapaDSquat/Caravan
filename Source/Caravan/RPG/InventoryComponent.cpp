@@ -30,7 +30,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UInventoryComponent::AddItems(const FDataTableRowHandle& ItemHandle, int Count /* = 0 */)
+void UInventoryComponent::AddItems(const FDataTableRowHandle& ItemHandle, int Count /* = 1 */)
 {
 	if (FItemStack* ExistingItemStack = FindItemStack(ItemHandle))
 	{

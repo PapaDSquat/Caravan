@@ -25,10 +25,13 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddItems(const FDataTableRowHandle& ItemHandle, int Count = 0);
+	void AddItems(const FDataTableRowHandle& ItemHandle, int Count = 1);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddItemStack(const FItemStack& ItemHandle);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	const TArray<FItemStack>& GetItemStacks() const { return Items; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void DropAllItems();
