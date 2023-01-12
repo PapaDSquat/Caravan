@@ -47,9 +47,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
 	TArray<FItemStack> DefaultItems;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
+	bool bSortItemsByDisplayPriority = true;
+
 private:
 	FItemStack* FindItemStack(const FDataTableRowHandle& ItemHandle);
-
+	void SortItems();
 
 	UPROPERTY(SaveGame)
 	TArray<FItemStack> Items;

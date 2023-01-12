@@ -23,11 +23,15 @@ APickupItemActor* UInventoryFunctionLibrary::SpawnPickupItem(UWorld* World, cons
 
 bool UInventoryFunctionLibrary::GetItemDefinition(const FDataTableRowHandle& ItemHandle, FInventoryItemDataRow& OutItemDef)
 {
-	if (const FInventoryItemDataRow* ItemDef = ItemHandle.GetRow<FInventoryItemDataRow>(TEXT("GetItemDefinition"));
-		ItemDef != nullptr)
+	if (const FInventoryItemDataRow* ItemDef = GetItemDefinition(ItemHandle))
 	{
 		OutItemDef = *ItemDef;
 		return true;
 	}
 	return false;
+}
+
+FInventoryItemDataRow* UInventoryFunctionLibrary::GetItemDefinition(const FDataTableRowHandle& ItemHandle)
+{
+	return ItemHandle.GetRow<FInventoryItemDataRow>(TEXT("GetItemDefinition"));
 }

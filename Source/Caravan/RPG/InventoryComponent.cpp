@@ -41,6 +41,8 @@ void UInventoryComponent::AddItems(const FDataTableRowHandle& ItemHandle, int Co
 		FItemStack& NewItemStack = Items.Emplace_GetRef();
 		NewItemStack.ItemHandle = ItemHandle;
 		NewItemStack.Count = Count;
+
+		SortItems(); // Sort after adding any new stack
 	}
 }
 
@@ -91,6 +93,19 @@ FItemStack* UInventoryComponent::FindItemStack(const FDataTableRowHandle& ItemHa
 			return ItemStack.ItemHandle == ItemHandle;
 		}
 	);
+}
+
+void UInventoryComponent::SortItems()
+{
+	if (!bSortItemsByDisplayPriority)
+		return;
+
+	Algo::Sort(Items, [](const FItemStack& First, const FItemStack& Second)
+	{
+			FInventoryItemDataRow* FirstDef = UInventoryFunctionLibrary::GetItemDefinition(First.ItemHandle);
+			FInventoryItemDataRow* SecondDef = UInventoryFunctionLibrary::GetItemDefinition(Second.ItemHandle);
+			return FirstDef && SecondDef && FirstDef->DisplayPriority < SecondDef->DisplayPriority;
+	});
 }
 
 void UInventoryComponent::AddCraftResource(const ACraftResourceActor* resourceActor)

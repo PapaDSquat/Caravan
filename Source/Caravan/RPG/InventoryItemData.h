@@ -20,6 +20,10 @@ struct CARAVAN_API FInventoryItemDataRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Description;
 
+	// Priority to sort display in an item list. Lower number is higher priority.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int DisplayPriority = 999;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMesh> StaticMesh = nullptr;
 

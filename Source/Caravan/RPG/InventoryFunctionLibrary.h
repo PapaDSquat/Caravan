@@ -21,4 +21,5 @@ public:
 	UFUNCTION(BlueprintPure)
 	static bool GetItemDefinition(const FDataTableRowHandle& ItemHandle, FInventoryItemDataRow& OutItemDef);
 
+	static FInventoryItemDataRow* GetItemDefinition(const FDataTableRowHandle& ItemHandle);
 };
