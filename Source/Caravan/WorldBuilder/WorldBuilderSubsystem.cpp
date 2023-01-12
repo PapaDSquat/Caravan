@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "WorldBuilder/WorldBuilderSubsystem.h"
 
 #include "AI/EnemyAIController.h"
@@ -484,6 +482,14 @@ bool UWorldBuilderSubsystem::HasNearbyResourceActor(const FVector& SearchLocatio
 		}
 	}
 	return false;
+}
+
+FDataTableRowHandle UWorldBuilderSubsystem::GetResourceItemHandle(const FName& ItemRowName)
+{
+	FDataTableRowHandle OutHandle;
+	OutHandle.DataTable = WorldSpec->ResourceItemsDataTable;
+	OutHandle.RowName = ItemRowName;
+	return OutHandle;
 }
 
 // Debug

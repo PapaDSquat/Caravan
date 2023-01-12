@@ -1,12 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "GameFramework/Actor.h"
 #include "CraftResourceActor.h"
+
 #include "DestructableResourceActor.generated.h"
 
+class APickupItemActor;
 class UInteractableComponent;
+struct FDataTableRowHandle;
 
 UCLASS()
 class ADestructableResourceActor : public AActor
@@ -42,6 +43,5 @@ private:
 	UFUNCTION()
 	void OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice);
 
-	template< class TActorClass >
-	TActorClass* SpawnResourceActor(const TSubclassOf<TActorClass>& ActorClass, int ActorIndex);
+	APickupItemActor* SpawnResourceActor(const FDataTableRowHandle& ItemHandle, int ActorIndex);
 };

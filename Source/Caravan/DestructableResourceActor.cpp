@@ -1,12 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "DestructableResourceActor.h"
+
 #include "Caravan.h"
 #include "Components/InteractableComponent.h"
 #include "CraftResourceActor.h"
 #include "Engine.h"
 #include "DrawDebugHelpers.h"
 #include "Math/UnrealMathUtility.h"
+#include "RPG/InventoryFunctionLibrary.h"
+#include "RPG/PickupItemActor.h"
 #include "Utils/CaravanEngineUtils.h"
 #include "WorldBuilder/WorldBuilderSubsystem.h"
 #include "WorldBuilder/WorldGenerationSpec.h"
@@ -50,59 +51,50 @@ void ADestructableResourceActor::OnInteract(APawn* InteractingPawn, UInteractabl
 		UWorldGenerationSpec* WorldSpec = NULL;
 		if (UWorldBuilderSubsystem* WorldBuilderSubsystem = GetGameInstance()->GetSubsystem<UWorldBuilderSubsystem>())
 		{
-			WorldSpec = WorldBuilderSubsystem->GetWorldSpec();
-		}
-
-		if (!ensure(WorldSpec != NULL))
-			return;
-
-		for (int i = 0; i < ResourceDropCount; ++i)
-		{
-			TSubclassOf<ACraftResourceActor> ActorClass = NULL;
-			switch (ResourceType)
+			for (int i = 0; i < ResourceDropCount; ++i)
 			{
-			case ECraftResourceType::Wood: ActorClass = WorldSpec->WoodActorClass; break;
-			case ECraftResourceType::Stone: ActorClass = WorldSpec->StoneActorClass; break;
+				// TODO : Do this better
+				FName ItemName;
+				switch (ResourceType)
+				{
+				case ECraftResourceType::Wood: ItemName = TEXT("Wood"); break;
+				case ECraftResourceType::Stone: ItemName = TEXT("Stone"); break;
+				}
+
+				const FDataTableRowHandle ItemHandle = WorldBuilderSubsystem->GetResourceItemHandle(ItemName);
+				SpawnResourceActor(ItemHandle, i);
 			}
-			SpawnResourceActor(ActorClass, i);
 		}
 
 		Destroy();
 	}
 }
 
-template< class TActorClass >
-TActorClass* ADestructableResourceActor::SpawnResourceActor(const TSubclassOf<TActorClass>& ActorClass, int ActorIndex)
+APickupItemActor* ADestructableResourceActor::SpawnResourceActor(const FDataTableRowHandle& ItemHandle, int ActorIndex)
 {
-	if (!ensureMsgf(ActorClass != NULL, TEXT("[UWorldBuilderSubsystem::SpawnGridCellActor] Invalid Actor Class. Check your World Spec!")))
-		return NULL;
+	if (!ensureMsgf(!ItemHandle.IsNull(), TEXT("[ADestructableResourceActor::SpawnResourceActor] Invalid ItemHandle!")))
+		return nullptr;
 
 	static float LOCATION_OFFSET_LENGTH = 100.f;
 
-	FActorSpawnParameters SpawnParameters;
-	if (TActorClass* resourceActor = GetWorld()->SpawnActor<TActorClass>(ActorClass.Get(), SpawnParameters))
+	APickupItemActor* ResourceActor = UInventoryFunctionLibrary::SpawnPickupItem(GetWorld(), ItemHandle, FTransform::Identity);
+	if(ResourceActor)
 	{
-		const FBox thisBB = GetComponentsBoundingBox();
-		const FBox resourceBB = resourceActor->GetComponentsBoundingBox();
+		const FBox LocalBB = GetComponentsBoundingBox();
+		const FBox ResourceBB = ResourceActor->GetComponentsBoundingBox();
 
 		// Offset position along forward, rotated around up by a fixed amount interval relative to amount of wood dropped
-		const FVector offset = GetActorForwardVector().RotateAngleAxis(ActorIndex * 360.f / (float)ResourceDropCount, GetActorUpVector());
-		FVector position = thisBB.GetCenter() + (offset * LOCATION_OFFSET_LENGTH);
+		const FVector LocationOffset = GetActorForwardVector().RotateAngleAxis(ActorIndex * 360.f / (float)ResourceDropCount, GetActorUpVector());
+		FVector Location = LocalBB.GetCenter() + (LocationOffset * LOCATION_OFFSET_LENGTH);
 
 		// Offset position along up by random range (-n < x < n)
-		float zOffset = FMath::Max(0.f, thisBB.GetExtent().Z - (resourceBB.GetExtent().Z * 1.5f));
-		position += GetActorUpVector() * FMath::RandRange(-1.f, 0.f) * zOffset;
+		float ZOffset = FMath::Max(0.f, LocalBB.GetExtent().Z - (ResourceBB.GetExtent().Z * 1.5f));
+		Location += GetActorUpVector() * FMath::RandRange(-1.f, 0.f) * ZOffset;
+		ResourceActor->SetActorLocation(Location);
 
 		// Rotate slightly around pitch and yaw
-		const FRotator rotation = FRotator(FMath::RandRange(5, 25), FMath::RandRange(30, 330), 0.f);
-
-		SCraftResourceInitData initData;
-		initData.Type = ResourceType;
-		initData.Location = position;
-		initData.Rotation = rotation;
-
-		resourceActor->InitCraftResource(initData);
-		return resourceActor;
+		const FRotator Rotation = FRotator(FMath::RandRange(5, 25), FMath::RandRange(30, 330), 0.f);
+		ResourceActor->SetActorRotation(Rotation);
 	}
-	return NULL;
+	return ResourceActor;
 }

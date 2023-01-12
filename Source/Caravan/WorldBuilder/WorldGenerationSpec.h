@@ -11,6 +11,7 @@ class ACaravanCharacter;
 class ACraftResourceActor;
 class ADestructableResourceActor;
 class UAIEnemyCharacterSpec;
+class UDataTable;
 
 USTRUCT(BlueprintType)
 struct FWorldGenerationActors
@@ -60,6 +61,10 @@ class CARAVAN_API UWorldGenerationSpec : public UDataAsset
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Crafting")
+	TObjectPtr<const UDataTable> ResourceItemsDataTable;
+
+	// TODO : Get rid of this crafting shit
 	UPROPERTY(EditDefaultsOnly, Category = "Crafting")
 	TSubclassOf<ADestructableResourceActor> TreeActorClass;
 
