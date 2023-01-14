@@ -2,6 +2,7 @@
 
 #include "AI/RobotAICharacter.h"
 #include "AI/AIRobotSubsystem.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/InteractableComponent.h"
 #include "Components/InteractionComponent.h"
@@ -117,4 +118,15 @@ bool ARobotAIController::Interact(UInteractableComponent* Interactable)
 bool ARobotAIController::GetIsFollowingPlayer() const
 {
 	return Blackboard ? Blackboard->GetValueAsBool(BB_IsFollowingPlayer) : false;
+}
+
+FText ARobotAIController::GetActiveTaskText() const
+{
+	// TODO : Proper custom strings for major tasks
+	UBehaviorTreeComponent* BehaviorTree = Cast<UBehaviorTreeComponent>(BrainComponent);
+	if (BehaviorTree)
+	{
+		return FText::FromString(BehaviorTree->DescribeActiveTasks());
+	}
+	return FText::GetEmpty();
 }

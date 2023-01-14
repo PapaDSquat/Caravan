@@ -64,6 +64,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	bool GetIsFollowingPlayer() const;
 
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	FText GetActiveTaskText() const;
+
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
 	FRobotAIProfile CharacterProfile;
 	
