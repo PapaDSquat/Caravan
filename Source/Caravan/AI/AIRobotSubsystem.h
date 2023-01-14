@@ -44,16 +44,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AI|Spawn")
 	bool DespawnRobotCharacter(ARobotAICharacter* RobotCharacter);
 
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "AI")
+	TArray< ARobotAIController* > RobotControllers;
+
 private:
 	bool BuildAIProfileFromSpec(const UAIRobotCharacterSpec* Spec, FRobotAIProfile& OutProfile) const;
 	void InitializeRobot(const UAIRobotCharacterSpec* Spec, ARobotAICharacter* Character, ARobotAIController* Controller) const;
 	void RegisterRobot(ARobotAIController* Controller);
 	void UnregisterRobot(ARobotAIController* Controller);
-
-	struct FAIRobotInternalData
-	{
-		ARobotAIController* Controller;
-	};
-	TArray< FAIRobotInternalData > RegisteredRobots;
-
 };

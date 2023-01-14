@@ -2,6 +2,7 @@
 
 #include "AI/RobotAICharacter.h"
 #include "AI/AIRobotSubsystem.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/InteractableComponent.h"
 #include "Components/InteractionComponent.h"
 #include "Utils/CaravanEngineUtils.h"
@@ -111,4 +112,9 @@ bool ARobotAIController::Interact(UInteractableComponent* Interactable)
 		return RobotCharacter->InteractionComponent->Interact(RobotCharacter, Interactable);
 	}
 	return false;
+}
+
+bool ARobotAIController::GetIsFollowingPlayer() const
+{
+	return Blackboard ? Blackboard->GetValueAsBool(BB_IsFollowingPlayer) : false;
 }

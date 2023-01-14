@@ -61,6 +61,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnAILocaleChanged(ERobotAILocale OldLocale, ERobotAILocale NewLocale);
 
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	bool GetIsFollowingPlayer() const;
+
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
 	FRobotAIProfile CharacterProfile;
 	
@@ -72,6 +75,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FRobotAIRegisterEvent OnAIRobotUnregister;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Blackboard")
+	FName BB_IsFollowingPlayer = TEXT("FollowPlayerRequested");
 
 private:
 	UFUNCTION()

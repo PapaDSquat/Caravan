@@ -95,12 +95,9 @@ bool UAIRobotSubsystem::BuildAIProfileFromSpec(const UAIRobotCharacterSpec* Spec
 		TArray< FName > NamesPool = Spec->Names;
 		
 		// Remove any already used names
-		for (const FAIRobotInternalData& RegisteredRobot : RegisteredRobots)
+		for (const ARobotAIController* RobotController : RobotControllers)
 		{
-			if (!RegisteredRobot.Controller)
-				continue;
-
-			const int32 Index = NamesPool.IndexOfByKey(RegisteredRobot.Controller->GetRobotName());
+			const int32 Index = NamesPool.IndexOfByKey(RobotController->GetRobotName());
 			if (Index != INDEX_NONE)
 			{
 				NamesPool.RemoveAt(Index);
@@ -146,8 +143,7 @@ void UAIRobotSubsystem::RegisterRobot(ARobotAIController* Controller)
 	if (!ensure(Controller))
 		return;
 
-	FAIRobotInternalData& Data = RegisteredRobots.Emplace_GetRef();
-	Data.Controller = Controller;
+	RobotControllers.Add(Controller);
 
 	Controller->OnRegisterToSubsystem();
 }
@@ -157,12 +153,10 @@ void UAIRobotSubsystem::UnregisterRobot(ARobotAIController* Controller)
 	if (!ensure(Controller))
 		return;
 	
-	int FoundIndex = RegisteredRobots.IndexOfByPredicate(
-		[Controller](const FAIRobotInternalData& Data) { return Data.Controller == Controller; });
-	if (FoundIndex != INDEX_NONE)
+	if (RobotControllers.Contains(Controller))
 	{
 		Controller->OnUnregisterFromSubsystem();
 
-		RegisteredRobots.RemoveAt(FoundIndex);
+		RobotControllers.Remove(Controller);
 	}
 }
