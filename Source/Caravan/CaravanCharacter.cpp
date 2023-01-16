@@ -110,10 +110,10 @@ void ACaravanCharacter::SetupPlayerInputComponent(class UInputComponent* inputCo
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	inputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	inputComponent->BindAxis("TurnRate", this, &ACaravanCharacter::TurnAtRate);
-	inputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	inputComponent->BindAxis("LookUpRate", this, &ACaravanCharacter::LookUpAtRate);
+	// inputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	// inputComponent->BindAxis("TurnRate", this, &ACaravanCharacter::TurnAtRate);
+	// inputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	// inputComponent->BindAxis("LookUpRate", this, &ACaravanCharacter::LookUpAtRate);
 
 	// handle touch devices
 	inputComponent->BindTouch(IE_Pressed, this, &ACaravanCharacter::TouchStarted);
