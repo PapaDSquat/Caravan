@@ -10,6 +10,7 @@ enum class ECraftResourceType : uint8
 {
 	Wood,
 	Stone,
+	Slime,
 	Invalid
 };
 ENUM_RANGE_BY_COUNT(ECraftResourceType, ECraftResourceType::Invalid);

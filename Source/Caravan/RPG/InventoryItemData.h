@@ -13,12 +13,17 @@ struct CARAVAN_API FInventoryItemDataRow : public FTableRowBase
 	// TODO : Change to FGameplayTag, or remove?
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName ItemID;
+	
+	// Optional, used by AI to find interactables
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	ECraftResourceType ResourceType = ECraftResourceType::Invalid;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText DisplayName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Description;
+
 
 	// Priority to sort display in an item list. Lower number is higher priority.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

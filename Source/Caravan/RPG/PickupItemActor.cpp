@@ -41,6 +41,12 @@ void APickupItemActor::InitializeItem(const FDataTableRowHandle& InItemHandle, c
 	StaticMeshComponent->WakeRigidBody();
 }
 
+ECraftResourceType APickupItemActor::GetResourceType() const
+{
+	const FInventoryItemDataRow* const ItemDef = UInventoryFunctionLibrary::GetItemDefinition(ItemHandle);
+	return ItemDef ? ItemDef->ResourceType : ECraftResourceType::Invalid;
+}
+
 void APickupItemActor::OnInteract(APawn* InteractingPawn, UInteractableComponent* Interactable, const FInteractionChoice& Choice)
 {
 	if (InteractingPawn != NULL)

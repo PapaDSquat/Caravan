@@ -18,6 +18,8 @@ public:
 
 	void InitializeItem(const FDataTableRowHandle& InItemHandle, const FInventoryItemDataRow& InItemDef);
 
+	ECraftResourceType GetResourceType() const;
+
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
 

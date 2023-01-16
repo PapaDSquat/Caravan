@@ -46,7 +46,7 @@ public:
 	class ADestructableResourceActor* FindClosestDestructableResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const;
 	
 	UFUNCTION(BlueprintCallable)
-	class ACraftResourceActor* FindClosestCraftResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const;
+	class APickupItemActor* FindClosestCraftResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const;
 
 	bool HasNearbyResourceActor(const FVector& SearchLocation, float Range) const;
 

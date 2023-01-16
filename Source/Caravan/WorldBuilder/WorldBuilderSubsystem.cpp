@@ -4,10 +4,10 @@
 #include "Caravan.h"
 #include "CaravanActor.h"
 #include "CaravanCharacter.h"
-#include "CraftResourceActor.h"
 #include "DestructableResourceActor.h"
 #include "Math/UnrealMathUtility.h"
 #include "RockActor.h"
+#include "RPG/PickupItemActor.h"
 #include "TreeActor.h"
 #include "Utils/CaravanCollisionTypes.h"
 #include "WorldBuilder/WorldGenerationSpec.h"
@@ -465,9 +465,9 @@ ADestructableResourceActor* UWorldBuilderSubsystem::FindClosestDestructableResou
 	return FindClosestResourceActor< ADestructableResourceActor >(InstigatorLocation, SearchLocation, Range, Type);
 }
 
-ACraftResourceActor* UWorldBuilderSubsystem::FindClosestCraftResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const
+APickupItemActor* UWorldBuilderSubsystem::FindClosestCraftResourceActor(const FVector& InstigatorLocation, const FVector& SearchLocation, float Range, ECraftResourceType Type) const
 {
-	return FindClosestResourceActor< ACraftResourceActor >(InstigatorLocation, SearchLocation, Range, Type);
+	return FindClosestResourceActor< APickupItemActor >(InstigatorLocation, SearchLocation, Range, Type);
 }
 
 bool UWorldBuilderSubsystem::HasNearbyResourceActor(const FVector& SearchLocation, float Range) const
