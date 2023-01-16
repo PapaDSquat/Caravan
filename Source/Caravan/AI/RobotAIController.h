@@ -64,8 +64,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	bool GetIsFollowingPlayer() const;
 
+	// Get text description of the active task from the behavior tree
 	UFUNCTION(BlueprintCallable, Category = "AI")
-	FText GetActiveTaskText() const;
+	FText GetBehaviorTreeActiveTaskDescriptor() const;
+
+	// Get the custom description of the active task
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	FText GetActiveTaskDescriptor() const;
+
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	void SetActiveTaskDescriptor(const FText& InText);
 
 	UPROPERTY(BlueprintReadOnly, Category = "AI")
 	FRobotAIProfile CharacterProfile;
@@ -82,6 +90,8 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Blackboard")
 	FName BB_IsFollowingPlayer = TEXT("FollowPlayerRequested");
+
+	FText ActiveTaskDescriptor;
 
 private:
 	UFUNCTION()

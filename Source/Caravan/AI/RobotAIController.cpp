@@ -120,13 +120,22 @@ bool ARobotAIController::GetIsFollowingPlayer() const
 	return Blackboard ? Blackboard->GetValueAsBool(BB_IsFollowingPlayer) : false;
 }
 
-FText ARobotAIController::GetActiveTaskText() const
+FText ARobotAIController::GetBehaviorTreeActiveTaskDescriptor() const
 {
-	// TODO : Proper custom strings for major tasks
 	UBehaviorTreeComponent* BehaviorTree = Cast<UBehaviorTreeComponent>(BrainComponent);
 	if (BehaviorTree)
 	{
 		return FText::FromString(BehaviorTree->DescribeActiveTasks());
 	}
 	return FText::GetEmpty();
+}
+
+FText ARobotAIController::GetActiveTaskDescriptor() const
+{
+	return ActiveTaskDescriptor;
+}
+
+void ARobotAIController::SetActiveTaskDescriptor(const FText& InText)
+{
+	ActiveTaskDescriptor = InText;
 }
