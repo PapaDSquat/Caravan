@@ -11,6 +11,7 @@ class ACaravanGameMode;
 class AMultiToolActor;
 class UInteractableComponent;
 class UInteractionComponent;
+class UInventoryComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerLocaleChangeEvent, class ACaravanCharacter*, PlayerCharacter, ERobotAILocale, Locale);
 
@@ -142,8 +143,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	UInteractableComponent* InteractFocus = NULL;
 
-	UPROPERTY(BlueprintReadOnly, Category = "RPG")
-	class UInventoryComponent* Inventory;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInventoryComponent> InventoryComponent = nullptr;
 
 private:
 	void OnInteractComponentDeactivated(UActorComponent* Component, bool bReset);
