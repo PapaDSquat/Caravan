@@ -18,6 +18,7 @@ public:
 
 	void InitializeItem(const FDataTableRowHandle& InItemHandle, const FInventoryItemDataRow& InItemDef);
 
+	UFUNCTION(BlueprintCallable, Category = "RPG")
 	ECraftResourceType GetResourceType() const;
 
 	UPROPERTY(VisibleAnywhere)

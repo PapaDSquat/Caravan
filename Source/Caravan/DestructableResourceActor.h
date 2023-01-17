@@ -20,6 +20,7 @@ public:
 
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable, Category = "RPG")
 	ECraftResourceType GetResourceType() const { return ResourceType; }
 
 	UPROPERTY(VisibleAnywhere)
