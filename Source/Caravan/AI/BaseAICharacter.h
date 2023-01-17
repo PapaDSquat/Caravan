@@ -22,6 +22,9 @@ public:
 	UInteractableComponent* GetInteractableComponent() { return InteractableComponent; }
 	UInventoryComponent* GetInventoryComponent() { return InventoryComponent; }
 
+	UFUNCTION(BlueprintCallable)
+	void SetWalkSpeed(float WalkSpeed);
+
 protected:
 	UFUNCTION()
 	void OnKill(UHealthComponent* InHealthComponent, AActor* InInstigator);
