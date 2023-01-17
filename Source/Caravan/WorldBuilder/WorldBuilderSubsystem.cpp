@@ -192,7 +192,7 @@ void UWorldBuilderSubsystem::ResetResourceGrid()
 			{
 				// If it already contains an actor, destroy it.
 				// This is critical when resetting the grid
-				if (cellData.Actor != NULL)
+				if (IsValid(cellData.Actor))
 				{
 					cellData.Actor->Destroy();
 					cellData.Actor = NULL;
