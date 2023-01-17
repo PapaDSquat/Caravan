@@ -19,6 +19,8 @@ enum class EInteractionType : uint8
 	CaravanPull,
 	CaravanToggleOpen,
 	CaravanBuildAttachment,
+
+	MenuBack,
 };
 
 USTRUCT(BlueprintType)
@@ -33,7 +35,11 @@ struct FInteractionChoice
 	FText InteractionName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EInteractionType InteractionType;
+	EInteractionType InteractionType = EInteractionType::None;
+
+	// Optional : interacting with this choice will trigger a sub-menu choice
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SubChoiceInteractionID;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInteractTargetEvent, APawn*, InteractingPawn, class UInteractableComponent*, InteractableComponent);
@@ -86,6 +92,9 @@ public:
 	void SetInteractionChoices(const TArray< FInteractionChoice >& Choices);
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	FName GetCurrentInteractionSubChoice() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	void RebuildInteractionChoices();
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
@@ -134,9 +143,18 @@ public:
 	//==================================================
 
 private:
-	// TODO : Interaction choice index should be in InteractionComponent
+	// TODO : All this should be in InteractionComponent
 	int CurrentInteractionChoiceIndex = -1;
 
-	APawn* TargetingPawn;
-	APawn* InteractingPawn;
+	// TODO: kinda sucks cuz im assuming ID is display text
+	TArray<FName> InteractionSubChoiceStack;
+	FName ParentChoiceID;
+
+	static FInteractionChoice s_MenuBackChoice;
+
+	UPROPERTY(Transient)
+	TObjectPtr<APawn> TargetingPawn;
+
+	UPROPERTY(Transient)
+	TObjectPtr<APawn> InteractingPawn;
 };

@@ -5,6 +5,8 @@
 #include "CaravanCharacter.h"
 #include "DrawDebugHelpers.h"
 
+/*static */FInteractionChoice UInteractableComponent::s_MenuBackChoice = {TEXT("Back"), FText::FromString(TEXT("Back")), EInteractionType::MenuBack};
+
 UInteractableComponent::UInteractableComponent()
 {
 	bAutoActivate = true;
@@ -30,12 +32,15 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		static FColor s_ColorSubTitle = FColor::Emerald;
 		static FColor s_ColorChoiceDefault = FColor::White;
 		static FColor s_ColorChoiceSelected = FColor::Cyan;
+		static FColor s_ColorChoiceParent(25, 200, 200); // Close to Cyan
 		static float s_ObjectNameOffsetZ = 40.f;
 		static float s_SubTitleOffsetZ = 44.f;
 		static float s_ChoiceOffsetZ = 31.5f;
+		static float s_ChoiceOffsetX = 24.f;
 
 		FVector InitialWorldLocation = GetComponentLocation();
-		FVector TextOffsetDirection = FVector::ZeroVector;
+		FVector TextOffsetDown = FVector::ZeroVector;
+		FVector TextOffsetRight = FVector::ZeroVector;
 
 		// Offset based on Camera orientation
 		if (class UCameraComponent* Camera = Player->GetCameraComponent();
@@ -46,7 +51,8 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			const FVector CameraForward = Camera->GetForwardVector();
 			InitialWorldLocation += (CameraRight * InteractionChoiceScreenOffset.X) + (CameraUp * InteractionChoiceScreenOffset.Y);
 
-			TextOffsetDirection = CameraUp * -1.f;
+			TextOffsetDown = CameraUp * -1.f;
+			TextOffsetRight = CameraRight;
 		}
 
 		FVector TextWorldLocation = InitialWorldLocation;
@@ -68,9 +74,9 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			);
 
 			if(bHasSubTitle)
-				TextWorldLocation += TextOffsetDirection * s_ObjectNameOffsetZ;
+				TextWorldLocation += TextOffsetDown * s_ObjectNameOffsetZ;
 			else
-				TextWorldLocation += TextOffsetDirection * s_SubTitleOffsetZ;
+				TextWorldLocation += TextOffsetDown * s_SubTitleOffsetZ;
 		}
 
 		if (bHasSubTitle)
@@ -86,13 +92,12 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 				s_FontSizeSubTitle
 			);
 
-			TextWorldLocation += TextOffsetDirection * s_SubTitleOffsetZ;
+			TextWorldLocation += TextOffsetDown * s_SubTitleOffsetZ;
 		}
 
 		// Input choices
-		const bool bHasMultipleChoices = HasInteractionChoices();
 		TArray< FInteractionChoice > ChoicesToDraw;
-		if (bHasMultipleChoices)
+		if (HasInteractionChoices())
 		{
 			ChoicesToDraw = InteractionChoices;
 		}
@@ -100,6 +105,25 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		{
 			ChoicesToDraw.Add(PrimaryInteractionChoice);
 		}
+
+		if (!ParentChoiceID.IsNone())
+		{
+			DrawDebugString(
+				GetWorld(),
+				TextWorldLocation,
+				ParentChoiceID.ToString(),
+				nullptr,
+				s_ColorChoiceParent,
+				0.f,
+				true,
+				s_FontSizeChoiceSelected
+			);
+
+			TextWorldLocation += TextOffsetDown * s_ChoiceOffsetZ;
+			TextWorldLocation += TextOffsetRight * s_ChoiceOffsetX;
+		}
+
+		const bool bHasMultipleChoices = ChoicesToDraw.Num() > 1;
 
 		for(int i=0; i<ChoicesToDraw.Num(); ++i)
 		{
@@ -121,7 +145,7 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 				TextSize
 			);
 
-			TextWorldLocation += TextOffsetDirection * s_ChoiceOffsetZ;
+			TextWorldLocation += TextOffsetDown * s_ChoiceOffsetZ;
 		}
 	}
 }
@@ -161,9 +185,25 @@ void UInteractableComponent::SetInteractionChoices(const TArray< FInteractionCho
 	InteractionChoices = Choices;
 }
 
+FName UInteractableComponent::GetCurrentInteractionSubChoice() const
+{
+	return InteractionSubChoiceStack.IsEmpty() ? FName() : InteractionSubChoiceStack.Top();
+}
+
 void UInteractableComponent::RebuildInteractionChoices()
 {
 	OnRebuildInteractionChoices.Broadcast(InteractingPawn, this);
+
+	// Add 'Back' interaction to sub-choice, if any
+	if (!InteractionSubChoiceStack.IsEmpty() && 
+		!InteractionChoices.IsEmpty() && 
+		InteractionChoices.Top().InteractionID != s_MenuBackChoice.InteractionID)
+	{
+		InteractionChoices.Add(s_MenuBackChoice);
+	}
+
+	// Clamp index in case the choices have changed
+	CurrentInteractionChoiceIndex = FMath::Min(CurrentInteractionChoiceIndex, InteractionChoices.Num() - 1);
 }
 
 void UInteractableComponent::SetTargeting(APawn* InTargetingPawn, bool bTargeting)
@@ -188,7 +228,10 @@ void UInteractableComponent::SetTargeting(APawn* InTargetingPawn, bool bTargetin
 	else
 	{
 		CurrentInteractionChoiceIndex = -1;
+		InteractionSubChoiceStack.Empty();
+		ParentChoiceID = FName();
 		TargetingPawn = NULL;
+
 		OnInteractUntarget.Broadcast(NULL, this);
 	}
 }
@@ -200,6 +243,18 @@ bool UInteractableComponent::Interact(APawn* InInteractingPawn)
 
 	const FInteractionChoice& Choice = GetCurrentInteractionChoice();
 	OnInteract.Broadcast(InInteractingPawn, this, Choice);
+
+	// Update sub-choices
+	if (Choice.InteractionID == s_MenuBackChoice.InteractionID)
+	{
+		InteractionSubChoiceStack.Pop();
+		ParentChoiceID = InteractionSubChoiceStack.IsEmpty() ? FName() : InteractionSubChoiceStack.Top();
+	}
+	else if (!Choice.SubChoiceInteractionID.IsNone())
+	{
+		InteractionSubChoiceStack.Add(Choice.SubChoiceInteractionID);
+		ParentChoiceID = Choice.InteractionID;
+	}
 
 	// If using dynamic choices, rebuild after interaction, just in case the interaction has changed the choices
 	if (bBuildInteractionChoicesDynamic)
