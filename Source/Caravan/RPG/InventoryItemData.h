@@ -3,7 +3,24 @@
 #include "CoreMinimal.h"
 #include "CraftResourceActor.h" // For ResourceType
 #include "Engine/DataTable.h"
+
 #include "InventoryItemData.generated.h"
+
+USTRUCT(BlueprintType)
+struct CARAVAN_API FItemStack
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FDataTableRowHandle ItemHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "!bInfinite"))
+	int Count = 0;
+
+	// TODO : Implement Infinite properly, maybe as -1 count?
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bInfinite = false;
+};
 
 USTRUCT(BlueprintType)
 struct CARAVAN_API FInventoryItemDataRow : public FTableRowBase
@@ -24,7 +41,6 @@ struct CARAVAN_API FInventoryItemDataRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Description;
 
-
 	// Priority to sort display in an item list. Lower number is higher priority.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int DisplayPriority = 999;
@@ -40,21 +56,5 @@ struct CARAVAN_API FInventoryItemDataRow : public FTableRowBase
 
 	// If craftable, the Resource materials necessary to craft this item
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<FDataTableRowHandle> MaterialsToCraft;
-};
-
-USTRUCT(BlueprintType)
-struct CARAVAN_API FItemStack
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FDataTableRowHandle ItemHandle;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="!bInfinite"))
-	int Count = 0;
-
-	// TODO : Implement Infinite properly, maybe as -1 count?
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bInfinite = false;
+	TArray<FItemStack> MaterialsToCraft;
 };

@@ -34,6 +34,10 @@ struct FInteractionChoice
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText InteractionName;
 
+	// Optional, displayed below name. Supports multi-line
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText InteractionDescription;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EInteractionType InteractionType = EInteractionType::None;
 

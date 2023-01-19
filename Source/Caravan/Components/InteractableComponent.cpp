@@ -5,7 +5,7 @@
 #include "CaravanCharacter.h"
 #include "DrawDebugHelpers.h"
 
-/*static */FInteractionChoice UInteractableComponent::s_MenuBackChoice = {TEXT("Back"), FText::FromString(TEXT("Back")), EInteractionType::MenuBack};
+/*static */FInteractionChoice UInteractableComponent::s_MenuBackChoice = {TEXT("Back"), FText::FromString(TEXT("Back")), FText::GetEmpty(), EInteractionType::MenuBack};
 
 UInteractableComponent::UInteractableComponent()
 {
@@ -24,19 +24,23 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	if (ACaravanCharacter* Player = Cast< ACaravanCharacter >(TargetingPawn))
 	{
-		static float s_FontSizeObjectName = 2.f;
-		static float s_FontSizeSubTitle = 1.1f;
-		static float s_FontSizeChoiceDefault = 1.35f;
-		static float s_FontSizeChoiceSelected = 1.5f;
-		static FColor s_ColorObjectName = FColor::Green;
-		static FColor s_ColorSubTitle = FColor::Emerald;
-		static FColor s_ColorChoiceDefault = FColor::White;
-		static FColor s_ColorChoiceSelected = FColor::Cyan;
-		static FColor s_ColorChoiceParent(25, 200, 200); // Close to Cyan
-		static float s_ObjectNameOffsetZ = 40.f;
-		static float s_SubTitleOffsetZ = 44.f;
-		static float s_ChoiceOffsetZ = 31.5f;
-		static float s_ChoiceOffsetX = 24.f;
+		const float s_FontSizeObjectName = 2.f;
+		const float s_FontSizeSubTitle = 1.1f;
+		const float s_FontSizeChoiceDefault = 1.35f;
+		const float s_FontSizeChoiceSelected = 1.5f;
+		const float s_FontSizeChoiceDescription = 1.25f;
+		const FColor s_ColorObjectName = FColor::Green;
+		const FColor s_ColorSubTitle = FColor::Emerald;
+		const FColor s_ColorChoiceDefault = FColor::White;
+		const FColor s_ColorChoiceSelected = FColor::Cyan;
+		const FColor s_ColorChoiceParent(25, 200, 200); // Close to Cyan
+		const FColor s_ColorChoiceDescription = FColor::Silver;
+		const float s_ObjectNameOffsetZ = 40.f;
+		const float s_SubTitleOffsetZ = 44.f;
+		const float s_ChoiceOffsetZ = 31.5f;
+		const float s_ChoiceOffsetX = 24.f;
+		const float s_ChoiceDescOffsetZ = 30.f;
+		const float s_ChoiceDescOffsetX = 24.f;
 
 		FVector InitialWorldLocation = GetComponentLocation();
 		FVector TextOffsetDown = FVector::ZeroVector;
@@ -146,6 +150,35 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			);
 
 			TextWorldLocation += TextOffsetDown * s_ChoiceOffsetZ;
+
+			if (IsSelectedChoice &&
+				!Choice.InteractionDescription.IsEmpty())
+			{
+				TextWorldLocation += TextOffsetRight * s_ChoiceDescOffsetX; // Indent
+
+				const FString DescriptionString = Choice.InteractionDescription.ToString();
+
+				TArray<FString> Lines;
+				DescriptionString.ParseIntoArray(Lines, TEXT("\\n"), true);
+				for (const FString& LineStr : Lines)
+				{
+					DrawDebugString(
+						GetWorld(),
+						TextWorldLocation,
+						LineStr,
+						nullptr,
+						s_ColorChoiceDescription,
+						0.f,
+						true,
+						s_FontSizeChoiceDescription
+					);
+					
+					TextWorldLocation += TextOffsetDown * s_ChoiceDescOffsetZ; // Space between description lines
+				}
+
+				TextWorldLocation -= TextOffsetRight * s_ChoiceDescOffsetX; // Un-Indent
+				//TextWorldLocation += TextOffsetDown * s_ChoiceDescOffsetZ; // One final vertical space before next choice
+			}
 		}
 	}
 }
