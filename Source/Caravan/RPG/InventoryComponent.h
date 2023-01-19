@@ -25,13 +25,19 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	const TArray<FItemStack>& GetItemStacks() const { return Items; }
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddItems(const FDataTableRowHandle& ItemHandle, int Count = 1);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddItemStack(const FItemStack& ItemHandle);
+	void AddItemStack(const FItemStack& ItemStack);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	const TArray<FItemStack>& GetItemStacks() const { return Items; }
+	bool RemoveItems(const FDataTableRowHandle& ItemHandle, int Count = 1);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	bool RemoveItemStack(const FItemStack& ItemStack);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void DropAllItems();
@@ -55,6 +61,7 @@ protected:
 
 private:
 	FItemStack* FindItemStack(const FDataTableRowHandle& ItemHandle);
+	int32 FindItemStackIndex(const FDataTableRowHandle& ItemHandle);
 	void SortItems();
 
 	UPROPERTY(SaveGame)

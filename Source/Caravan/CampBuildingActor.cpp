@@ -1,7 +1,10 @@
 #include "CampBuildingActor.h"
 
 #include "Caravan.h"
+#include "Caravan/CampBuildingSpec.h"
 #include "Components/InteractableComponent.h"
+#include "RPG/InventoryComponent.h"
+#include "RPG/InventoryItemData.h"
 
 ACampBuildingActor::ACampBuildingActor()
 {
@@ -10,6 +13,9 @@ ACampBuildingActor::ACampBuildingActor()
 
 	InteractableComponent = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractableComponent"));
 	InteractableComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	AddOwnedComponent(InventoryComponent);
 }
 
 void ACampBuildingActor::BeginPlay()
@@ -17,6 +23,14 @@ void ACampBuildingActor::BeginPlay()
 	Super::BeginPlay();
 	
 	SetBuildingState(IsConstructed() ? ECampBuildingState::Constructed : ECampBuildingState::Deconstructed);
+
+	if (CampBuildingSpec)
+	{
+		for (const FItemStack ItemStack : CampBuildingSpec->DefaultCraftableItems)
+		{
+			InventoryComponent->AddItemStack(ItemStack);
+		 }
+	}
 }
 
 void ACampBuildingActor::SetActive(bool bValue)

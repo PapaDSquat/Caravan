@@ -7,6 +7,7 @@
 #include "CampBuildingSpec.generated.h"
 
 class ACampBuildingActor;
+struct FItemStack;
 
 UENUM(BlueprintType)
 enum class ECampBuildingType : uint8
@@ -31,4 +32,7 @@ public:
     // Skill required by AI to work here
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     ERobotAISkill WorkerAISkill = ERobotAISkill::Invalid;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
+	TArray<FItemStack> DefaultCraftableItems;
 };

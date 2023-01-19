@@ -37,6 +37,10 @@ struct CARAVAN_API FInventoryItemDataRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> UIIcon = nullptr;
+
+	// If craftable, the Resource materials necessary to craft this item
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FDataTableRowHandle> MaterialsToCraft;
 };
 
 USTRUCT(BlueprintType)
@@ -47,6 +51,10 @@ struct CARAVAN_API FItemStack
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FDataTableRowHandle ItemHandle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="!bInfinite"))
 	int Count = 0;
+
+	// TODO : Implement Infinite properly, maybe as -1 count?
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bInfinite = false;
 };

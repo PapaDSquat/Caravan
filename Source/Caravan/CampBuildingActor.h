@@ -4,7 +4,7 @@
 
 class UCampBuildingSpec;
 class UInteractableComponent;
-
+class UInventoryComponent;
 
 UENUM(BlueprintType)
 enum class ECampBuildingState : uint8
@@ -60,6 +60,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UInteractableComponent* InteractableComponent;
 	
+	// Items that can be crafted are stored in the inventory
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UInventoryComponent* InventoryComponent;
+
 	UPROPERTY(SaveGame, BlueprintReadOnly)
 	float ConstructedPercent = 0.f;
 

@@ -51,6 +51,29 @@ void UInventoryComponent::AddItemStack(const FItemStack& ItemStack)
 	AddItems(ItemStack.ItemHandle, ItemStack.Count);
 }
 
+bool UInventoryComponent::RemoveItems(const FDataTableRowHandle& ItemHandle, int Count /* = 1 */)
+{
+	const int32 Index = FindItemStackIndex(ItemHandle);
+	if(Index != INDEX_NONE)
+	{
+		FItemStack& ItemStack = Items[Index];
+		ItemStack.Count = FMath::Max(0, ItemStack.Count - Count);
+
+		// Uncomment to remove stack when emptied
+		//if (ItemStack.Count == 0)
+		//{
+		//	Items.RemoveAt(Index);
+		//}
+		return true;
+	}
+	return false;
+}
+
+bool UInventoryComponent::RemoveItemStack(const FItemStack& ItemStack)
+{
+	return RemoveItems(ItemStack.ItemHandle, ItemStack.Count);
+}
+
 void UInventoryComponent::DropAllItems()
 {
 	if (Items.IsEmpty())
@@ -88,6 +111,16 @@ void UInventoryComponent::DropAllItems()
 FItemStack* UInventoryComponent::FindItemStack(const FDataTableRowHandle& ItemHandle)
 {
 	return Items.FindByPredicate(
+		[ItemHandle](const FItemStack& ItemStack)
+		{
+			return ItemStack.ItemHandle == ItemHandle;
+		}
+	);
+}
+
+int32 UInventoryComponent::FindItemStackIndex(const FDataTableRowHandle& ItemHandle)
+{
+	return Items.IndexOfByPredicate(
 		[ItemHandle](const FItemStack& ItemStack)
 		{
 			return ItemStack.ItemHandle == ItemHandle;
