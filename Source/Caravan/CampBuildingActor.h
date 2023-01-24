@@ -36,6 +36,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsConstructed() const { return ConstructedPercent == 1.f; }
 
+	UFUNCTION(BlueprintCallable)
+	bool CraftItem(APawn* InteractingPawn, int InventoryItemIndex);
+
 protected:
 	ECampBuildingState GetBuildingState() const { return BuildingState; }
 	void SetBuildingState(ECampBuildingState InState);
@@ -49,7 +52,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnBuildingConstructed();
 
-
+	// TODO : Should this be set from caravan construction rather than default value?
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly);
 	UCampBuildingSpec* CampBuildingSpec;
 

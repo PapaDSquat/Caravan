@@ -74,6 +74,16 @@ bool UInventoryComponent::RemoveItemStack(const FItemStack& ItemStack)
 	return RemoveItems(ItemStack.ItemHandle, ItemStack.Count);
 }
 
+bool UInventoryComponent::RemoveItemStacks(const TArray<FItemStack>& ItemStacks)
+{
+	bool bRemovedSuccessful = !ItemStacks.IsEmpty();
+	for (const FItemStack& ItemStack : ItemStacks)
+	{
+		bRemovedSuccessful &= RemoveItemStack(ItemStack);
+	}
+	return bRemovedSuccessful;
+}
+
 void UInventoryComponent::DropAllItems()
 {
 	if (Items.IsEmpty())
@@ -108,6 +118,37 @@ void UInventoryComponent::DropAllItems()
 	Items.Empty();
 }
 
+bool UInventoryComponent::HasItems(const FDataTableRowHandle& ItemHandle, int Count) const
+{
+	if (const FItemStack* OwnedItemStack = FindItemStack(ItemHandle))
+	{
+		return OwnedItemStack->bInfinite || OwnedItemStack->Count >= Count;
+	}
+	return false;
+}
+
+bool UInventoryComponent::HasItems(const FItemStack& ItemStack) const
+{
+	return HasItems(ItemStack.ItemHandle, ItemStack.Count);
+}
+
+bool UInventoryComponent::HasItems(const TArray<FItemStack>& ItemStacks) const
+{
+	if (ItemStacks.IsEmpty() || Items.IsEmpty())
+	{
+		return false;
+	}
+
+	for (const FItemStack ItemStack : ItemStacks)
+	{
+		if (!HasItems(ItemStack))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 FItemStack* UInventoryComponent::FindItemStack(const FDataTableRowHandle& ItemHandle)
 {
 	return Items.FindByPredicate(
@@ -116,6 +157,11 @@ FItemStack* UInventoryComponent::FindItemStack(const FDataTableRowHandle& ItemHa
 			return ItemStack.ItemHandle == ItemHandle;
 		}
 	);
+}
+
+const FItemStack* UInventoryComponent::FindItemStack(const FDataTableRowHandle& ItemHandle) const
+{
+	return const_cast<UInventoryComponent*>(this)->FindItemStack(ItemHandle);
 }
 
 int32 UInventoryComponent::FindItemStackIndex(const FDataTableRowHandle& ItemHandle)

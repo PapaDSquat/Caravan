@@ -40,7 +40,14 @@ public:
 	bool RemoveItemStack(const FItemStack& ItemStack);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	bool RemoveItemStacks(const TArray<FItemStack>& ItemStacks);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void DropAllItems();
+
+	bool HasItems(const FDataTableRowHandle& ItemHandle, int Count) const;
+	bool HasItems(const FItemStack& ItemStack) const;
+	bool HasItems(const TArray<FItemStack>& ItemStacks) const;
 
 	// TODO : Remove
 	UFUNCTION(BlueprintCallable, Category = "Crafting")
@@ -61,6 +68,7 @@ protected:
 
 private:
 	FItemStack* FindItemStack(const FDataTableRowHandle& ItemHandle);
+	const FItemStack* FindItemStack(const FDataTableRowHandle& ItemHandle) const;
 	int32 FindItemStackIndex(const FDataTableRowHandle& ItemHandle);
 	void SortItems();
 

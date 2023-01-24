@@ -5,6 +5,7 @@
 #include "Components/InteractableComponent.h"
 #include "RPG/InventoryComponent.h"
 #include "RPG/InventoryItemData.h"
+#include "Rpg/InventoryFunctionLibrary.h"
 
 ACampBuildingActor::ACampBuildingActor()
 {
@@ -72,6 +73,55 @@ void ACampBuildingActor::DeconstructBuilding()
 {
 	ConstructedPercent = 0.f; // Reset construction progress
 	SetBuildingState(ECampBuildingState::Deconstructed);
+}
+
+bool ACampBuildingActor::CraftItem(APawn* InteractingPawn, int InventoryItemIndex)
+{
+	if (!IsValid(InteractingPawn))
+	{
+		return false;
+	}
+
+	UInventoryComponent* InteractingPawnInventory = InteractingPawn->FindComponentByClass<UInventoryComponent>();
+	if (!InteractingPawnInventory)
+	{
+		return false;
+	}
+
+	const TArray<FItemStack>& InventoryItems = InventoryComponent->GetItemStacks();
+	if (InventoryItems.Num() <= InventoryItemIndex)
+	{
+		return false;
+	}
+
+	const FItemStack& ItemStack = InventoryItems[InventoryItemIndex];
+	const FInventoryItemDataRow* const ItemDef = UInventoryFunctionLibrary::GetItemDefinition(ItemStack.ItemHandle);
+	if (!ItemDef)
+	{
+		return false;
+	}
+
+	// Check if can craft
+	const bool bCanCraft = InteractingPawnInventory->HasItems(ItemDef->MaterialsToCraft);
+	if (!bCanCraft)
+	{
+		return false;
+	}
+
+	// It's Crafting Time!
+
+	// Remove crafting materials
+	InteractingPawnInventory->RemoveItemStacks(ItemDef->MaterialsToCraft);
+		
+	// Add crafted resource to pawn inventory
+	InteractingPawnInventory->AddItems(ItemStack.ItemHandle, 1);
+
+	// Remove from building inventory
+	if (!ItemStack.bInfinite)
+	{
+		InventoryComponent->RemoveItems(ItemStack.ItemHandle, 1);
+	}
+	return true;
 }
 
 void ACampBuildingActor::SetBuildingState(ECampBuildingState InState)

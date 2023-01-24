@@ -20,6 +20,8 @@ enum class EInteractionType : uint8
 	CaravanToggleOpen,
 	CaravanBuildAttachment,
 
+	CraftItem,
+
 	MenuBack,
 };
 
@@ -44,6 +46,9 @@ struct FInteractionChoice
 	// Optional : interacting with this choice will trigger a sub-menu choice
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName SubChoiceInteractionID;
+
+	UPROPERTY(BlueprintReadWrite)
+	int ChoiceIndex;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInteractTargetEvent, APawn*, InteractingPawn, class UInteractableComponent*, InteractableComponent);
